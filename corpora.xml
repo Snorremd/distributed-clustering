@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<corpora>
+    <corpus name="klimauken">
+        <directory>klimauken</directory>
+        <corpusfile>klimaukenOBT.xml</corpusfile>
+        <snippetfile>klimaukenSnippets.xml</snippetfile>
+        <processorname>KlimaukenCorpusProcessor</processorname>
+    </corpus>
+</corpora>
