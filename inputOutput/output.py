@@ -47,7 +47,7 @@ def show_confirmation_dialog(question, default="yes"):
 
 def show_option_dialog(question, options):
     """
-    
+    Show a list based option dialog.
     :type question: str
     :param question: the question to ask
     :type options: list
