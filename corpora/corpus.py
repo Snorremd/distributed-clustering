@@ -1,4 +1,13 @@
 # -*- coding: utf-8 --
+"""
+The corpus module contains classes needed to process corpus files. Each class
+ must implement the abstract class' (CorpusProcessor) process_file and
+ write_snippet_file methods.
+
+ The following classes are implemented:
+ - KlimaukenCorpusProcessor
+"""
+
 from corpora.snippets import SnippetBuilder
 from inputOutput.filehandling import sep_file_and_path
 import codecs

@@ -1,4 +1,4 @@
-__author__ = 'snorre'
+__author__ = 'Snorre Magnus Davøen'
 
 import sys
 import os
@@ -12,6 +12,8 @@ def get_root_path():
 def sep_file_and_path(path):
 
     """Handle paths with ending slash
+    :type path: str
+    :param path: the path to separate
     :return: filename and path tuple
     :rtype: tuple
     """

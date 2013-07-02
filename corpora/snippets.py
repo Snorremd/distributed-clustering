@@ -5,22 +5,29 @@ __author__ = 'Snorre Magnus Davøen'
 
 
 class SnippetBuilder(object):
+    """
+    SnippetBuilder implements functionality for building snippet xml
+    documents. It creates a root element <snippetcollection> with a
+    sourcefile attribute. A caller method may insert documents <snippet>
+    elements with attributes for docId, tags and source. It should also
+    provide a list of snippets whit which to fill the snippet element.
+    """
 
-    def __init__(self, sourceFilename,):
+    def __init__(self, sourceFilename, ):
         """Initialize a snippet builder
 
-        :type sourceFilename: basestring
+        :type sourceFilename: str
         :param sourceFilename: the filename of the source corpus file
         """
         self.root = Element('snippetcollection', {'source': sourceFilename})
 
     def add_document(self, docId, tags, source, snippets):
         """
-        :type docId: basestring
+        :type docId: str
         :param docId: the id of the document
         :type tags: str
         :param tags: a string of one or more tags for document
-        :type source: basestring
+        :type source: str
         :param source: the source of the document
         :type snippets: list
         :param snippets: a list of snippets contained in the document
