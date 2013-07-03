@@ -37,4 +37,6 @@ nosetests.xml
 
 # Project specific
 corpusfiles
-
+logs
+results
+.DS_STORE
