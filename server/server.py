@@ -5,7 +5,7 @@ to handle incoming connections and creates ClientHandler objects to
 communicate with clients.
 """
 
-from _socket import socket
+import socket
 import asynchat
 import asyncore
 from pickle import PickleError
@@ -21,7 +21,7 @@ class Server(asyncore.dispatcher):
     Receive connections and establish handlers for each client
     """
 
-    def __init__(self, address, timeoutSeconds, taskOrganizer,
+    def __init__(self, address, programId, timeoutSeconds, taskOrganizer,
                  gAlgorithm, batchSize):
         """
         Initialize Server class
@@ -41,7 +41,7 @@ class Server(asyncore.dispatcher):
 
         self.logger = getLoggerForStdOut("Server")
 
-        self.programId = "StringCounter"
+        self.programId = programId
         self.timeoutSeconds = timeoutSeconds  # REMOVE THIS!
         self.batchSize = batchSize
         self.clientSockets = {}
@@ -58,10 +58,10 @@ class Server(asyncore.dispatcher):
         self.listen(50)
         return
 
-    #    def initiate_send(self):
-    #        self.sending.acquire()
-    #        asynchat.async_chat.initiate_send(self)
-    #        self.sending.release()
+    def initiate_send(self):
+        self.sending.acquire()
+        asynchat.async_chat.initiate_send(self)
+        self.sending.release()
 
     def handle_accept(self):
         """
@@ -128,6 +128,7 @@ class ClientHandler(asynchat.async_chat):
         self.receivedData = []  # String data from client
 
         self.set_terminator('</' + self.programId + '>')
+
         return
 
     def collect_incoming_data(self, data):
@@ -151,7 +152,7 @@ class ClientHandler(asynchat.async_chat):
         """
         stringInput = ''.join(self.receivedData)  # Complete data from client
         self.taskOrganizer.check_active_tasks()
-        # self.logger.debug('Process command: %s', command)
+
         try:
             message = deserialize_message(stringInput)
         except PickleError:

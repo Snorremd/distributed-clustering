@@ -66,3 +66,18 @@ def show_option_dialog(question, options):
         else:
             sys.stdout.write("Please type on of the options exactly as it is "
                              "displayed\n")
+
+
+def show_input_dialog(question):
+    """
+    Shows a question prompting user for an input
+    :type question: str
+    :param question: the question to ask the user
+    """
+    sys.stdout.write(question)
+    while True:
+        choice = raw_input().lower().strip()
+        if not (choice == '' or choice is None):
+            return choice
+        else:
+            sys.stdout.write("Please type in an non-empty answer")

@@ -85,7 +85,6 @@ class Chromosome:
 
         Calculate fitness as the average of the two
         '''
-        #TODO: Implement a fitness function
         self.result = compactTrieClusterer.cluster(self)
         fMeasure0 = self.result[4][0]
         fMeasure1 = self.result[4][1]

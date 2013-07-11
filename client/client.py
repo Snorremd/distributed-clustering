@@ -20,17 +20,18 @@ from tasks.taskExecutor import ClusteringTaskExecutor
 
 
 class Client(asynchat.async_chat):
-
     '''Counts the length of strings received from server
     '''
+
     def __init__(self, address, programId, username):
         '''Constructor of Client class
         '''
         asynchat.async_chat.__init__(self)
 
         self.logger = getLoggerForStdOut("Client")
+        self.address = address
 
-        self.programId = "StringCounter"
+        self.programId = programId
         self.username = username
         self.set_terminator('</' + programId + '>')
         self.receivedData = []
@@ -52,8 +53,22 @@ class Client(asynchat.async_chat):
 
     def handle_error(self):
         asynchat.async_chat.handle_error(self)
-        self.logger.debug("Server probably closed connection " + \
-                          "without messaging first.")
+        self.logger.debug("Either Connection to server with address {0} and "
+                          "port {1} failed or server broke connection. Please"
+                          " try to restart clientMain script...".format(
+            *self.address))
+        self.close
+
+    def handle_expt(self):
+        """
+        Connection to server failed, handle exception
+        """
+        # connection failed
+        self.logger.debug("Either Connection to server with address {0} and "
+                          "port {1} failed or server broke connection. Please"
+                          " try to restart clientMain script...".format(
+            *self.address))
+        self.close()
 
     def disconnect(self, disconnectInfo):
         '''Disconnect from server and close connection
@@ -93,7 +108,7 @@ class Client(asynchat.async_chat):
             elif isinstance(message, AuthErrorMessage):
                 self.logger.debug("Server returned AuthErrorMessage " + \
                                   "for tasks:\n" + str(message.taskIds))
-                self.logger.debug("Could not authenticate with program id: " + 
+                self.logger.debug("Could not authenticate with program id: " +
                                   self.programId + ". Closing client")
                 self.close_when_done()
             elif isinstance(message, AuthenticationMessage):
@@ -158,9 +173,9 @@ class Client(asynchat.async_chat):
         '''Outputs scores to the logger defined in self
         '''
         scoreOutput = "\n#####################################\n" + \
-        "Your score: " + str(scoreMessage.userScore) + "\n" + \
-        "-----------\n" + \
-        self.get_scoreboard_string(scoreMessage.topScores)
+                      "Your score: " + str(scoreMessage.userScore) + "\n" + \
+                      "-----------\n" + \
+                      self.get_scoreboard_string(scoreMessage.topScores)
         self.logger.debug(scoreOutput)
 
     def get_scoreboard_string(self, topScores):

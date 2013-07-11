@@ -1,26 +1,54 @@
 """
 The server module allows you to run the genetic algorithm and asynchat server.
 """
+import asyncore
+
 from easylogging.configLogger import getLoggerForStdOut
+from inputOutput.output import show_info_dialog, show_input_dialog, \
+    show_option_dialog
 from server.server import Server
-from tasks.task import StringTask
 import geneticalgorithm.geneticAlgorithm as geneticAlgorithm
 from geneticalgorithm.geneticAlgorithm import GeneticAlgorithm
-
-import asyncore
 from tasks.taskOrganizer import TaskOrganizer
 
+
 if __name__ == '__main__':
+    show_info_dialog("This server runs a distributed genetic algorithm for "
+                     "optimization of parameters for the compact trie "
+                     "clustering algorithm. The server use a task organizer "
+                     "to organize chromosomes for which to calculate fitness,"
+                     " and the asynchat library to communicate with clients"
+                     ".\n")
+
+    hostAddress = show_option_dialog("Please type in one of the two options "
+                                     "for listening locally or externally: ",
+                                     ['localhost', '0.0.0.0'])
+
+    port = show_input_dialog("Please input the port the server should listen "
+                             "to: ")
+
+    programId = show_input_dialog("Please specify a programId: ")
+
+    batchSize = show_input_dialog("Please specify a batch size (should "
+                                  "preferably take no more than 60 seconds to"
+                                  " complete): ")
+
+    timeout = show_input_dialog("Specify task timeout in seconds (make this a"
+                                " multiple of task completion time and batch "
+                                "size): ")
+
+    populationSize = show_input_dialog("Please specify a population size: ")
+
     mainLogger = getLoggerForStdOut('Main')
     mainLogger.debug("Create genetic algorithm object and initial population")
-    taskOrganizer = TaskOrganizer(200, [])
-    gAlgorithm = GeneticAlgorithm(taskOrganizer, 20, 3,
+    taskOrganizer = TaskOrganizer(int(timeout), [])
+    gAlgorithm = GeneticAlgorithm(taskOrganizer, int(populationSize), 3,
                                   GeneticAlgorithm.ROULETTEWHEEL,
                                   0.5, 0.10, geneticAlgorithm.VERBOSEFILE)
-    mainLogger.debug("Attach ga to task organizer")
-    taskOrganizer.attach(gAlgorithm)
 
-    server = Server(("localhost", 9874), 200, taskOrganizer, gAlgorithm, 10)
+    ## Start server and asyncore loop
+    server = Server((hostAddress, int(port)), programId, int(timeout),
+                    taskOrganizer, gAlgorithm, int(batchSize))
     mainLogger.debug("Created server to listen on %s:%s" %
                      server.address)
     mainLogger.debug("Start asyncore loop")
