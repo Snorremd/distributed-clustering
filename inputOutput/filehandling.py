@@ -1,4 +1,4 @@
-__author__ = 'Snorre Magnus Davøen'
+__author__ = 'Snorre Magnus Davoeen'
 
 import sys
 import os

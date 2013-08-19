@@ -11,6 +11,7 @@ The corpus module contains classes needed to process corpus files. Each class
 from corpora.snippets import SnippetBuilder
 from inputOutput.filehandling import sep_file_and_path
 import codecs
+import lxml
 
 __author__ = 'snorre'
 
@@ -164,12 +165,9 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
         """
         """
         snippetTree = self.snippetBuilder.get_element_tree()
-        print snippetTree.getroot()[0][0].tag
-        print snippetTree.getroot()[0][0].attrib
-        print snippetTree.getroot()[0][0].text
 
         snippetTree.write(self.snippetPath, encoding="UTF-8",
-                          xml_declaration=False)
+                          xml_declaration=False, pretty_print=True)
 
     def scan_to_line(self, stringList):
         """
