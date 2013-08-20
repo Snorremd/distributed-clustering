@@ -1,5 +1,6 @@
 # coding=utf-8
-from xml.etree.ElementTree import ElementTree, Element, SubElement
+#from xml.etree.ElementTree import ElementTree, Element, SubElement
+from lxml.etree import ElementTree, Element, SubElement
 
 __author__ = 'Snorre Magnus Davøen'
 
