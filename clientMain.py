@@ -38,12 +38,12 @@ if __name__ == '__main__':
     except socket.error:
         # Server probably busy
         mainLogger.debug("Could not connect to server with address {0} and "
-                         "port {1}. Please restart script").format(
-            hostAddress, port)
+                         "port {1}. Please restart script"
+                         .format(hostAddress, port))
     except KeyboardInterrupt:
         try:
-            if not client == None:
-                mainLogger.debug("Attempting to disconnect from server.\n" + \
+            if client:
+                mainLogger.debug("Attempting to disconnect from server.\n" +
                                  "Press ctrl + C again to force close script.")
                 client.disconnect("User cancelled script")
         except KeyboardInterrupt:

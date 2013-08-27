@@ -11,7 +11,6 @@ The corpus module contains classes needed to process corpus files. Each class
 from corpora.snippets import SnippetBuilder
 from inputOutput.filehandling import sep_file_and_path
 import codecs
-import lxml
 
 __author__ = 'snorre'
 

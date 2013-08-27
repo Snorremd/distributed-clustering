@@ -90,7 +90,7 @@ class Client(asynchat.async_chat):
         try:
             message = deserialize_message(receivedString)
         except PickleError:
-            self.logger.debug("Could not deserialize message")
+            self.logger.debug("Could not deserialise message")
         else:
             if isinstance(message, TaskMessage):
                 self.process_tasks(message)

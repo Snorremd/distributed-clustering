@@ -1,8 +1,8 @@
-'''
+"""
 Created on Apr 2, 2013
 
-@author: snorre
-'''
+@author: Snorre
+"""
 import os
 from datetime import datetime
 from random import random, randint
@@ -34,15 +34,15 @@ CHROMOSOMEHEADERS = ["Treetype", "top bc amount",
 
 
 class GeneticAlgorithm:
-    ''' A class implementing the genetic algorithm
-    '''
+    """ A class implementing the genetic algorithm
+    """
     ## Define class constants
     ROULETTEWHEEL = 0
 
     def __init__(self, taskOrganizer, populationSize, noOfGenerations,
                  selectionType, selectionRate, mutationRate,
                  gaVerbosity):
-        '''Constructor of the GeneticAlgorithm class
+        """Constructor of the GeneticAlgorithm class
 
         Args:
             populationSize (int): the max number of individuals/chromosomes
@@ -52,7 +52,7 @@ class GeneticAlgorithm:
             clusterSettings (ClusterSettings): an object wrapping info and
                                                settings to use for clustering
             gaVerbosity (int): wether to write to file or output to terminal
-        '''
+        """
         self.logger = getLoggerForFile("GeneticAlgorithm")
 
         self.taskOrganizer = taskOrganizer
@@ -69,8 +69,8 @@ class GeneticAlgorithm:
         self.selectionProbabilities = []
         self.currentGeneration = 0
 
-        self.clusterSettings = ClusterSettings(True, 1.0)
-        self.corpus = Corpus("klimauken", "klimaukenOBTsnippets.xml",
+        self.clusterSettings = ClusterSettings(True, 1.0, 'klimauken')
+        self.corpus = Corpus("klimauken", "klimaukenSnippets.xml",
                              "klimauken", True)
 
         timeNow = str(datetime.now())
@@ -81,7 +81,7 @@ class GeneticAlgorithm:
         self.topFile = resultPath + "_top.csv"
         self.avgFile = resultPath + "_avg.csv"
         if self.gaVerbosity == VERBOSEFILE:
-            writeToFile(self.topFile, ";".join(COLUMNHEADERS + \
+            writeToFile(self.topFile, ";".join(COLUMNHEADERS +
                                                CHROMOSOMEHEADERS))
             writeToFile(self.avgFile, ";".join(COLUMNHEADERS))
 
@@ -91,12 +91,12 @@ class GeneticAlgorithm:
         self.taskOrganizer.add_tasks(self.make_clustering_tasks())
 
     def generateInitialPopulation(self):
-        '''Generates n number of initial chromosomes
+        """Generates n number of initial chromosomes
 
         This method generates a number of initial chromosomes
         given the population size defined in self. The properties
         of the chromosome are given random values.
-        '''
+        """
         for _ in range(self.populationSize):
             chromosome = createRandomChromosome()
             self.population.append(chromosome)
@@ -111,15 +111,15 @@ class GeneticAlgorithm:
         self.evolve()
 
     def evolve(self):
-        '''Starts the evolution of the population
+        """Starts the evolution of the population
 
         Implements the evolution step in the genetic algorithm. The method
         currently use a predetermined limit on the number of generations to
         run. This can be changed to a dynamically determined limit based on
         a cutoff criteria like population convergence or lack of change in
         fitness over several generations...
-        '''
-        self.logger.info("Calculate data for generation " + \
+        """
+        self.logger.info("Calculate data for generation " +
                          str(self.currentGeneration))
         generationData = self.calcGenerationData()
         self.log_generation_data(generationData)
@@ -128,7 +128,10 @@ class GeneticAlgorithm:
 
         if self.currentGeneration < self.noOfGenerations:
             self.currentGeneration += 1
-            self.logger.info("Create generation {0}".format(self.currentGeneration))
+            self.logger.info(
+                "Create generation {0}"
+                .format(self.currentGeneration)
+            )
             self.generationStep()
             self.taskOrganizer.add_tasks(self.make_clustering_tasks())
 
@@ -138,7 +141,8 @@ class GeneticAlgorithm:
         outputText += "#######################################\n"
         outputText += "Generation {0} \n".format(self.currentGeneration)
         outputText += "_________________________________\n"
-        outputText += "Top chromosome: " + str(topChromosome.genesAsTuple()) + "\n"
+        outputText += "Top chromosome: " + str(
+            topChromosome.genesAsTuple()) + "\n"
         outputText += "Fitness: %.4f" % (topChromosome.fitness,) + "\n"
         outputText += "Precisions: %.4f, %.4f, %.4f, %.4f, %.4f, %.4f" % \
                       topChromosome.get_precision() + "\n"
@@ -150,8 +154,10 @@ class GeneticAlgorithm:
                       str(topChromosome.get_time_number_clusters()) + "\n\n"
 
         outputText += "Average fitness: %.4f" % (generationData[1],) + "\n"
-        outputText += "Average precision0: %.4f" % (generationData[3][0],) + "\n"
-        outputText += "Average precision1: %.4f" % (generationData[3][1],) + "\n"
+        outputText += "Average precision0: %.4f" % (
+            generationData[3][0],) + "\n"
+        outputText += "Average precision1: %.4f" % (
+            generationData[3][1],) + "\n"
         outputText += "Average recall0: %.4f" % (generationData[4][0],) + "\n"
         outputText += "Average recall1: %.4f" % (generationData[4][1],) + "\n\n"
 
@@ -189,14 +195,14 @@ class GeneticAlgorithm:
         writeToFile(self.topFile, stringToWrite)
 
     def generationStep(self):
-        '''Simulates one generational step in the evolution of the population
+        """Simulates one generational step in the evolution of the population
 
         This method takes the population and sort it by fitness.
         The bottom half of the generation gets discarded. Then the
         algorithm mate pairs of individuals till the population size
         match the original population size. A random number of inidividuals
         have their chromosome randomly mutated.
-        '''
+        """
         ##  Keep the selection rate top fraction of chromosomes
         self.population = self.population[:self.keepSize]
         self.produceOffspring()
@@ -205,24 +211,28 @@ class GeneticAlgorithm:
     def sortPopulation(self):
         """Sort all the chromosomes in the population
         """
-        self.population = sorted(self.population, key=lambda chromosome:
-        - chromosome.fitness)  # Use fitness as sorting key
+
+        def fitness_inverse(chromosome):
+            return - chromosome.fitness
+
+        # Use fitness as sorting key
+        self.population = sorted(self.population, key=fitness_inverse)
         print "Sorted population by fitness: "
         for individual in self.population:
             print individual.fitness, str(individual.genesAsTuple())
 
     def produceOffspring(self):
-        '''Produce new chromosomes as offspring from the previous
+        """Produce new chromosomes as offspring from the previous
         generation's survivors.
 
-        This method supports several types of selection:
-        Roulette wheel
+        This method supports Roulette Wheel selection
 
-        '''
+        """
         ## Make a copy of the population:
         parents = ()
         if self.selectionType == GeneticAlgorithm.ROULETTEWHEEL:
             parents = self.rouletteWheelSelection()
+        # noinspection PyArgumentList
         for i in xrange(0, len(parents), 2):
             parent1 = parents[i]
             parent2 = parents[i + 1]
@@ -235,7 +245,7 @@ class GeneticAlgorithm:
         ## of each generation step
 
     def rouletteWheelSelection(self):
-        '''A roulette wheel selection method using ranked selection
+        """A roulette wheel selection method using ranked selection
 
         The method is implemented based on the description in:
         http://dx.doi.org/10.1002/0471671746.ch1
@@ -249,64 +259,71 @@ class GeneticAlgorithm:
         Returns:
             a set of indexes of which chromosomes in the population to
             use as parents in the crossing stage of the algorithm.
-        '''
+        """
         ## If the selection probability list is empty, calculate probabilities:
         if len(self.selectionProbabilities) == 0:
             self.calculateRankingProbabilities()
-        parents = []
-        parents.append(self.population[0])  # Always include the best chromosome once
+        parents = [self.population[0]]
         ## While the number of parents AND chromosomes to keep are less than
         ## the population size we need parents to breed new offspring. Two
         ## parents produce two offspring.
         while len(parents) + self.keepSize < self.populationSize:
             randomProbability = random()
+            # noinspection PyArgumentList
             for i in xrange(0, len(self.selectionProbabilities)):
-                if (self.selectionProbabilities[i][1] < randomProbability):  # O(1) on avg
-                    if not self.population[i] == parents[-1]:  # Need two different parents
+                ## O(1) on avg
+                if self.selectionProbabilities[i][1] < randomProbability:
+                    ## Need two different parents
+                    if not self.population[i] == parents[-1]:
                         parents.append(self.population[i])
                         break
         return parents
 
     def calculateRankingProbabilities(self):
-        '''Calculate the ranking probabilities of each position
+        """
+        Calculate the ranking probabilities of each position
         in the population.
 
         This method takes the population and calculate the probability
         rank and accumulated probability rank of each member. These ranks
         can be used to randomly select (in roulette wheel selection for ex.)
-        the inidividuals of a population for crossing.
+        the individuals of a population for crossing.
 
         See http://dx.doi.org/10.1002/0471671746.ch1 for explanation.
-        '''
+        """
         print "Calculate ranking probabilities"
         sumOfRanks = 0
+        # noinspection PyArgumentList
         for rank in xrange(1, self.keepSize):
             sumOfRanks += rank
         accumulatedProbability = 0
+        # noinspection PyArgumentList
         for position in xrange(0, self.keepSize):
             probabilityNumerator = self.keepSize - position + 1
             probability = probabilityNumerator / sumOfRanks
             accumulatedProbability += probability
-            self.selectionProbabilities.append((probability, accumulatedProbability))
+            self.selectionProbabilities.append(
+                (probability, accumulatedProbability))
 
     def mutateChromosomes(self):
-        '''Mutates a random gene in a random selection of chromosomes
+        """Mutates a random gene in a random selection of chromosomes
 
         This method first calculate the number of mutations by using
         the mutation rate provided by the user. It then selects a random
         number of chromosomes (by index) and mutates a random gene in that
         chromosome by a random amount.
-        '''
+        """
         chromosomeSize = len(self.population[0].genesAsTuple())
         noOfMutations = int(math.ceil((self.populationSize - 1)
                                       * self.mutationRate * chromosomeSize))
         for _ in xrange(noOfMutations):
             randomChromosome = randint(0, self.populationSize - 1)
-            self.population[randomChromosome].mutate()  # Mutates a random chromosome
+            self.population[
+                randomChromosome].mutate()  # Mutates a random chromosome
 
     def calcGenerationData(self):
-        '''Calculate average fitness etc.
-        '''
+        """Calculate average fitness etc.
+        """
         topChromosome = self.population[0]
         averageNumTime = self.calc_average_num_time()
         averageFitness = self.calc_average_fitness()

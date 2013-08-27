@@ -111,6 +111,8 @@ class ClientHandler(asynchat.async_chat):
         asynchat.async_chat.__init__(self, sock=clientSock)
         self.serverSocket = serverSocket
 
+        self.logger.debug("Create ClientHandler")
+
         self.clientId = clientAddress
         self.username = "Unspecified"
         self.programId = serverSocket.programId
@@ -195,7 +197,10 @@ class ClientHandler(asynchat.async_chat):
             self.scoreBoard.increase_user_score(self.username, 0)
             authMessage = AuthenticationMessage("Authentification suceeded",
                                                 "Authentification data was "
-                                                "correct", None)
+                                                "correct", self.username)
+            self.logger.debug("Client with username {0} and id {1} "
+                              "successfully authenticated!"
+                              .format(self.username, self.clientId))
             self.send_message(authMessage)
 
         else:

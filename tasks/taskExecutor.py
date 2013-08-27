@@ -7,6 +7,7 @@ from tasks.task import Task
 from tasks.errors import TaskExecutionError
 from cluster.clustering import CompactTrieClusterer
 
+
 class TaskExecutor:
 
     def __init__(self, message):

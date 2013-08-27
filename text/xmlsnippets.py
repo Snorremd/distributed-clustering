@@ -5,8 +5,8 @@
 
 ## Parsing a snippet-collection (XML) using Element Trees
 
-from xml.etree.ElementTree import *
-
+#from xml.etree.ElementTree import *
+from lxml.etree import *
 ##P = XMLParser(encoding='utf-8')
  
 def get_snippet_collection(filename):
@@ -15,8 +15,8 @@ def get_snippet_collection(filename):
     <snippet id="2009-12-07-aa-02"
      tags="Innenriks-kultur-aaretstroender-oppfordring-trondheim"
      source="http://www.adressa.no/tema/arets_tronder/article1419602.ece">
-        <snip> Hvem burde troender</snip>
-        <snip> sende forslag</snip>
+        <snip type="ArticleTitle"> Hvem burde troender</snip>
+        <snip type="ArticleText"> sende forslag</snip>
     </snippet>
     and produce a list on the form:
     [("hvem burde troender", "http://www.adressa.no/tema/arets_tronder/article1419602.ece"), ("terms...", "source"), (..., ...)]
@@ -26,7 +26,7 @@ def get_snippet_collection(filename):
     Snippets = []
     for s in tree.findall("snippet"):
         for x in s.findall("snip"):
-            Snippets.append((x.text, [s.get("source")]))
+            Snippets.append((x.text, [s.get("source")], x.get("type")))
             ##Snippets.append((x.text.encode('latin-1'),[s.get("source")]))
     return Snippets
 

@@ -5,10 +5,10 @@ from easylogging.configLogger import getLoggerForStdOut
 
 
 class Subject:
-    '''Subject in observer pattern
+    """Subject in observer pattern
 
     Source: http://code.activestate.com/recipes/131499-observer-pattern/
-    '''
+    """
     def __init__(self):
         self._observers = []
 
@@ -30,7 +30,7 @@ class Subject:
 
 class TaskOrganizer(Subject):
 
-    '''Handles tasks and results
+    """Handles tasks and results
 
     Params:
         taskLength (int): current no of tasks to execute
@@ -38,11 +38,11 @@ class TaskOrganizer(Subject):
         activeTasks (dict): a dict of taskids and tasks for active tasks
         results (dict): a dict of taskids and corresponding results
         timeout (int): task timeout-limit in seconds
-    '''
+    """
 
     def __init__(self, timeoutSeconds, tasks):
-        '''Initialize StringCounterServer
-        '''
+        """Initialize StringCounterServer
+        """
         Subject.__init__(self)
         self.logger = getLoggerForStdOut("TaskOrganizer")
         self.taskLength = 0
@@ -52,36 +52,36 @@ class TaskOrganizer(Subject):
         self.timeout = timeoutSeconds
 
     def add_tasks(self, tasks):
-        '''Add all elements of tasks to pending tasks
-        '''
+        """Add all elements of tasks to pending tasks
+        """
         self.pendingTasks.extend(tasks)
         self.taskLength = len(tasks)
 
     def get_task(self):
-        '''Get first remaning Task if any
+        """Get first remaning Task if any
 
         Returns:
             A Task id and first available Task object.
             If none available, raise NoTasksError.
-        '''
+        """
         try:
             task = self.pendingTasks.popleft()
         except IndexError:
-            raise NoTasksError("There are no remaning tasks in" + 
+            raise NoTasksError("There are no remaining tasks in" +
                                " pendingTasks deque")
         else:  # No exceptions raised
             self.make_task_active(task)
             return task
 
     def get_tasks(self, noOfTasks):
-        '''Get n number of tasks from Task list
+        """Get n number of tasks from Task list
 
         Args:
             noOfTasks (int): number of tasks to get
 
         Returns:
             a dict containing taskId, Task pairs
-        '''
+        """
         tasks = []
         for _ in xrange(noOfTasks):
             try:
@@ -93,7 +93,7 @@ class TaskOrganizer(Subject):
         if not len(tasks) == 0:
             return tasks
         else:
-            raise NoTasksError("There are no remaning tasks in" + 
+            raise NoTasksError("There are no remaining tasks in" +
                                " pendingTasks deque")
 
     def make_task_active(self, task):

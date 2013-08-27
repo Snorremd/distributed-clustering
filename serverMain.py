@@ -2,6 +2,7 @@
 The server module allows you to run the genetic algorithm and asynchat server.
 """
 import asyncore
+import sys
 
 from easylogging.configLogger import getLoggerForStdOut
 from inputOutput.output import show_info_dialog, show_input_dialog, \
@@ -39,17 +40,27 @@ if __name__ == '__main__':
 
     populationSize = show_input_dialog("Please specify a population size: ")
 
-    mainLogger = getLoggerForStdOut('Main')
-    mainLogger.debug("Create genetic algorithm object and initial population")
-    taskOrganizer = TaskOrganizer(int(timeout), [])
-    gAlgorithm = GeneticAlgorithm(taskOrganizer, int(populationSize), 3,
-                                  GeneticAlgorithm.ROULETTEWHEEL,
-                                  0.5, 0.10, geneticAlgorithm.VERBOSEFILE)
 
-    ## Start server and asyncore loop
-    server = Server((hostAddress, int(port)), programId, int(timeout),
-                    taskOrganizer, gAlgorithm, int(batchSize))
-    mainLogger.debug("Created server to listen on %s:%s" %
-                     server.address)
-    mainLogger.debug("Start asyncore loop")
-    asyncore.loop()
+    try:
+        mainLogger = getLoggerForStdOut('Main')
+        mainLogger.debug("Create genetic algorithm object and initial population")
+        taskOrganizer = TaskOrganizer(int(timeout), [])
+        gAlgorithm = GeneticAlgorithm(taskOrganizer, int(populationSize), 3,
+                                      GeneticAlgorithm.ROULETTEWHEEL,
+                                      0.5, 0.10, geneticAlgorithm.VERBOSEFILE)
+
+        ## Start server and asyncore loop
+        server = Server((hostAddress, int(port)), programId, int(timeout),
+                        taskOrganizer, gAlgorithm, int(batchSize))
+        mainLogger.debug("Created server to listen on %s:%s" %
+                         server.address)
+        mainLogger.debug("Start asyncore loop")
+        asyncore.loop()
+
+    except KeyboardInterrupt:
+            try:
+                mainLogger.debug("Server might still be running, do you really want "
+                                 "to end server process?\n" +
+                                 "Press ctrl + C again to force close script.")
+            except KeyboardInterrupt:
+                sys.exit(0)

@@ -1,11 +1,10 @@
-'''
+"""
 Created on Mar 8, 2013
 
 @author: snorre
-'''
+"""
 from random import randint, uniform
-from cluster import cluster
-from tasks.result import CompactTrieClusteringResult
+from cluster import clustering
 
 # Map genes to numbers
 TREETYPE = 1
@@ -16,14 +15,15 @@ MINLIMITFORBASECLUSTERSCORE = 5
 MAXLIMITFORBASECLUSTERSCORE = 6
 SHOULDDROPSINGLETONBASECLUSTERS = 7
 SHOULDDROPONEWORDCLUSTERS = 8
+TEXTTYPE = 9
 
 
 class Chromosome:
-    '''Represents a parameter list for the compact trie clustering algorithm.
+    """Represents a parameter list for the compact trie clustering algorithm.
 
     This class models a chromosome (in genetic algorithms) and is a
     representation of the parameters used in the compact trie clustering
-    algorithm. It contains parameters for tree type (and slice lenghts),
+    algorithm. It contains parameters for tree type (and slice lengths),
     the max number of base clusters to produce, the min occurrence and
     max occurrence ratio for terms wherein the term is not considered
     a stop word, min and max limits for base cluster scoring, and
@@ -32,7 +32,10 @@ class Chromosome:
 
     The object has methods to set a fitness as well as randomly mutate
     one or more of the parameters.
-    '''
+    """
+
+    #ID Counter
+    idCounter = 1
 
     def __init__(self,
                  treeType,
@@ -42,15 +45,16 @@ class Chromosome:
                  minLimitForBaseClusterScore,
                  maxLimitForBaseClusterScore,
                  shouldDropSingletonBaseClusters,
-                 shouldDropOneWordClusters):
-        '''
+                 shouldDropOneWordClusters,
+                 textType):
+        """
         Constructor for the Chromosome class.
 
         Args:
             treeType (tuple): takes tree values:
                                 1. treetype (0 suffix, 1 midslice,
                                             2 rangeslice, 3 nslice)
-                                2. 
+                                2.
             topBaseClustersAmount (int): the amount of base clusters to use for
                                             merging to components
             minTermOccurrenceInCollection (int): the lowest limit for which a word
@@ -63,7 +67,9 @@ class Chromosome:
                                                 cluster receives a score of 7.
             shouldDropSingletonBaseClusters (int): boolean (0,1)
             shouldDropOneWordClusters (int): boolean (0,1)
-        '''
+        """
+        self.id = Chromosome.idCounter
+        Chromosome.idCounter += 1
         self.treeType = treeType
         self.topBaseClustersAmount = topBaseClustersAmount
         self.minTermOccurrenceInCollection = minTermOccurrenceInCollection
@@ -74,9 +80,11 @@ class Chromosome:
         self.shouldDropOneWordClusters = shouldDropOneWordClusters
         self.fitness = 0
         self.result = None
+        self.textType = textType
 
     def calc_fitness_score(self, compactTrieClusterer):
-        '''Returns the fitness of the chromosome
+        """
+        Returns the fitness of the chromosome
 
         Args:
             cSetting (clusterSettings): An object wrapping data
@@ -84,18 +92,19 @@ class Chromosome:
             the parameters in chromosome excluded.
 
         Calculate fitness as the average of the two
-        '''
+        """
         self.result = compactTrieClusterer.cluster(self)
         fMeasure0 = self.result[4][0]
         fMeasure1 = self.result[4][1]
         self.fitness = fMeasure0 + fMeasure1
 
     def mutate(self):
-        '''Mutates one of the chromosome's "genes"
+        """
+        Mutates one of the chromosome's "genes"
 
         Mutates one of the objects fields/properties given a probability
         function. The method randomly select one property to mutate.
-        '''
+        """
         geneToMutate = randint(1, 8)
         if geneToMutate == TREETYPE:
             self.treeType = getRandomTreeType()
@@ -124,7 +133,8 @@ class Chromosome:
                 self.minLimitForBaseClusterScore,
                 self.maxLimitForBaseClusterScore,
                 self.shouldDropSingletonBaseClusters,
-                self.shouldDropOneWordClusters)
+                self.shouldDropOneWordClusters,
+                self.textType)
 
     def get_precision(self):
         return self.result[2]
@@ -140,54 +150,60 @@ class Chromosome:
 
 
 def createRandomChromosome():
-    '''Create and return a chromosome with random values
-    '''
+    """
+    Create and return a chromosome with random values
+    """
     treeType = getRandomTreeType()
     topBaseClustersAmount = randint(0, 5000)
-    minTermOccurenceInCollection = randint(1, 100)
+    minTermOccurrenceInCollection = randint(1, 100)
     maxTermRatioInCollection = uniform(.1, 1)
     minLimitForBaseClusterScore = randint(1, 5)
     maxLimitForBaseClusterScore = randint(6, 10)
     shouldDropSingletonBaseClusters = randint(0, 1)
     shouldDropOneWordClusters = randint(0, 1)
+    textType = getRandomTextType()
 
     return Chromosome(treeType,
                       topBaseClustersAmount,
-                      minTermOccurenceInCollection,
+                      minTermOccurrenceInCollection,
                       maxTermRatioInCollection,
                       minLimitForBaseClusterScore,
                       maxLimitForBaseClusterScore,
                       shouldDropSingletonBaseClusters,
-                      shouldDropOneWordClusters)
+                      shouldDropOneWordClusters,
+                      textType)
 
 
 def getRandomTreeType():
-    '''Return a tuple representing a randomized tree type
-    '''
+    """
+    Return a tuple representing a randomized tree type
+    """
     treeType = randint(0, 3)
-    if treeType == cluster.SUFFIXTREE:
-        return (0, 0, 0)
-    elif treeType == cluster.MIDSLICE:
-        return (1, 0, 0)
-    elif treeType == cluster.RANGESLICE:
+    if treeType == clustering.SUFFIXTREE:
+        return 0, 0, 0
+    elif treeType == clustering.MIDSLICE:
+        return 1, 0, 0
+    elif treeType == clustering.RANGESLICE:
         return getRandomRangeSlice()
-    elif treeType == cluster.NSLICE:
+    elif treeType == clustering.NSLICE:
         return getRandomNSlice()
 
 
 def getRandomRangeSlice():
-    '''Get random range slice values
-    '''
+    """
+    Get random range slice values
+    """
     rangeMin = uniform(.1, .5)
     rangeMax = uniform(.6, .9)
-    return (2, rangeMin, rangeMax)
+    return 2, rangeMin, rangeMax
 
 
 def getRandomNSlice():
-    '''Get a random nslice value
-    '''
+    """
+    Get a random nslice value
+    """
     sliceLength = randint(1, 20)
-    return (3, sliceLength, 0)
+    return 3, sliceLength, 0
 
 
 def getRandomTopBaseClustersAmount():
@@ -214,23 +230,35 @@ def getRandomShouldDropSingletons():
     return randint(0, 1)
 
 
-def genesTupleToChromosome(tuple):
-    '''Takes a tuple of genes and transforms it to a chromosome
-    '''
-    return Chromosome(tuple[0],
-                      tuple[1],
-                      tuple[2],
-                      tuple[3],
-                      tuple[4],
-                      tuple[5],
-                      tuple[6],
-                      tuple[7])
+def getRandomTextType():
+    textTypes = {}
+    for i in xrange(6):
+        key = clustering.TEXTTYPES[i]
+        textTypes[key] = randint(0, 1)
+    return textTypes
+
+
+def genesTupleToChromosome(geneTuple):
+    """
+    Takes a tuple of genes and transforms it to a chromosome
+    :param geneTuple:
+    """
+    return Chromosome(geneTuple[0],
+                      geneTuple[1],
+                      geneTuple[2],
+                      geneTuple[3],
+                      geneTuple[4],
+                      geneTuple[5],
+                      geneTuple[6],
+                      geneTuple[7],
+                      geneTuple[8])
 
 
 def crossChromosomes(chromosome1, chromosome2):
-    '''Takes two  parent chromosomes cross them and return two children
+    """
+    Takes two  parent chromosomes cross them and return two children
     chromosomes
-    '''
+    """
     genes1 = chromosome1.genesAsTuple()
     genes2 = chromosome2.genesAsTuple()
     crossOverPoint = randint(1, len(genes1) - 1)
