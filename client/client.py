@@ -18,6 +18,9 @@ from messaging.pickling import serialize_message, deserialize_message
 from pickle import PickleError
 from tasks.taskExecutor import ClusteringTaskExecutor
 
+from guppy import hpy
+## from memory_profiler import profile
+heapy = hpy()
 
 class Client(asynchat.async_chat):
     '''Counts the length of strings received from server
@@ -86,6 +89,8 @@ class Client(asynchat.async_chat):
         self.process_message()
 
     def process_message(self):
+        print "MEMORY USAGE CLIENT"
+        print heapy.heap()
         receivedString = ''.join(self.receivedData)
         try:
             message = deserialize_message(receivedString)
@@ -124,7 +129,7 @@ class Client(asynchat.async_chat):
             message = serialize_message(messageObj)
         except PickleError:
             self.logger.debug("Could not serialize/pickle message")
-            self.send_task_request()  # Ask for new Task
+            ##self.send_task_request()  # Ask for new Task
         else:
             self.push(message + self.get_terminator())
 
@@ -148,6 +153,7 @@ class Client(asynchat.async_chat):
             try:
                 self.logger.debug("Execute tasks")
                 results = taskExecutor.execute_tasks()
+                sleep(10)
             except TaskExecutionError as error:
                 self.logger.debug("Could not execute task: " + \
                                   str(error.task))

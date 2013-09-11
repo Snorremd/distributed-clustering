@@ -22,7 +22,7 @@ class SnippetBuilder(object):
         """
         self.root = Element('snippetcollection', {'source': sourceFilename})
 
-    def add_document(self, docId, tags, source, snippets):
+    def add_document(self, docId, tags, source, **snippetsLists):
         """
         :type docId: str
         :param docId: the id of the document
@@ -30,23 +30,28 @@ class SnippetBuilder(object):
         :param tags: a string of one or more tags for document
         :type source: str
         :param source: the source of the document
-        :type snippets: list
-        :param snippets: a list of snippets contained in the document
+        :type snippetsLists: dict
+        :param snippetsLists: lists of snippets contained in the document
         """
+
         document = SubElement(self.root, 'snippet',
                               {'id': docId, 'tags': tags, 'source': source})
-        self.add_snippets(document, snippets)
+        for key, list in snippetsLists.iteritems():
+            self.add_snippets(document, key, list)
 
-    def add_snippets(self, document, snippetTuples):
+    def add_snippets(self, document, key, snippetList):
         """
         :type document: xml.etree.ElementTree.Element
         :param document: the document in which to insert snippets
-        :type snippetTuples: list
-        :param snippetTuples: a list of tuples with snippet - attribute pairs
+        :type key: str
+        :param key: type of snippets
+        :type snippetList: list
+        :param snippetList: a list of snippets
         """
-        for snippets, snippetType in snippetTuples:
+        snippetType = SubElement(document, key)
+        for snippets in snippetList:
             for snippet in snippets:
-                snip = SubElement(document, 'snip', {'type': snippetType})
+                snip = SubElement(snippetType, 'snip')
                 snip.text = snippet
 
     def get_element_tree(self):

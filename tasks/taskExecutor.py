@@ -3,6 +3,7 @@ Created on May 13, 2013
 
 @author: snorre
 '''
+## from memory_profiler import profile
 from tasks.task import Task
 from tasks.errors import TaskExecutionError
 from cluster.clustering import CompactTrieClusterer

@@ -4,7 +4,10 @@
 #  Richard E. Moe
 #  11.05.2011
 
+
 from text.phrases import emptyphrase, firstword, getCommonStartSegment
+from guppy import hpy
+heapy = hpy()
 
 class CompactTrie:
     '''
@@ -101,13 +104,16 @@ class CompactTrie:
 
 
 #Build a compact trie for a list of phrase+source pairs
-                
+
 def phraseTree(phrases):
     '''
     Builds a compact trie from a list of phrase source-pairs.
     '''
     tree = CompactTrie()
-    for (p, s) in phrases: tree.insert(p, s)
+    for (p, s) in phrases:
+        tree.insert(p, s)
+    print "MEMORY USAGE PHRASETREE"
+    print heapy.heap()
     return tree
 
 

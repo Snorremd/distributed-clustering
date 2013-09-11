@@ -6,10 +6,11 @@ Created on May 21, 2013
 
 ## Import python library modules
 import os
-from time import time
+from time import time, sleep
 import math
 from datetime import datetime
 import __main__
+## from memory_profiler import profile
 from text.xmlsnippets import make_tag_index, make_groundtruth_clusters, \
     get_snippet_collection
 from compactTrie.clustersPlus import topBaseClusters, \
@@ -20,7 +21,8 @@ from text.sliceTrees import midSliceTree, rangeSliceTree, n_slice_tree
 from text.phrases import stringToPhrase
 from compactTrie.clustersPlus import common
 from easylogging.configLogger import getLoggerForStdOut
-
+from guppy import hpy
+heapy = hpy()
 
 ## Tree types
 SUFFIXTREE = 0
@@ -63,6 +65,8 @@ class CompactTrieClusterer(object):
         self.groundTruthClusters = make_groundtruth_clusters(self.corpusPath)
         self.logger.debug("Make snippet collection")
         self.snippetCollection = get_snippet_collection(self.corpusPath)
+        self.logger.debug("Size of snippet collection: {0}".format(len(self
+        .snippetCollection)))
 
     def get_corpus_path(self, corpus):
         """Given a corpus return path to file
@@ -92,6 +96,8 @@ class CompactTrieClusterer(object):
                 5. (fMeasure0, fMeasure1, ..., fMeasure5)
         """
         ## Make "aliases" for cluster setting variables
+        print "MEMORY USAGE CLUSTERING"
+        print heapy.heap()
         dropSingletonGTClusters = self.clusterSettings.dropSingletonGTClusters
         tagIndex = self.tagIndex
         filename = self.corpusPath
@@ -111,6 +117,13 @@ class CompactTrieClusterer(object):
             chromosome.shouldDropSingletonBaseClusters
         shouldDropOneWordClusters = chromosome.shouldDropOneWordClusters
         textTypes = chromosome.textType
+
+        if text_types_none(textTypes):
+            return ((0, 0, 0),
+                    (.0, .0, .0),
+                    (.0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0))
 
         if dropSingletonGTClusters:
             groundTruthClusters = dropSingletonGroundTruthClusters(
@@ -132,6 +145,7 @@ class CompactTrieClusterer(object):
                                        maxTermRatioInCollection,
                                        minLimitForBaseClusterScore,
                                        maxLimitForBaseClusterScore)
+        del tree
 
         if chromosome.shouldDropSingletonBaseClusters == 1:
             baseClusters = dropSingletonBaseClusters(baseClusters)
@@ -140,7 +154,9 @@ class CompactTrieClusterer(object):
         clusters = None
         if not noOfBaseClusters == 0:
             mergedComponents = mergeComponents(baseClusters)
+            del baseClusters
             clusters = makeClusters(mergedComponents)
+            del mergedComponents
             if chromosome.shouldDropOneWordClusters == 1:
                 clusters = dropOneWordClusters(clusters)
 
@@ -238,6 +254,8 @@ class CompactTrieClusterer(object):
         groundTruthRepTuple = getOverlapResultTuple(resultsGroundTruthRep, 2)
         fMeasureTuple = getOverlapResultTuple(resultsFMeasure, 1)
 
+        del clusters
+
         return ((timeToCluster, noOfClusters, noOfBaseClusters),
                 (precision, recall, fMeasure),
                 groundTruthTuple,
@@ -253,10 +271,9 @@ class CompactTrieClusterer(object):
         :return: a filtered list of snippets
         """
         filteredCollection = []
-        for snip in self.snippetCollection:
-            textType = snip[2]
-            if textTypes[textType]:
-                filteredCollection.append((snip[0], snip[1]))
+        for textType, snippets in self.snippetCollection.iteritems():
+            if textTypes[textType.tag]:
+                filteredCollection.extend(snippets)
         return filteredCollection
 
 
@@ -649,3 +666,18 @@ def contains(list1, list2):  ## list1 contains list2
 
 def equal(list1, list2):
     return contains(list1, list2) and contains(list2, list1)
+
+
+def text_types_none(textTypes):
+    """
+    Utility method to check if no text types are to be included
+    :param textTypes: key value pairs for text type inclusion
+    :type textTypes: dict
+    :return: true if all text types are set to false, false if not
+    :rtype: bool
+    """
+    none = True
+    for value in textTypes.values():
+        if value:
+            none = False
+    return none

@@ -11,6 +11,7 @@ The corpus module contains classes needed to process corpus files. Each class
 from corpora.snippets import SnippetBuilder
 from inputOutput.filehandling import sep_file_and_path
 import codecs
+import lxml.etree as etree
 
 __author__ = 'snorre'
 
@@ -85,7 +86,7 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
                 if len(l) < 2:
                     print "FEIL:", groundForm, ":", l, ":FEIL"  # DEBUG REMOVE
                 elif groundForm not in self.stopWords and \
-                        l[1] in self.goodWords:
+                                l[1] in self.goodWords:
                     words = words + ' ' + groundForm
                 line = self.scan_to_line(self.endTags)  # skip
                 # remaining
@@ -133,40 +134,55 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
 
             line = self.scan_tag(self.tags)
 
-            snippets = []  # Store snippet-list, type tuples
+            frontpageHeadings = []  # Store snippet-list, type tuples
+            frontpageIntroductions = []
+            articleHeadings = []
+            articleBylines = []
+            articleIntroductions = []
+            articleTexts = []
             while line != '</artikkel>':
                 if line == '<forsideoverskrift>':
-                    snippets.append((collectsentences(),
-                                     'FrontpageHeading'))
+                    frontpageHeadings.append(collectsentences())
                 elif line == '<forsideingress>':
-                    snippets.append((collectsentences(),
-                                     'FrontpageIntroduction'))
+                    frontpageIntroductions.append(collectsentences())
                 elif line == '<artikkeloverskrift>':
-                    snippets.append((collectsentences(),
-                                     'ArticleHeading'))
+                    articleHeadings.append(collectsentences())
                 elif line == '<artikkelbildetekst>':
-                    snippets.append((collectsentences(),
-                                     'ArticleByline'))
+                    articleBylines.append(collectsentences())
                 elif line == '<artikkelingress>':
-                    snippets.append((collectsentences(),
-                                     'ArticleIntroduction'))
+                    articleIntroductions.append(collectsentences())
                 elif line == '<artikkeltekst>':
-                    snippets.append((collectsentences(),
-                                     'ArticleText'))
+                    articleTexts.append(collectsentences())
                 else:
                     print "ERROR UNKNOWN TAG"
                 line = self.scan_tag(self.tags)
 
-            self.snippetBuilder.add_document(docId, tag, url, snippets)
+            self.snippetBuilder.add_document(docId, tag, url,
+                                             FrontpageHeading=frontpageHeadings,
+                                             FrontpageIntroduction=
+                                             frontpageIntroductions,
+                                             ArticleHeading=
+                                             articleHeadings,
+                                             ArticleByline=
+                                             articleBylines,
+                                             ArticleIntroduction=
+                                             articleIntroductions,
+                                             ArticleText=articleTexts)
             line = self.corpusFile.readline()
 
     def write_snippet_file(self):
         """
         """
         snippetTree = self.snippetBuilder.get_element_tree()
+        xmlstring = etree.tostring(snippetTree, encoding='utf8',
+                                   pretty_print=True)
+        print "Xml string created, write to file"
+        print self.snippetPath
+        outputFile = open(self.snippetPath, "w")
+        outputFile.write(xmlstring)
 
-        snippetTree.write(self.snippetPath, encoding="UTF-8",
-                          xml_declaration=False, pretty_print=True)
+        ##snippetTree.write(self.snippetPath, encoding="UTF-8",
+        ##                  xml_declaration=False, pretty_print=True)
 
     def scan_to_line(self, stringList):
         """

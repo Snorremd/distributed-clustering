@@ -5,10 +5,10 @@
 
 ## Parsing a snippet-collection (XML) using Element Trees
 
-#from xml.etree.ElementTree import *
-from lxml.etree import *
+from xml.etree.ElementTree import *
+#from lxml.etree import *
 ##P = XMLParser(encoding='utf-8')
- 
+
 def get_snippet_collection(filename):
     ''' Builds a list of snippet, source-tuples.
     Takes a XML snippet-file on the form:
@@ -22,13 +22,23 @@ def get_snippet_collection(filename):
     [("hvem burde troender", "http://www.adressa.no/tema/arets_tronder/article1419602.ece"), ("terms...", "source"), (..., ...)]
     '''
     tree = parse(filename)
+    snippetDict = {}
+    for document in tree.findall("snippet"):
+        source = document.get("source")
+        for textType in document:
+            snippets = []
+            for snippet in textType:
+                snippets.append((snippet.text, [source]))
+            snippetDict[textType] = snippets
+    return snippetDict
+
     ##tree = parse(filename, parser=P)
-    Snippets = []
-    for s in tree.findall("snippet"):
-        for x in s.findall("snip"):
-            Snippets.append((x.text, [s.get("source")], x.get("type")))
-            ##Snippets.append((x.text.encode('latin-1'),[s.get("source")]))
-    return Snippets
+    #Snippets = []
+    #for s in tree.findall("snippet"):
+    #    for x in s.findall("snip"):
+    #        Snippets.append((x.text, [s.get("source")], x.get("type")))
+    #        ##Snippets.append((x.text.encode('latin-1'),[s.get("source")]))
+    #return Snippets
 
 
 def make_tag_index(filename):
@@ -46,5 +56,5 @@ def make_groundtruth_clusters(filename):
         tags = snippet.get("tags")
         if Index.has_key(tags):
             Index[tags].append(snippet.get("source"))
-        else: Index[tags] = [snippet.get("source")] 
+        else: Index[tags] = [snippet.get("source")]
     return Index
