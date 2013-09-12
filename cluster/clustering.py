@@ -11,7 +11,7 @@ import math
 from datetime import datetime
 import __main__
 ## from memory_profiler import profile
-from text.xmlsnippets import make_tag_index, make_groundtruth_clusters, \
+from text.jsonsnippets import make_tag_index, make_groundtruth_clusters, \
     get_snippet_collection
 from compactTrie.clustersPlus import topBaseClusters, \
     dropSingletonBaseClusters, mergeComponents, makeClusters, \
@@ -272,7 +272,7 @@ class CompactTrieClusterer(object):
         """
         filteredCollection = []
         for textType, snippets in self.snippetCollection.iteritems():
-            if textTypes[textType.tag]:
+            if textTypes[textType]:
                 filteredCollection.extend(snippets)
         return filteredCollection
 

@@ -70,7 +70,7 @@ class GeneticAlgorithm:
         self.currentGeneration = 0
 
         self.clusterSettings = ClusterSettings(True, 1.0, 'klimauken')
-        self.corpus = Corpus("klimauken", "klimaukenSnippetsNew.xml",
+        self.corpus = Corpus("klimauken", "klimaukenSnippetsNew.json",
                              "klimauken", True)
 
         timeNow = str(datetime.now())
