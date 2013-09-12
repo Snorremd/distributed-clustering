@@ -32,7 +32,10 @@ def get_snippet_collection(filename):
                 if not document[key] is None:  # If text type is non-empty
                     for snippet in document[key]["snip"]:
                         snippets.append((snippet, [source]))
+                if key not in snippetDict:
                     snippetDict[key] = snippets
+                else:
+                    snippetDict[key].extend(snippets)
     return snippetDict
 
     #for document in jsonTree.items:

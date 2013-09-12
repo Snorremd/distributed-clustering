@@ -5,9 +5,7 @@
 #  11.05.2011
 
 
-from text.phrases import emptyphrase, firstword, getCommonStartSegment
-from guppy import hpy
-heapy = hpy()
+from text.phrases import firstword, getCommonStartSegment
 
 class CompactTrie:
     '''
@@ -29,35 +27,38 @@ class CompactTrie:
 
     def nodelabel(self):
         '''Returns the concatenated nodelabel array of self and parent'''
-        if self.parent == None: return self.phrase
-        else: return self.parent.nodelabel() + self.phrase
+        if self.parent is None:
+            return self.phrase
+        else:
+            return self.parent.nodelabel() + self.phrase
 
-    def display(self): printCTindent(self, 0)
+    def display(self):
+        printCTindent(self, 0)
 
     def addSources(self, sourceDictionary):
         for x in sourceDictionary:
             if not x in self.sources:
                 self.sources[x] = 1
             else:
-                self.sources[x] = self.sources[x] + 1
+                self.sources[x] += 1
 
     def insert(self, Phrase, Sources):
         '''
         Insert a phrase/source-pair into the compact trie structure.
         If phrases is empty, the method terminates.
         '''
-        if Phrase == []: return None  ## do nothing on empty phrase
+        if not Phrase:
+            return None  ## do nothing on empty phrase
         sources = Sources[:]  #make copies of the parameters
         phrase = Phrase[:]  #(perhaps not necessary for Phrase?)
         first = firstword(phrase)
-        if not self.subtrees.has_key(first):
+        if not first in self.subtrees:
             ## Branch does not exist, create a new branch
             newBranch = CompactTrie()
             newBranch.phrase = phrase
             newBranch.parent = self
             newBranch.addSources(sources)
-            newBranch.subtrees = {}
-            self.subtrees[first] = newBranch
+            newBranch.subtrees = {first: newBranch}
         else:
             ## Branch exist (a subtree with first word in phrase found)
             branch = self.subtrees[first]
@@ -112,8 +113,6 @@ def phraseTree(phrases):
     tree = CompactTrie()
     for (p, s) in phrases:
         tree.insert(p, s)
-    print "MEMORY USAGE PHRASETREE"
-    print heapy.heap()
     return tree
 
 
@@ -125,8 +124,8 @@ def printCTindent(ct, indent):  ## prints a compact trie ct with indentation
     i = 0
     dots = ""
     while i < indent:
-        dots = dots + "...."
-        i = i + 1
+        dots += "...."
+        i += 1
     print dots,
     print ct.phrase,
     print ": ",

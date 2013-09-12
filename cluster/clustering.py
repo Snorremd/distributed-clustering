@@ -21,8 +21,6 @@ from text.sliceTrees import midSliceTree, rangeSliceTree, n_slice_tree
 from text.phrases import stringToPhrase
 from compactTrie.clustersPlus import common
 from easylogging.configLogger import getLoggerForStdOut
-from guppy import hpy
-heapy = hpy()
 
 ## Tree types
 SUFFIXTREE = 0
@@ -65,8 +63,6 @@ class CompactTrieClusterer(object):
         self.groundTruthClusters = make_groundtruth_clusters(self.corpusPath)
         self.logger.debug("Make snippet collection")
         self.snippetCollection = get_snippet_collection(self.corpusPath)
-        self.logger.debug("Size of snippet collection: {0}".format(len(self
-        .snippetCollection)))
 
     def get_corpus_path(self, corpus):
         """Given a corpus return path to file
@@ -96,8 +92,6 @@ class CompactTrieClusterer(object):
                 5. (fMeasure0, fMeasure1, ..., fMeasure5)
         """
         ## Make "aliases" for cluster setting variables
-        print "MEMORY USAGE CLUSTERING"
-        print heapy.heap()
         dropSingletonGTClusters = self.clusterSettings.dropSingletonGTClusters
         tagIndex = self.tagIndex
         filename = self.corpusPath
@@ -130,6 +124,9 @@ class CompactTrieClusterer(object):
                 groundTruthClusters)
 
         snippetCollection = self.filter_snippets(textTypes)
+        self.logger.debug("Size of snippet collection: {0}".format(
+            len(snippetCollection)))
+        self.logger.debug(chromosome.genesAsTuple())
 
         ## Keep track of time for timing purposes
         start = time()
@@ -255,6 +252,8 @@ class CompactTrieClusterer(object):
         fMeasureTuple = getOverlapResultTuple(resultsFMeasure, 1)
 
         del clusters
+
+        self.logger.debug("Finished clustering")
 
         return ((timeToCluster, noOfClusters, noOfBaseClusters),
                 (precision, recall, fMeasure),

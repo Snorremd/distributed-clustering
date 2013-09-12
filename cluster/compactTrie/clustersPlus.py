@@ -16,9 +16,7 @@ from compactTrie import CompactTrie  # CompactTrie, nodelabel
 from text.phrases import phraseToString
 from text.wordOccurrence import *
 from time import time
-from guppy import hpy
 import math
-heapy = hpy()
 
 class basecluster:
     def __init__(self):
@@ -243,9 +241,6 @@ def topBaseClusters(CompactTrie,
 #    bb = dropSingletonBaseClusters(b)
     bc.sort(key=score)
 
-    print "MEMORY USAGE BASE CLUSTERS"
-    print heapy.heap()
-
     if TopBaseClustersAmount == 'all':
         return bc
     else:
@@ -380,10 +375,3 @@ def common(Lists):
                 del Common[Common.index(x)]
                 break
     return Common
-
-
-
-
-
-        
-    

@@ -18,9 +18,6 @@ from messaging.pickling import serialize_message, deserialize_message
 from pickle import PickleError
 from tasks.taskExecutor import ClusteringTaskExecutor
 
-from guppy import hpy
-## from memory_profiler import profile
-heapy = hpy()
 
 class Client(asynchat.async_chat):
     '''Counts the length of strings received from server
@@ -60,7 +57,8 @@ class Client(asynchat.async_chat):
                           "port {1} failed or server broke connection. Please"
                           " try to restart clientMain script...".format(
             *self.address))
-        self.close
+        self.close()
+        return
 
     def handle_expt(self):
         """
@@ -72,6 +70,7 @@ class Client(asynchat.async_chat):
                           " try to restart clientMain script...".format(
             *self.address))
         self.close()
+        return
 
     def disconnect(self, disconnectInfo):
         '''Disconnect from server and close connection
@@ -81,16 +80,18 @@ class Client(asynchat.async_chat):
         self.send_message(message)
         self.close_when_done()
         self.logger.debug("Disconnected from server")
+        return
 
     def collect_incoming_data(self, data):
         self.receivedData.append(data)
+        return
 
     def found_terminator(self):
         self.process_message()
+        return
 
     def process_message(self):
         print "MEMORY USAGE CLIENT"
-        print heapy.heap()
         receivedString = ''.join(self.receivedData)
         try:
             message = deserialize_message(receivedString)
@@ -121,6 +122,7 @@ class Client(asynchat.async_chat):
                 self.send_task_request()
 
         self.receivedData = []
+        return
 
     def send_message(self, messageObj):
         '''Serialize message and send to server
@@ -132,12 +134,14 @@ class Client(asynchat.async_chat):
             ##self.send_task_request()  # Ask for new Task
         else:
             self.push(message + self.get_terminator())
+        return
 
     def send_task_request(self):
         '''Sends a Task request message to server
         '''
         message = RequestMessage("Request Task")
         self.send_message(message)
+        return
 
     def process_tasks(self, message):
         '''Process n tasks and sends a results message to server
@@ -153,7 +157,6 @@ class Client(asynchat.async_chat):
             try:
                 self.logger.debug("Execute tasks")
                 results = taskExecutor.execute_tasks()
-                sleep(10)
             except TaskExecutionError as error:
                 self.logger.debug("Could not execute task: " + \
                                   str(error.task))
@@ -165,6 +168,7 @@ class Client(asynchat.async_chat):
                 self.logger.debug("Send results to server")
                 self.send_task_results(results)
                 self.noOfCompletedTasks += len(results)
+        return
 
     def send_task_results(self, results):
         '''Sends task results to the server
@@ -174,6 +178,7 @@ class Client(asynchat.async_chat):
         '''
         message = ResultMessage("Result", results)
         self.send_message(message)
+        return
 
     def output_scores(self, scoreMessage):
         '''Outputs scores to the logger defined in self

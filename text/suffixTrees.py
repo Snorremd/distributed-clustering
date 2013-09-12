@@ -12,7 +12,7 @@ from xmlsnippets import *
 def suffixes(phrase):
     p = phrase
     suffixlist = []
-    while p != []:
+    while p:
         suffixlist.append(p[:])  #copy p to avoid mutilating side-effects
         del p[0]
     return suffixlist

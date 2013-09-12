@@ -6,9 +6,9 @@
 #   08.10.2010
 #
 
-emptyphrase = []
 
-def firstword(Phrase): return Phrase[0]
+def firstword(Phrase):
+    return Phrase[0]
 
 
 def getCommonStartSegment(Phrase1, Phrase2):
