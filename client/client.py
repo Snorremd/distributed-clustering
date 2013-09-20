@@ -56,7 +56,7 @@ class Client(asynchat.async_chat):
         self.logger.debug("Either Connection to server with address {0} and "
                           "port {1} failed or server broke connection. Please"
                           " try to restart clientMain script...".format(
-            *self.address))
+                          *self.address))
         self.close()
         return
 
@@ -67,8 +67,8 @@ class Client(asynchat.async_chat):
         # connection failed
         self.logger.debug("Either Connection to server with address {0} and "
                           "port {1} failed or server broke connection. Please"
-                          " try to restart clientMain script...".format(
-            *self.address))
+                          " try to restart clientMain script..."
+                          .format(*self.address))
         self.close()
         return
 

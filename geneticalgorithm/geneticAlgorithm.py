@@ -13,7 +13,7 @@ import __main__
 from tasks.task import CompactTrieClusteringTask
 from easylogging.configLogger import getLoggerForFile
 from cluster.clusterSettings import ClusterSettings
-from text.corpora import Corpus
+from corpora.corpus import Corpus
 
 
 ## Define module constants:
@@ -39,7 +39,7 @@ class GeneticAlgorithm:
     ## Define class constants
     ROULETTEWHEEL = 0
 
-    def __init__(self, taskOrganizer, populationSize, noOfGenerations,
+    def __init__(self, taskOrganizer, corpus, populationSize, noOfGenerations,
                  selectionType, selectionRate, mutationRate,
                  gaVerbosity):
         """Constructor of the GeneticAlgorithm class
@@ -69,14 +69,13 @@ class GeneticAlgorithm:
         self.selectionProbabilities = []
         self.currentGeneration = 0
 
-        self.clusterSettings = ClusterSettings(True, 1.0, 'klimauken')
-        self.corpus = Corpus("klimauken", "klimaukenSnippetsNew.json",
-                             "klimauken", True)
+        self.clusterSettings = ClusterSettings(True, 1.0)
+        self.corpus = corpus
 
         timeNow = str(datetime.now())
         pathToMain = os.path.dirname(__main__.__file__)
         resultPath = os.path.join(pathToMain, "results",
-                                  self.corpus.directory,
+                                  self.corpus.name,
                                   self.corpus.name + timeNow)
         self.topFile = resultPath + "_top.csv"
         self.avgFile = resultPath + "_avg.csv"

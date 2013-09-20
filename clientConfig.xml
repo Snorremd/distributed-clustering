@@ -1,0 +1,6 @@
+<config>
+    <address>localhost</address>
+    <port>9875</port>
+    <programid>distributed-clustering</programid>
+    <username>Snorre</username>
+</config>

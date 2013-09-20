@@ -136,6 +136,39 @@ class Chromosome:
                 self.shouldDropOneWordClusters,
                 self.textType)
 
+    def chromosome_as_dict(self):
+        textTypesKeys = clustering.TEXTTYPES
+        chromosomeDict = {
+            "id": self.id,
+            "tree_type_1": self.treeType[1],
+            "tree_type_2": self.treeType[2],
+            "tree_type_3": self.treeType[3],
+            "text_type_frontpageheading": self.textType[textTypesKeys[0]],
+            "text_type_frontpageintroduction": self.textType[textTypesKeys[1]],
+            "text_type_articleheading": self.textType[textTypesKeys[2]],
+            "text_type_articlebyline": self.textType[textTypesKeys[3]],
+            "text_type_articleintroduction": self.textType[textTypesKeys[4]],
+            "text_type_articletext": self.textType[textTypesKeys[5]],
+            "top_base_clusters_amount": self.topBaseClustersAmount,
+            "min_term_occurrence_collection": self
+            .minTermOccurrenceInCollection,
+            "max_term_ratio_collection": self.maxTermRatioInCollection,
+            "min_limit_base_cluster_score": self
+            .minLimitForBaseClusterScore,
+            "max_limit_base_cluster_score": self
+            .maxLimitForBaseClusterScore,
+            "drop_singleton_base_clusters": self
+            .shouldDropSingletonBaseClusters,
+            "drop_one_word_clusters": self.shouldDropOneWordClusters,
+            "fitness": self.fitness
+        }
+        if self.result:
+            chromosomeDict["fmeasure"] = self.result[1][0]
+            chromosomeDict["precision"] = self.result[1][1]
+            chromosomeDict["recall"] = self.result[1][2]
+            chromosomeDict["fmeasure"] = self.result[1][0]
+
+
     def get_precision(self):
         return self.result[2]
 
@@ -178,6 +211,7 @@ def getRandomTreeType():
     """
     Return a tuple representing a randomized tree type
     """
+    if True: return (2,0.1,0.9)
     treeType = randint(0, 3)
     if treeType == clustering.SUFFIXTREE:
         return 0, 0, 0
@@ -193,8 +227,8 @@ def getRandomRangeSlice():
     """
     Get random range slice values
     """
-    rangeMin = uniform(.1, .5)
-    rangeMax = uniform(.6, .9)
+    rangeMin = uniform(.3, .5)
+    rangeMax = uniform(.6, .8)
     return 2, rangeMin, rangeMax
 
 

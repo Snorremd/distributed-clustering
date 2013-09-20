@@ -23,22 +23,18 @@ def get_snippet_collection(filename):
     '''
     tree = parse(filename)
     snippetDict = {}
-    for document in tree.findall("snippet"):
+    documents = tree.findall("snippet")
+    for document in documents:
         source = document.get("source")
         for textType in document:
             snippets = []
             for snippet in textType:
                 snippets.append((snippet.text, [source]))
-            snippetDict[textType] = snippets
+            if not textType.tag in snippetDict:
+                snippetDict[textType.tag] = snippets
+            else:
+                snippetDict[textType.tag].extend(snippets)
     return snippetDict
-
-    ##tree = parse(filename, parser=P)
-    #Snippets = []
-    #for s in tree.findall("snippet"):
-    #    for x in s.findall("snip"):
-    #        Snippets.append((x.text, [s.get("source")], x.get("type")))
-    #        ##Snippets.append((x.text.encode('latin-1'),[s.get("source")]))
-    #return Snippets
 
 
 def make_tag_index(filename):

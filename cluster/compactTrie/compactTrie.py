@@ -1,9 +1,10 @@
 #
-#  Compact Trie 
+#  Compact Trie
 #
 #  Richard E. Moe
 #  11.05.2011
-
+from time import sleep
+import gc
 
 from text.phrases import firstword, getCommonStartSegment
 
@@ -50,7 +51,7 @@ class CompactTrie:
         if not Phrase:
             return None  ## do nothing on empty phrase
         sources = Sources[:]  #make copies of the parameters
-        phrase = Phrase[:]  #(perhaps not necessary for Phrase?)
+        phrase = Phrase  #(perhaps not necessary for Phrase?)
         first = firstword(phrase)
         if not first in self.subtrees:
             ## Branch does not exist, create a new branch
@@ -58,7 +59,7 @@ class CompactTrie:
             newBranch.phrase = phrase
             newBranch.parent = self
             newBranch.addSources(sources)
-            newBranch.subtrees = {first: newBranch}
+            self.subtrees[first] = newBranch
         else:
             ## Branch exist (a subtree with first word in phrase found)
             branch = self.subtrees[first]
@@ -68,7 +69,7 @@ class CompactTrie:
             else:
                 ## branch has different phrase. Find common start segment (sub-phrase)
                 (commonStartSegment, branchRest, phraseRest) = getCommonStartSegment(branch.phrase, phrase)
-                if phraseRest == []:
+                if not phraseRest:
                     ## If phrase "rest" is empty, make new compact trie
                     newNode = CompactTrie()
                     newNode.phrase = commonStartSegment
@@ -78,7 +79,7 @@ class CompactTrie:
                     branch.phrase = branchRest
                     branch.parent = newNode  # Make newNode a parent of branch
                     self.subtrees[first] = newNode  # Make newNode a subtree of self (this trie)"
-                elif branchRest == []:
+                elif not branchRest:
                     branch.insert(phraseRest, sources)  # Insert rest of phrase into branch (recursivly)
                 else:  # phraseRest and branchRest are nonempty and start with different words
                     ## First create a new trie for the common start segment
@@ -113,12 +114,13 @@ def phraseTree(phrases):
     tree = CompactTrie()
     for (p, s) in phrases:
         tree.insert(p, s)
+        gc.collect()
     return tree
 
 
 
 ###################
-## auxillilaries ## 
+## auxillilaries ##
 ###################
 def printCTindent(ct, indent):  ## prints a compact trie ct with indentation
     i = 0
@@ -134,4 +136,5 @@ def printCTindent(ct, indent):  ## prints a compact trie ct with indentation
     #print ct.nodelabel(),
     #print ") "
     #print "\n"
-    for s in ct.subtrees.values(): printCTindent(s, indent + 1)
+    for s in ct.subtrees.values():
+        printCTindent(s, indent + 1)

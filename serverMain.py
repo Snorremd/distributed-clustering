@@ -2,15 +2,21 @@
 The server module allows you to run the genetic algorithm and asynchat server.
 """
 import asyncore
+import os
 import sys
+from xml.etree import ElementTree as ET
 
 from easylogging.configLogger import getLoggerForStdOut
+from inputOutput.filehandling import get_root_path, get_corpus_options, get_server_config, get_corpus_settings
 from inputOutput.output import show_info_dialog, show_input_dialog, \
     show_option_dialog
 from server.server import Server
 import geneticalgorithm.geneticAlgorithm as geneticAlgorithm
 from geneticalgorithm.geneticAlgorithm import GeneticAlgorithm
 from tasks.taskOrganizer import TaskOrganizer
+
+
+
 
 
 if __name__ == '__main__':
@@ -21,31 +27,47 @@ if __name__ == '__main__':
                      " and the asynchat library to communicate with clients"
                      ".\n")
 
-    hostAddress = show_option_dialog("Please type in one of the two options "
-                                     "for listening locally or externally: ",
-                                     ['localhost', '0.0.0.0'])
+    show_info_dialog("")
 
-    port = show_input_dialog("Please input the port the server should listen "
-                             "to: ")
+    choice = show_option_dialog("Do you want to use config file?",
+                                ["yes", "no"])
+    if choice == "yes":
+        hostAddress, port, programId, batchSize,\
+            timeout, populationSize, corpusName = get_server_config()
 
-    programId = show_input_dialog("Please specify a programId: ")
+    else:
+        hostAddress = show_option_dialog("Please type in one of the two options "
+                                         "for listening locally or externally: ",
+                                         ['localhost', '0.0.0.0'])
 
-    batchSize = show_input_dialog("Please specify a batch size (should "
-                                  "preferably take no more than 60 seconds to"
-                                  " complete): ")
+        port = show_input_dialog("Please input the port the server should listen "
+                                 "to: ")
 
-    timeout = show_input_dialog("Specify task timeout in seconds (make this a"
-                                " multiple of task completion time and batch "
-                                "size): ")
+        programId = show_input_dialog("Please specify a programId: ")
 
-    populationSize = show_input_dialog("Please specify a population size: ")
+        batchSize = show_input_dialog("Please specify a batch size (should "
+                                      "preferably take no more than 60 seconds to"
+                                      " complete): ")
+
+        timeout = show_input_dialog("Specify task timeout in seconds (make this a"
+                                    " multiple of task completion time and batch "
+                                    "size): ")
+
+        populationSize = show_input_dialog("Please specify a population size: ")
+
+        corpusName = show_input_dialog("Specify one of the following corpora:",
+                                   get_corpus_options())
 
 
     try:
+
+        corpus = get_corpus_settings(corpusName)
+
         mainLogger = getLoggerForStdOut('Main')
         mainLogger.debug("Create genetic algorithm object and initial population")
         taskOrganizer = TaskOrganizer(int(timeout), [])
-        gAlgorithm = GeneticAlgorithm(taskOrganizer, int(populationSize), 3,
+        gAlgorithm = GeneticAlgorithm(taskOrganizer,
+                                      corpus, int(populationSize), 3,
                                       GeneticAlgorithm.ROULETTEWHEEL,
                                       0.5, 0.10, geneticAlgorithm.VERBOSEFILE)
 

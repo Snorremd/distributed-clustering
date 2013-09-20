@@ -5,10 +5,13 @@ Slice-clustering
 @author: Richard Moe
 @version: 12.05.11
 '''
+from time import sleep
 from cluster.compactTrie.compactTrie import phraseTree
 from phrases import stringToPhrase
 from xmlsnippets import get_snippet_collection
 from math import floor, ceil
+from guppy import hpy
+heapy = hpy()
 
  
 
@@ -17,7 +20,7 @@ def n_slices(n, phrase):  # assuming n =< len(phrase)
     Returns a list of all slices of n length generated
     from a list of phrases where each phrase is a list
     ''' 
-    if phrase == []:
+    if not phrase:
         return []
     Slices = []
     p = phrase[:]  ## make a copy
@@ -32,13 +35,14 @@ def n_slices(n, phrase):  # assuming n =< len(phrase)
 def rangeSlices(min, max, phrase):
     Slices = []
     for n in range(min, max + 1):
-        Slices = Slices + n_slices(n, phrase)
+        Slices = Slices + n_slices(n, phrase[:])
     return Slices
 
 
 def n_slice_tree(n, strings):
     slices = []
     for (x, y) in strings:
+        x = x[:]
         phrase = stringToPhrase(x)
         if n > len(phrase):
             n = len(x)
@@ -48,16 +52,26 @@ def n_slice_tree(n, strings):
 
 
 def rangeSliceTree(strings, rangeMin=.5, rangeMax=.7):  # build slice tree from a list of string+source pairs
+    print heapy.heap()
     Slices = []
     for (x, y) in strings:
-        str = stringToPhrase(x)
-        min = int(floor(len(str) * rangeMin))
+        x = x[:]
+        y = y[:]
+        string = stringToPhrase(x)
+        min = int(floor(len(string) * rangeMin))
         if min == 0:
             min = 1
-        max = int(ceil(len(str) * rangeMax))
-        ####print min, ", ", max
-        for s in rangeSlices(min, max, str):
+        max = int(ceil(len(string) * rangeMax))
+        for s in rangeSlices(min, max, string):
             Slices.append((s, y))
+    print heapy.heap()
+    sleep(4)
+    totalLength = 0
+    for slice in Slices:
+        for snip in slice[0]:
+            totalLength += len(snip)
+    print "Total length: ", totalLength
+    print "Number of suffixes: ", len(Slices)
     return phraseTree(Slices)
 
 
@@ -79,6 +93,7 @@ def midSliceTree(strings):
     ''' Build a mSlice tree from a list of string -> source pair.'''
     Slices = []
     for (string, source) in strings:
+        string = string[:]
         phrase = stringToPhrase(string)
         for mSlice in midSlices(phrase): 
             Slices.append((mSlice, source))
@@ -91,13 +106,3 @@ def makeMidSliceTree(filename):
     read from an XML SnippetCollection
     '''
     return midSliceTree(get_snippet_collection(filename))
-
-
-
-
-
-
-
-
-
-   

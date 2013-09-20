@@ -18,6 +18,7 @@ from text.wordOccurrence import *
 from time import time
 import math
 
+
 class basecluster:
     def __init__(self):
         self.label = ""
@@ -31,9 +32,10 @@ class basecluster:
                 self.size = self.size + 1.0
 
     def display(self):
-         print self.label,
-         print " : ",
-         print self.sources
+        print self.label,
+        print " : ",
+        print self.sources
+
 
 class component:
     def __init__(self):
@@ -44,12 +46,13 @@ class component:
     def delete(self):  ## assume first component never deleted.
         if self.previous != None:
             self.previous.next = self.next
-            
+
         if self.next != None:
             self.next.previous = self.previous
+
 ## delete merely cuts out of the pointer-list, the object is not
 ## reclaimed  (worry about garbage-collection???)
-        
+
 
 class cluster:
     def __init__(self):
@@ -67,8 +70,8 @@ class cluster:
             if not x in self.sources:
                 self.sources[x] = sourceDict[x]  # .append(x)
                 self.numberOfSources = self.numberOfSources + 1
-        
-   
+
+
     def collectWords(self, labelList):
         for x in labelList:
             if self.wordFrequency.has_key(x):
@@ -77,18 +80,19 @@ class cluster:
                 self.wordFrequency[x] = 1
                 self.numberOfWords = self.numberOfWords + 1
 
-            
+
     def makeLabel(self):  # make label for the cluster as a whole:
         L = []
         #for x in self.wordFrequency.keys(): L.append((self.wordFrequency[x],x))
         for (x, y) in self.wordFrequency.items(): L.append((y, x))
         L.sort(reverse=True)
         for (x, y) in L: self.label.append(y)
-## The label is (somewhat arbitrary) the list of words occurring in labels, 
-## ordered by frequency.  Change to score-labels cf paper??
-        
-        
-              
+
+    ## The label is (somewhat arbitrary) the list of words occurring in labels,
+    ## ordered by frequency.  Change to score-labels cf paper??
+
+
+
     def display(self):
         print "<", phraseToString(self.label), ">"
         print "labels:",
@@ -99,8 +103,6 @@ class cluster:
         print "\nsource overlap: ", self.sourceOverlap
         #print self.wordFrequency, "(", self.numberOfWords, ")"
         print "\n"
-
- 
 
 
 #####################
@@ -122,7 +124,6 @@ def generateBaseClusters(Tree):
     return baseClusters
 
 
-
 def similarJaccard(BaseCluster1, BaseCluster2, jaccardLimit=0.5):
     '''
     Similarity measure based on the Jaccard coefficient.
@@ -136,63 +137,68 @@ def similarJaccard(BaseCluster1, BaseCluster2, jaccardLimit=0.5):
             common.append(x)
     sizeOverlap = float(len(common))
     return (sizeOverlap / BaseCluster1.size > jaccardLimit and
-             sizeOverlap / BaseCluster2.size > jaccardLimit)
+            sizeOverlap / BaseCluster2.size > jaccardLimit)
+
 
 def similarCosineSim(BaseCluster1, BaseCluster2, cosineSimLimit=0.5):
     '''
     Similarity measure based on the cosine distance
     formula. If the cosine distance of BaseCluster1
     to BaseCluster2 is > 0.5, they are included in
-    the component graph. 
+    the component graph.
     '''
-    
+
     def calcWeights():
         '''
         A method that calculates the weight of a node for
         each document in that node. Algorithm derived from
         http://ieeexplore.ieee.org/lpdocs/epic03/wrapper.htm?arnumber=4459328
         '''
-        documentFrequency1 = len(BaseCluster1.sources)  # Document frequency equal to no of sources in node
+        documentFrequency1 = len(
+            BaseCluster1.sources)  # Document frequency equal to no of sources in node
         documentFrequency2 = len(BaseCluster2.sources)
-        commonSources = dict(BaseCluster1.sources.items() + BaseCluster2.sources.items())  ## Ignore value overwrites
+        commonSources = dict(
+            BaseCluster1.sources.items() + BaseCluster2.sources.items())  ## Ignore value overwrites
         for source in commonSources:
             tfidf1 = 0.0
             tfidf2 = 0.0
-            
-            if source in BaseCluster1.sources:    
+
+            if source in BaseCluster1.sources:
                 termFrequency = BaseCluster1.sources[source]
-                tfidf1 = (1 + math.log(termFrequency)) * math.log(1 + 6223 / documentFrequency1)
-            if source in BaseCluster2.sources:    
+                tfidf1 = (1 + math.log(termFrequency)) * math.log(
+                    1 + 6223 / documentFrequency1)
+            if source in BaseCluster2.sources:
                 termFrequency = BaseCluster2.sources[source]
-                tfidf2 = (termFrequency) * math.log(1 + 6223 / documentFrequency2)
-                    
+                tfidf2 = (termFrequency) * math.log(
+                    1 + 6223 / documentFrequency2)
+
             commonSources[source] = (tfidf1, tfidf2)
-        
+
         return commonSources
+
     ## Calculate tf-idf scores for each document->node pair
     weights = calcWeights()
-    
+
     ## Use an inverted vector space model to calculate the
     ## similarity of the clusters (i.e. each document is a feature
     ## in the vector space and each node is a vector)
     dotProduct = 0
-    squareSum1 = 0 
+    squareSum1 = 0
     squareSum2 = 0
     for source in weights:
         (weight1, weight2) = weights[source]
         dotProduct += weight1 * weight2
-        
+
         squareSum1 += weight1 * weight1
         squareSum2 += weight2 * weight2
-    
+
     normalizedLength = math.sqrt(squareSum1 * squareSum2)
     similarity = dotProduct / normalizedLength
     if similarity > 0.1:
         print "Similarity of clusters = ", similarity
     return similarity > 0.001
-            
-    
-    
+
+
 ############################
 #### base cluster score ####
 ############################
@@ -201,9 +207,9 @@ def similarCosineSim(BaseCluster1, BaseCluster2, cosineSimLimit=0.5):
 #(more than 40% of the collection) receive a score of 0.
 # We assume that 'the collection' means the entire collection of documents
 # rather than the documents local to the base cluster.
-# 
+#
 
-    
+
 def topBaseClusters(CompactTrie,
                     TopBaseClustersAmount=500,
                     MinNoInCollection=3,
@@ -211,7 +217,7 @@ def topBaseClusters(CompactTrie,
                     minLimitForBaseClusterScore=1,
                     maxLimitForBaseClusterScore=6):  #Etziani-limits default
     '''
-    Takes a compact trie structure and returns the TopBaseClustersAmount 
+    Takes a compact trie structure and returns the TopBaseClustersAmount
     number of base clusters, stop words removed.
     '''
     bc = generateBaseClusters(CompactTrie)
@@ -232,13 +238,15 @@ def topBaseClusters(CompactTrie,
             n = 0
             for w in label:
                 m = len(ws[w])
-                if (m > MinNoInCollection and float(m) / float(num) <= MaxRatioInCollection):
+                if m > MinNoInCollection and \
+                                        float(m) / float(
+                                        num) <= MaxRatioInCollection:
                     n = n + 1
             return n
 
         return baseCluster.size * f(effectiveWords(baseCluster.label))
 
-#    bb = dropSingletonBaseClusters(b)
+    #    bb = dropSingletonBaseClusters(b)
     bc.sort(key=score)
 
     if TopBaseClustersAmount == 'all':
@@ -251,7 +259,8 @@ def topBaseClusters(CompactTrie,
 def dropSingletonBaseClusters(baseClusters):
     List = []
     for b in baseClusters:
-        if b.size > 1: List.append(b)
+        if b.size > 1:
+            List.append(b)
     return List
 
 #######################
@@ -261,10 +270,10 @@ def dropSingletonBaseClusters(baseClusters):
 # We may think of the baseclusters and similarity measure as defining a similarity-graph
 # where nodes are baseclusters and similar nodes are connected. Clusters corresponds to
 # the connected components of the similarity graph.
-#  
-#  
+#
+#
 
- 
+
 def initialComponents(BaseClusters):
     ComponentIndex = []
 
@@ -295,13 +304,14 @@ def mergeComponents(BaseClusters):
 
     for x in BaseClusters:
         baseIndex.append(count)
-        count = count + 1
+        count += 1
 
     i = 0
     while i < count:
         j = i + 1
-        while  j < count:
-            if similarJaccard(BaseClusters[i], BaseClusters[j]) and baseIndex[i] != baseIndex[j]:
+        while j < count:
+            if similarJaccard(BaseClusters[i], BaseClusters[j]) and \
+               baseIndex[i] != baseIndex[j]:
                 if baseIndex[i] < baseIndex[j]:
                     min = baseIndex[i]
                     max = baseIndex[j]
@@ -311,16 +321,14 @@ def mergeComponents(BaseClusters):
                 merge(CI[min], CI[max])
                 CI[max].delete()
                 baseIndex[max] = baseIndex[min]
-            j = j + 1
-        i = i + 1
-    #return CI[0]
+            j += 1
+        i += 1
+        #return CI[0]
     clusters = CI[0]
-    while clusters != None:
+    while clusters is not None:
         Components.append(clusters.baseclusters)
         clusters = clusters.next
     return Components
-
-
 
 
 ## A cluster is basically the union of sources of the baseclusters in a
@@ -335,12 +343,12 @@ def makeClusters(ComponentList):
             newCluster.addSources(b.sources)
             newCluster.labels.append(b.label)
             newCluster.collectWords(b.label)
-        newCluster.sourceOverlap = common(map(lambda(x):x.sources, clusters))
-        newCluster.labelOverlap = common(map(lambda(x):x.label, clusters))
+        newCluster.sourceOverlap = common(map(lambda (x): x.sources, clusters))
+        newCluster.labelOverlap = common(map(lambda (x): x.label, clusters))
         newCluster.makeLabel()  #arbitrary label, drop or fix to something interesting??
         Clusters.append(newCluster)
     return Clusters
-        
+
 
 def dropOneWordClusters(Clusters):
     result = []
@@ -360,12 +368,13 @@ def printClusters(ClusterList):
 def flatten(List):  # List of lists
     FlatList = []
     for x in List:
-        for y in x: FlatList.append(y)
+        for y in x:
+            FlatList.append(y)
     return FlatList
 
 
 def common(Lists):
-    allElements = flatten(Lists) 
+    allElements = flatten(Lists)
     Common = []
     for x in allElements:
         if not x in Common: Common.append(x)

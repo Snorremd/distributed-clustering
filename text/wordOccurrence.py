@@ -45,10 +45,5 @@ def getWordSources(compactTrie):
     return wordDict
 
 
-
 def countSources(compactTrie):
     return len(collectSources(compactTrie))
-
-
-    
-    

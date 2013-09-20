@@ -7,15 +7,18 @@ import asyncore
 import socket
 from time import sleep
 import sys
+from inputOutput.filehandling import get_client_config
 from inputOutput.output import show_info_dialog, show_input_dialog, show_option_dialog
 
 
 if __name__ == '__main__':
 
-    choice = show_option_dialog("Do you want to use default options?", ["yes",
-                                                                   "no"])
-    if(choice == "yes"):
-        client = Client(("localhost",9876), "lol", "snorre")
+    choice = show_option_dialog("Do you want to use config file?",
+                                ["yes", "no"])
+    if choice == "yes":
+        address, port, programId, username = get_client_config()
+        client = Client((address, int(port)), programId,
+                        username)
         asyncore.loop()
     else:
         show_info_dialog("This client is intended to run on one processor core "

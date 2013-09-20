@@ -10,11 +10,9 @@ class ClusterSettings:
     A class for wrapping information needed for clustering
     '''
 
-    def __init__(self, dropSingletonGTClusters,
-                 fBetaConstant, corpusName):
+    def __init__(self, dropSingletonGTClusters, fBetaConstant):
         '''
         Constructor
         '''
         self.dropSingletonGTClusters = dropSingletonGTClusters
         self.fBetaConstant = fBetaConstant
-        self.corpusName = corpusName

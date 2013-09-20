@@ -11,7 +11,8 @@ import math
 from datetime import datetime
 import __main__
 ## from memory_profiler import profile
-from text.jsonsnippets import make_tag_index, make_groundtruth_clusters, \
+from inputOutput.filehandling import get_corpus_settings
+from text.xmlsnippets import make_tag_index, make_groundtruth_clusters, \
     get_snippet_collection
 from compactTrie.clustersPlus import topBaseClusters, \
     dropSingletonBaseClusters, mergeComponents, makeClusters, \
@@ -54,22 +55,21 @@ class CompactTrieClusterer(object):
         """
         self.logger = getLoggerForStdOut("CompactTrieClusterer")
         self.corpus = corpus
-        self.corpusPath = self.get_corpus_path(corpus)
-        self.logger.debug("Corpus path: {0}".format(self.corpusPath))
+        self.snippetPath = self.get_snippet_path(corpus.name)
+        self.logger.debug("Corpus path: {0}".format(self.snippetPath))
         self.clusterSettings = clusterSettings
         self.logger.debug("Make tag index")
-        self.tagIndex = make_tag_index(self.corpusPath)
+        self.tagIndex = make_tag_index(self.snippetPath)
         self.logger.debug("Make ground truth clusters")
-        self.groundTruthClusters = make_groundtruth_clusters(self.corpusPath)
+        self.groundTruthClusters = make_groundtruth_clusters(self.snippetPath)
         self.logger.debug("Make snippet collection")
-        self.snippetCollection = get_snippet_collection(self.corpusPath)
+        self.snippetCollection = get_snippet_collection(self.snippetPath)
 
-    def get_corpus_path(self, corpus):
+    def get_snippet_path(self, corpusName):
         """Given a corpus return path to file
         """
-        pathToMain = os.path.dirname(__main__.__file__)
-        return os.path.join(pathToMain, "corpusfiles",
-                            corpus.directory, corpus.filename)
+        corpus = get_corpus_settings(corpusName)
+        return corpus.snippetFilePath
 
     def cluster(self, chromosome):
         """Clusters a snippet collection given a set of parameters
@@ -94,7 +94,7 @@ class CompactTrieClusterer(object):
         ## Make "aliases" for cluster setting variables
         dropSingletonGTClusters = self.clusterSettings.dropSingletonGTClusters
         tagIndex = self.tagIndex
-        filename = self.corpusPath
+        filename = self.snippetPath
         groundTruthClusters = self.groundTruthClusters
         fBetaConstant = self.clusterSettings.fBetaConstant
         verbose = 0
@@ -134,6 +134,11 @@ class CompactTrieClusterer(object):
         ## Make tree from suffixes, midslices, rangeslices or n-slices
         tree = generate_compact_trie(treeType, snippetCollection)
 
+        if False: return ((0, 0, 0),
+                    (.0, .0, .0),
+                    (.0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0))
         ## Extract base clusters from compact trie given
         ## stop word parameters and number of clusters...
         baseClusters = topBaseClusters(tree,
@@ -142,7 +147,6 @@ class CompactTrieClusterer(object):
                                        maxTermRatioInCollection,
                                        minLimitForBaseClusterScore,
                                        maxLimitForBaseClusterScore)
-        del tree
 
         if chromosome.shouldDropSingletonBaseClusters == 1:
             baseClusters = dropSingletonBaseClusters(baseClusters)
@@ -161,6 +165,7 @@ class CompactTrieClusterer(object):
         timeToCluster = stop - start
 
         if noOfBaseClusters == 0:
+            self.logger.debug("Number of base clusters == 0")
             return ((timeToCluster, 0, noOfBaseClusters),
                     (.0, .0, .0),
                     (.0, .0, .0, .0, .0),
@@ -173,6 +178,7 @@ class CompactTrieClusterer(object):
 
         ## For hopeless cases where no clusters are found
         if noOfClusters == 0:
+            self.logger.debug("Number of clusters == 0")
             return ((timeToCluster, 0, noOfBaseClusters),
                     (.0, .0, .0),
                     (.0, .0, .0, .0, .0),
@@ -254,7 +260,7 @@ class CompactTrieClusterer(object):
         del clusters
 
         self.logger.debug("Finished clustering")
-
+        self.logger.debug("F-Measure: {0}".format(str(fMeasureTuple)))
         return ((timeToCluster, noOfClusters, noOfBaseClusters),
                 (precision, recall, fMeasure),
                 groundTruthTuple,
