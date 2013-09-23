@@ -11,7 +11,7 @@ from phrases import stringToPhrase
 from xmlsnippets import get_snippet_collection
 from math import floor, ceil
 from guppy import hpy
-heapy = hpy()
+
 
  
 
@@ -52,7 +52,6 @@ def n_slice_tree(n, strings):
 
 
 def rangeSliceTree(strings, rangeMin=.5, rangeMax=.7):  # build slice tree from a list of string+source pairs
-    print heapy.heap()
     Slices = []
     for (x, y) in strings:
         x = x[:]
@@ -64,7 +63,6 @@ def rangeSliceTree(strings, rangeMin=.5, rangeMax=.7):  # build slice tree from 
         max = int(ceil(len(string) * rangeMax))
         for s in rangeSlices(min, max, string):
             Slices.append((s, y))
-    print heapy.heap()
     sleep(4)
     totalLength = 0
     for slice in Slices:

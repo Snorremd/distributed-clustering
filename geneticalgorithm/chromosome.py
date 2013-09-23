@@ -140,9 +140,9 @@ class Chromosome:
         textTypesKeys = clustering.TEXTTYPES
         chromosomeDict = {
             "id": self.id,
-            "tree_type_1": self.treeType[1],
-            "tree_type_2": self.treeType[2],
-            "tree_type_3": self.treeType[3],
+            "tree_type_1": self.treeType[0],
+            "tree_type_2": self.treeType[1],
+            "tree_type_3": self.treeType[2],
             "text_type_frontpageheading": self.textType[textTypesKeys[0]],
             "text_type_frontpageintroduction": self.textType[textTypesKeys[1]],
             "text_type_articleheading": self.textType[textTypesKeys[2]],
@@ -167,6 +167,7 @@ class Chromosome:
             chromosomeDict["precision"] = self.result[1][1]
             chromosomeDict["recall"] = self.result[1][2]
             chromosomeDict["fmeasure"] = self.result[1][0]
+        return chromosomeDict
 
 
     def get_precision(self):

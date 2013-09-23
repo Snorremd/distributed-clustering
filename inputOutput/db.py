@@ -1,3 +1,5 @@
+from geneticalgorithm.chromosome import createRandomChromosome
+
 __author__ = 'snorre'
 
 import MySQLdb
@@ -310,9 +312,58 @@ class DbHandler(object):
     def insert_chromosomes_saved_population(self, chromosomes):
         values = []
         for chromosome in chromosomes:
-            chromosomeDict = chromosome.chromosome_as_dict()
-            values
+            values.append(chromosome.chromosome_as_dict())
+        for chromosome in values:
+            for key, value in chromosome.iteritems():
+                if isinstance(value, str):
+                    print "Value is string: {0}",format(value)
 
+        sql = "INSERT INTO saved_population (" \
+              "`id`, " \
+              "`tree_type_1`, " \
+              "`tree_type_2`, " \
+              "`tree_type_3`, " \
+              "`text_type_frontpageheading`, " \
+              "`text_type_frontpageintroduction`, " \
+              "`text_type_articleheading`, " \
+              "`text_type_articlebyline`, " \
+              "`text_type_articleintroduction`, " \
+              "`text_type_articletext`, " \
+              "`top_base_clusters_amount`, " \
+              "`min_term_occurrence_collection`, " \
+              "`max_term_ratio_collection`, " \
+              "`min_limit_base_cluster_score`, " \
+              "`max_limit_base_cluster_score`, " \
+              "`drop_singleton_base_clusters`, " \
+              "`drop_one_word_clusters`, " \
+              "`fitness`" \
+              ") VALUES ( " \
+              "%(id)s, " \
+              "%(tree_type_1)s, " \
+              "%(tree_type_2)s, " \
+              "%(tree_type_3)s, " \
+              "%(text_type_frontpageheading)s, " \
+              "%(text_type_frontpageintroduction)s, " \
+              "%(text_type_articleheading)s, " \
+              "%(text_type_articlebyline)s, " \
+              "%(text_type_articleintroduction)s, " \
+              "%(text_type_articletext)s, " \
+              "%(top_base_clusters_amount)s, " \
+              "%(min_term_occurrence_collection)s, " \
+              "%(max_term_ratio_collection)s, " \
+              "%(min_limit_base_cluster_score)s, " \
+              "%(max_limit_base_cluster_score)s, " \
+              "%(drop_singleton_base_clusters)s, " \
+              "%(drop_one_word_clusters)s, " \
+              "%(fitness)s )"
+        print sql
+
+        con = self.__getDatabaseConnection()
+        cur = con.cursor()
+        cur.executemany(sql, values)
+        con.commit()
+        cur.close()
+        print cur.fetchall()
 
     def insert_chromosome_chromosomes(self):
         pass
@@ -331,3 +382,7 @@ if __name__ == '__main__':
     dbhandler = DbHandler("localhost", "ctcluster", "fTnYTmuPm6FbEmZK",
                           "ctcluster")
     dbhandler.create_all_tables()
+    chromosomes = []
+    for _ in xrange(10):
+        chromosomes.append(createRandomChromosome())
+    dbhandler.insert_chromosomes_saved_population(chromosomes)
