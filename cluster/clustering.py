@@ -115,9 +115,9 @@ class CompactTrieClusterer(object):
         if text_types_none(textTypes):
             return ((0, 0, 0),
                     (.0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0))
+                    (.0, .0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0, .0))
 
         if dropSingletonGTClusters:
             groundTruthClusters = dropSingletonGroundTruthClusters(
@@ -134,11 +134,6 @@ class CompactTrieClusterer(object):
         ## Make tree from suffixes, midslices, rangeslices or n-slices
         tree = generate_compact_trie(treeType, snippetCollection)
 
-        if False: return ((0, 0, 0),
-                    (.0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0))
         ## Extract base clusters from compact trie given
         ## stop word parameters and number of clusters...
         baseClusters = topBaseClusters(tree,
@@ -168,9 +163,9 @@ class CompactTrieClusterer(object):
             self.logger.debug("Number of base clusters == 0")
             return ((timeToCluster, 0, noOfBaseClusters),
                     (.0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0))
+                    (.0, .0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0, .0))
 
         noOfSources = len(tagIndex)
         noOfClusters = len(clusters)
@@ -181,9 +176,9 @@ class CompactTrieClusterer(object):
             self.logger.debug("Number of clusters == 0")
             return ((timeToCluster, 0, noOfBaseClusters),
                     (.0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0),
-                    (.0, .0, .0, .0, .0))
+                    (.0, .0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0, .0),
+                    (.0, .0, .0, .0, .0, .0))
 
         resultsTagAccuracy = calc_tag_accuracy(clusters,
                                                noOfClusters,

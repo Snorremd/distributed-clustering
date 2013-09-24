@@ -5,6 +5,7 @@
 #  11.05.2011
 from time import sleep
 import gc
+from easylogging import configLogger
 
 from text.phrases import firstword, getCommonStartSegment
 
@@ -51,7 +52,7 @@ class CompactTrie:
         if not Phrase:
             return None  ## do nothing on empty phrase
         sources = Sources[:]  #make copies of the parameters
-        phrase = Phrase  #(perhaps not necessary for Phrase?)
+        phrase = Phrase[:]  #(perhaps not necessary for Phrase?)
         first = firstword(phrase)
         if not first in self.subtrees:
             ## Branch does not exist, create a new branch
@@ -111,10 +112,15 @@ def phraseTree(phrases):
     '''
     Builds a compact trie from a list of phrase source-pairs.
     '''
+    logger = configLogger.getLoggerForStdOut("compactTrie")
+    logger.debug("Building Phrase tree")
     tree = CompactTrie()
     for (p, s) in phrases:
         tree.insert(p, s)
-        gc.collect()
+        del p
+        del s
+
+    logger.debug("Finished building phrase tree")
     return tree
 
 

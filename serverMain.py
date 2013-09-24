@@ -7,6 +7,7 @@ import sys
 from xml.etree import ElementTree as ET
 
 from easylogging.configLogger import getLoggerForStdOut
+from inputOutput.db import DbHandler
 from inputOutput.filehandling import get_root_path, get_corpus_options, get_server_config, get_corpus_settings
 from inputOutput.output import show_info_dialog, show_input_dialog, \
     show_option_dialog
@@ -33,7 +34,8 @@ if __name__ == '__main__':
                                 ["yes", "no"])
     if choice == "yes":
         hostAddress, port, programId, batchSize,\
-            timeout, populationSize, corpusName = get_server_config()
+            timeout, populationSize, corpusName,\
+            dbhost, dbname, dbuser, dbpasswd = get_server_config()
 
     else:
         hostAddress = show_option_dialog("Please type in one of the two options "
@@ -58,6 +60,14 @@ if __name__ == '__main__':
         corpusName = show_input_dialog("Specify one of the following corpora:",
                                    get_corpus_options())
 
+        dbhost = show_input_dialog("Specify dbhost (localhost/X.X.X.X: ")
+
+        dbname = show_input_dialog("Specify database: ")
+
+        dbuser = show_input_dialog("Specify user: ")
+
+        dbpasswd = show_input_dialog("Specify password: ")
+
 
     try:
 
@@ -65,8 +75,9 @@ if __name__ == '__main__':
 
         mainLogger = getLoggerForStdOut('Main')
         mainLogger.debug("Create genetic algorithm object and initial population")
+        dbHandler = DbHandler(dbhost, dbname, dbuser, dbpasswd)
         taskOrganizer = TaskOrganizer(int(timeout), [])
-        gAlgorithm = GeneticAlgorithm(taskOrganizer,
+        gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
                                       corpus, int(populationSize), 3,
                                       GeneticAlgorithm.ROULETTEWHEEL,
                                       0.5, 0.10, geneticAlgorithm.VERBOSEFILE)

@@ -167,16 +167,45 @@ class Chromosome:
             chromosomeDict["precision"] = self.result[1][1]
             chromosomeDict["recall"] = self.result[1][2]
             chromosomeDict["fmeasure"] = self.result[1][0]
+            chromosomeDict["time"] = self.result[0][0]
+            chromosomeDict["number_of_clusters"] = self.result[0][1]
+            chromosomeDict["number_of_base_clusters"] = self.result[0][2]
+            chromosomeDict["precision_0"] = self.result[2][0]
+            chromosomeDict["precision_1"] = self.result[2][0]
+            chromosomeDict["precision_2"] = self.result[2][0]
+            chromosomeDict["precision_3"] = self.result[2][0]
+            chromosomeDict["precision_4"] = self.result[2][0]
+            chromosomeDict["precision_5"] = self.result[2][0]
+            chromosomeDict["recall_0"] = self.result[3][0]
+            chromosomeDict["recall_1"] = self.result[3][0]
+            chromosomeDict["recall_2"] = self.result[3][0]
+            chromosomeDict["recall_3"] = self.result[3][0]
+            chromosomeDict["recall_4"] = self.result[3][0]
+            chromosomeDict["recall_5"] = self.result[3][0]
+            chromosomeDict["f_measure_0"] = self.result[4][0]
+            chromosomeDict["f_measure_1"] = self.result[4][0]
+            chromosomeDict["f_measure_2"] = self.result[4][0]
+            chromosomeDict["f_measure_3"] = self.result[4][0]
+            chromosomeDict["f_measure_4"] = self.result[4][0]
+            chromosomeDict["f_measure_5"] = self.result[4][0]
         return chromosomeDict
 
-
     def get_precision(self):
-        return self.result[2]
+        return self.result[1][0]
 
     def get_recall(self):
-        return self.result[3]
+        return self.result[1][1]
 
     def get_fmeasure(self):
+        return self.result[1][2]
+
+    def get_precisions(self):
+        return self.result[2]
+
+    def get_recalls(self):
+        return self.result[3]
+
+    def get_fmeasures(self):
         return self.result[4]
 
     def get_time_number_clusters(self):
@@ -212,7 +241,6 @@ def getRandomTreeType():
     """
     Return a tuple representing a randomized tree type
     """
-    if True: return (2,0.1,0.9)
     treeType = randint(0, 3)
     if treeType == clustering.SUFFIXTREE:
         return 0, 0, 0

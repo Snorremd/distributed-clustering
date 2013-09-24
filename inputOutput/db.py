@@ -1,158 +1,22 @@
 from geneticalgorithm.chromosome import createRandomChromosome
+from inputOutput.sqlStatements import INSERT_INTO_SAVED_POPULATION, \
+    INSERT_INTO_CHROMOSOMES, BEST_CHROMOSOMES_CREATE_STATEMENT, \
+    WORST_CHROMOSOMES_CREATE_STATEMENT, MEDIAN_CHROMOSOMES_CREATE_STATEMENT, \
+    TABLE_EXISTS_STRING, DROP_TABLE_STATEMENT, \
+    GENETIC_ALGORITHM_TABLE_CREATE_STATEMENT, \
+    CHROMOSOME_TABLE_CREATE_STATEMENT, \
+    POPULATION_TABLE_CREATE_STATEMENT, INSERT_INTO_GENETIC_ALGORITHM, \
+    INSERT_INTO_BEST_CHROMOSOMES, INSERT_INTO_WORST_CHROMOSOMES, \
+    INSERT_INTO_MEDIAN_CHROMOSOMES
 
 __author__ = 'snorre'
 
 import MySQLdb
 from easylogging import configLogger
 
-DB_EXISTS_STRING = ("SELECT schema_name FROM information_schema.schemata WHERE"
-                    "schema_name = %s")
-
-TABLE_EXISTS_STRING = ("SELECT * FROM information_schema.tables WHERE table_"
-                       "schema = %s AND table_name = %s LIMIT 1")
-
-## SQL statement to
-DROP_TABLE_STATEMENT = "DROP TABLE IF EXISTS %s"
-
-
-## SQL statements to create tables
-POPULATION_TABLE_CREATE_STATEMENT = \
-    """
-    CREATE TABLE IF NOT EXISTS `saved_population` (
-      `id` int NOT NULL,
-      `tree_type_1` int NOT NULL,
-      `tree_type_2` double NOT NULL,
-      `tree_type_3` double NOT NULL,
-      `text_type_frontpageheading` tinyint NOT NULL,
-      `text_type_frontpageintroduction` tinyint NOT NULL,
-      `text_type_articleheading` tinyint NOT NULL,
-      `text_type_articlebyline` tinyint NOT NULL,
-      `text_type_articleintroduction` tinyint NOT NULL,
-      `text_type_articletext` tinyint NOT NULL,
-      `top_base_clusters_amount` int(11) NOT NULL,
-      `min_term_occurrence_collection` int(11) NOT NULL,
-      `max_term_ratio_collection` int(11) NOT NULL,
-      `min_limit_base_cluster_score` int(11) NOT NULL,
-      `max_limit_base_cluster_score` int(11) NOT NULL,
-      `drop_singleton_base_clusters` tinyint(1) NOT NULL,
-      `drop_one_word_clusters` tinyint(1) NOT NULL,
-      `fitness` double NOT NULL,
-      PRIMARY KEY (id)
-
-    ) ENGINE=InnoDB;
-    """
-
-GENETIC_ALGORITHM_TABLE_CREATE_STATEMENT = \
-    """
-    CREATE TABLE IF NOT EXISTS `genetic_algorithm` (
-        `generation` int NOT NULL,
-        `fitness_avg` double NOT NULL,
-        `fmeasure_avg` double NOT NULL,
-        `precision_avg` double NOT NULL,
-        `recall_avg` double NOT NULL,
-        `time_avg` int NOT NULL,
-        `number_of_clusters_avg` int NOT NULL,
-        `number_of_base_clusters_avg` int NOT NULL,
-        `precision_avg_0` double NOT NULL,
-        `precision_avg_1` double NOT NULL,
-        `precision_avg_2` double NOT NULL,
-        `precision_avg_3` double NOT NULL,
-        `precision_avg_4` double NOT NULL,
-        `precision_avg_5` double NOT NULL,
-        `recall_avg_0` double NOT NULL,
-        `recall_avg_1` double NOT NULL,
-        `recall_avg_2` double NOT NULL,
-        `recall_avg_3` double NOT NULL,
-        `recall_avg_4` double NOT NULL,
-        `recall_avg_5` double NOT NULL,
-        `fmeasure_avg_0` double NOT NULL,
-        `fmeasure_avg_1` double NOT NULL,
-        `fmeasure_avg_2` double NOT NULL,
-        `fmeasure_avg_3` double NOT NULL,
-        `fmeasure_avg_4` double NOT NULL,
-        `fmeasure_avg_5` double NOT NULL,
-        PRIMARY KEY (generation)
-    ) ENGINE=InnoDB;
-    """
-
-BEST_CHROMOSOMES_CREATE_STATEMENT = \
-    """
-    CREATE TABLE IF NOT EXISTS `best_chromosomes` (
-        `generation_id` int NOT NULL,
-        `chromosome_id` int NOT NULL,
-        PRIMARY KEY (generation_id, chromosome_id),
-        CONSTRAINT FOREIGN KEY (generation_id) REFERENCES genetic_algorithm(
-        generation) ON DELETE CASCADE ON UPDATE CASCADE,
-        CONSTRAINT FOREIGN KEY (chromosome_id) REFERENCES chromosomes(id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-    ) ENGINE=InnoDB;
-    """
-
-WORST_CHROMOSOMES_CREATE_STATEMENT = \
-    """
-    CREATE TABLE IF NOT EXISTS `worst_chromosomes` (
-        `generation_id` int NOT NULL,
-        `chromosome_id` int NOT NULL,
-        PRIMARY KEY (generation_id, chromosome_id),
-        CONSTRAINT FOREIGN KEY (generation_id) REFERENCES genetic_algorithm(
-        generation)  ON DELETE CASCADE ON UPDATE CASCADE,
-        CONSTRAINT FOREIGN KEY (chromosome_id) REFERENCES chromosomes(id)
-        ON DELETE CASCADE ON UPDATE CASCADE
-    ) ENGINE=InnoDB;
-    """
-
-CHROMOSOME_TABLE_CREATE_STATEMENT = \
-    """
-    CREATE TABLE IF NOT EXISTS `chromosomes` (
-        `id` int NOT NULL,
-        `tree_type_1` int NOT NULL,
-        `tree_type_2` double NOT NULL,
-        `tree_type_3` double NOT NULL,
-        `text_type_frontpageheading` tinyint NOT NULL,
-        `text_type_frontpageintroduction` tinyint NOT NULL,
-        `text_type_articleheading` tinyint NOT NULL,
-        `text_type_articlebyline` tinyint NOT NULL,
-        `text_type_articleintroduction` tinyint NOT NULL,
-        `text_type_articletext` tinyint NOT NULL,
-        `top_base_clusters_amount` int(11) NOT NULL,
-        `min_term_occurrence_collection` int(11) NOT NULL,
-        `max_term_ratio_collection` int(11) NOT NULL,
-        `min_limit_base_cluster_score` int(11) NOT NULL,
-        `max_limit_base_cluster_score` int(11) NOT NULL,
-        `drop_singleton_base_clusters` tinyint(1) NOT NULL,
-        `drop_one_word_clusters` tinyint(1) NOT NULL,
-        `fitness` double NOT NULL,
-        `fmeasure` double NOT NULL,
-        `precision` double NOT NULL,
-        `recall` double NOT NULL,
-        `time` int NOT NULL,
-        `number_of_clusters` int NOT NULL,
-        `number_of_base_clusters` int NOT NULL,
-        `precision_0` double NOT NULL,
-        `precision_1` double NOT NULL,
-        `precision_2` double NOT NULL,
-        `precision_3` double NOT NULL,
-        `precision_4` double NOT NULL,
-        `precision_5` double NOT NULL,
-        `recall_0` double NOT NULL,
-        `recall_1` double NOT NULL,
-        `recall_2` double NOT NULL,
-        `recall_3` double NOT NULL,
-        `recall_4` double NOT NULL,
-        `recall_5` double NOT NULL,
-        `f_measure_0` double NOT NULL,
-        `f_measure_1` double NOT NULL,
-        `f_measure_2` double NOT NULL,
-        `f_measure_3` double NOT NULL,
-        `f_measure_4` double NOT NULL,
-        `f_measure_5` double NOT NULL,
-        PRIMARY KEY(id)
-    ) ENGINE=InnoDB;
-    """
-
 
 class DbHandler(object):
-    def __init__(self, hostname, username, password, database, port=3306):
+    def __init__(self, hostname, database, username, password, port=3306):
         """
 
         :param hostname: the host address of database (i.e. localhost/x.x.x.x)
@@ -276,7 +140,7 @@ class DbHandler(object):
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
         else:
-            self.logger.debug("Successully dropped saved_population table")
+            self.logger.debug("Successfully dropped saved_population table")
 
     def create_best_chromosomes_table(self):
         try:
@@ -287,7 +151,7 @@ class DbHandler(object):
                                                           e.args[1]))
             return False
         else:
-            self.logger.debug("Successfully created chromosomes table")
+            self.logger.debug("Successfully created best_chromosomes table")
             return True
 
     def create_worst_chromosomes_table(self):
@@ -299,7 +163,19 @@ class DbHandler(object):
                                                           e.args[1]))
             return False
         else:
-            self.logger.debug("Successfully created chromosomes table")
+            self.logger.debug("Successfully created worst_chromosomes table")
+            return True
+
+    def create_median_chromosomes_table(self):
+        try:
+            self.create_table("median_chromosomes",
+                              MEDIAN_CHROMOSOMES_CREATE_STATEMENT)
+        except MySQLdb.Error, e:
+            self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
+                                                          e.args[1]))
+            return False
+        else:
+            self.logger.debug("Successfully created median_chromosomes table")
             return True
 
     def create_all_tables(self):
@@ -308,6 +184,7 @@ class DbHandler(object):
         self.create_chromosomes_table()
         self.create_best_chromosomes_table()
         self.create_worst_chromosomes_table()
+        self.create_median_chromosomes_table()
 
     def insert_chromosomes_saved_population(self, chromosomes):
         values = []
@@ -316,46 +193,9 @@ class DbHandler(object):
         for chromosome in values:
             for key, value in chromosome.iteritems():
                 if isinstance(value, str):
-                    print "Value is string: {0}",format(value)
+                    print "Value is string: {0}".format(value)
 
-        sql = "INSERT INTO saved_population (" \
-              "`id`, " \
-              "`tree_type_1`, " \
-              "`tree_type_2`, " \
-              "`tree_type_3`, " \
-              "`text_type_frontpageheading`, " \
-              "`text_type_frontpageintroduction`, " \
-              "`text_type_articleheading`, " \
-              "`text_type_articlebyline`, " \
-              "`text_type_articleintroduction`, " \
-              "`text_type_articletext`, " \
-              "`top_base_clusters_amount`, " \
-              "`min_term_occurrence_collection`, " \
-              "`max_term_ratio_collection`, " \
-              "`min_limit_base_cluster_score`, " \
-              "`max_limit_base_cluster_score`, " \
-              "`drop_singleton_base_clusters`, " \
-              "`drop_one_word_clusters`, " \
-              "`fitness`" \
-              ") VALUES ( " \
-              "%(id)s, " \
-              "%(tree_type_1)s, " \
-              "%(tree_type_2)s, " \
-              "%(tree_type_3)s, " \
-              "%(text_type_frontpageheading)s, " \
-              "%(text_type_frontpageintroduction)s, " \
-              "%(text_type_articleheading)s, " \
-              "%(text_type_articlebyline)s, " \
-              "%(text_type_articleintroduction)s, " \
-              "%(text_type_articletext)s, " \
-              "%(top_base_clusters_amount)s, " \
-              "%(min_term_occurrence_collection)s, " \
-              "%(max_term_ratio_collection)s, " \
-              "%(min_limit_base_cluster_score)s, " \
-              "%(max_limit_base_cluster_score)s, " \
-              "%(drop_singleton_base_clusters)s, " \
-              "%(drop_one_word_clusters)s, " \
-              "%(fitness)s )"
+        sql = INSERT_INTO_SAVED_POPULATION
         print sql
 
         con = self.__getDatabaseConnection()
@@ -363,26 +203,109 @@ class DbHandler(object):
         cur.executemany(sql, values)
         con.commit()
         cur.close()
-        print cur.fetchall()
+        con.close()
 
-    def insert_chromosome_chromosomes(self):
-        pass
+    def insert_chromosomes_chromosomes(self, chromosomes):
+        values = []
+        for chromosome in chromosomes:
+            values.append(chromosome.chromosome_as_dict())
 
-    def insert_generation(self):
-        pass
+        sql = INSERT_INTO_CHROMOSOMES
 
-    def insert_top_chromosome(self):
-        pass
+        con = self.__getDatabaseConnection()
+        cur = con.cursor()
+        cur.executemany(sql, values)
+        con.commit()
+        cur.close()
+        con.close()
 
-    def insert_worst_chromosome(self):
-        pass
+    def insert_generation(self, generationResult):
+        sql = INSERT_INTO_GENETIC_ALGORITHM
+        con = self.__getDatabaseConnection()
+        cur = con.cursor()
+        cur.execute(sql, generationResult)
+        cur.close()
+        con.close()
+
+    def insert_top_chromosomes(self, chromosomes, generation):
+        values = []
+        for chromosome in chromosomes:
+            values.append(chromosome.chromosome_as_dict())
+
+        sql = INSERT_INTO_CHROMOSOMES
+        con = self.__getDatabaseConnection()
+        cur = con.cursor()
+        print sql, values
+        cur.executemany(sql, values)
+        cur.close()
+        cur = con.cursor()
+
+        sql = INSERT_INTO_BEST_CHROMOSOMES
+        values = []
+        for chromosome in chromosomes:
+            values.append([chromosome.id, generation])
+
+        cur.executemany(sql, values)
+        con.commit()
+        cur.close()
+        con.close()
+
+    def insert_worst_chromosomes(self, chromosomes, generation):
+        values = []
+        for chromosome in chromosomes:
+            values.append(chromosome.chromosome_as_dict())
+
+        sql = INSERT_INTO_CHROMOSOMES
+        con = self.__getDatabaseConnection()
+        cur = con.cursor()
+        cur.executemany(sql, values)
+        cur.close()
+        cur = con.cursor()
+
+        sql = INSERT_INTO_WORST_CHROMOSOMES
+        values = []
+        for chromosome in chromosomes:
+            values.append([chromosome.id, generation])
+
+        cur.executemany(sql, values)
+        con.commit()
+        cur.close()
+        con.close()
+
+    def insert_median_chromosomes(self, chromosomes, generation):
+        values = []
+        for chromosome in chromosomes:
+            values.append(chromosome.chromosome_as_dict())
+
+        sql = INSERT_INTO_CHROMOSOMES
+        con = self.__getDatabaseConnection()
+        cur = con.cursor()
+        cur.executemany(sql, values)
+        cur.close()
+        cur = con.cur()
+
+        sql = INSERT_INTO_MEDIAN_CHROMOSOMES
+        values = []
+        for chromosome in chromosomes:
+            values.append([chromosome.id, generation])
+
+        cur.executemany(sql, values)
+        con.commit()
+        cur.close()
+        con.close()
 
 
 if __name__ == '__main__':
-    dbhandler = DbHandler("localhost", "ctcluster", "fTnYTmuPm6FbEmZK",
+    dbHandler = DbHandler("localhost", "ctcluster", "secret",
                           "ctcluster")
-    dbhandler.create_all_tables()
+    dbHandler.create_all_tables()
     chromosomes = []
     for _ in xrange(10):
-        chromosomes.append(createRandomChromosome())
-    dbhandler.insert_chromosomes_saved_population(chromosomes)
+        chromosome = createRandomChromosome()
+        chromosome.result = ((4, 54, 534),
+                             (0.87, 0.34, 0.54),
+                             (0.5, 0.5, 0.5, 0.5, 0.5, 0.5),
+                             (0.5, 0.5, 0.5, 0.5, 0.5, 0.5),
+                             (0.5, 0.5, 0.5, 0.5, 0.5, 0.5))
+        chromosomes.append(chromosome)
+    dbHandler.insert_chromosomes_chromosomes(chromosomes)

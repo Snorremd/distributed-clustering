@@ -10,6 +10,7 @@ import math as math
 
 from chromosome import createRandomChromosome, crossChromosomes
 import __main__
+from geneticalgorithm.result import GenerationResult
 from tasks.task import CompactTrieClusteringTask
 from easylogging.configLogger import getLoggerForFile
 from cluster.clusterSettings import ClusterSettings
@@ -39,8 +40,8 @@ class GeneticAlgorithm:
     ## Define class constants
     ROULETTEWHEEL = 0
 
-    def __init__(self, taskOrganizer, corpus, populationSize, noOfGenerations,
-                 selectionType, selectionRate, mutationRate,
+    def __init__(self, taskOrganizer, dbHandler, corpus, populationSize,
+                 noOfGenerations, selectionType, selectionRate, mutationRate,
                  gaVerbosity):
         """Constructor of the GeneticAlgorithm class
 
@@ -54,6 +55,7 @@ class GeneticAlgorithm:
             gaVerbosity (int): wether to write to file or output to terminal
         """
         self.logger = getLoggerForFile("GeneticAlgorithm")
+        self.dbHandler = dbHandler
 
         self.taskOrganizer = taskOrganizer
         self.taskOrganizer.attach(self)  # Get notified when tasks done
@@ -122,8 +124,22 @@ class GeneticAlgorithm:
                          str(self.currentGeneration))
         generationData = self.calcGenerationData()
         self.log_generation_data(generationData)
-        self.results_to_avg_file(generationData[1:])
-        self.results_to_top_file(generationData[0])
+        ## self.results_to_avg_file(generationData[1:])
+        ## self.results_to_top_file(generationData[0])
+
+        ## Insert results into database
+        self.dbHandler.insert_generation(self.algorithm_as_dict(generationData))
+        self.dbHandler.insert_top_chromosomes(generationData.topChromosomes,
+                                              self.currentGeneration)
+        self.dbHandler.insert_worst_chromosomes(generationData
+                                                .worstChromosomes,
+                                                self.currentGeneration)
+        self.dbHandler.insert_median_chromosomes(
+            generationData.medianChromosomes, self.currentGeneration)
+
+        self.dbHandler.insert_chromosomes_saved_population(self.population)
+
+
 
         if self.currentGeneration < self.noOfGenerations:
             self.currentGeneration += 1
@@ -135,7 +151,7 @@ class GeneticAlgorithm:
             self.taskOrganizer.add_tasks(self.make_clustering_tasks())
 
     def log_generation_data(self, generationData):
-        topChromosome = generationData[0]
+        topChromosome = generationData.topChromosomes[0]
         outputText = ""
         outputText += "#######################################\n"
         outputText += "Generation {0} \n".format(self.currentGeneration)
@@ -144,21 +160,24 @@ class GeneticAlgorithm:
             topChromosome.genesAsTuple()) + "\n"
         outputText += "Fitness: %.4f" % (topChromosome.fitness,) + "\n"
         outputText += "Precisions: %.4f, %.4f, %.4f, %.4f, %.4f, %.4f" % \
-                      topChromosome.get_precision() + "\n"
+                      topChromosome.get_precisions() + "\n"
         outputText += "Recalls: %.4f, %.4f, %.4f, %.4f, %.4f, %.4f" % \
-                      topChromosome.get_recall() + "\n"
+                      topChromosome.get_recalls() + "\n"
         outputText += "FMeasures: %.4f, %.4f, %.4f, %.4f, %.4f, %.4f" % \
-                      topChromosome.get_fmeasure() + "\n"
+                      topChromosome.get_fmeasures() + "\n"
         outputText += "Time, no. clusters, no. baseclusters: " + \
                       str(topChromosome.get_time_number_clusters()) + "\n\n"
 
-        outputText += "Average fitness: %.4f" % (generationData[1],) + "\n"
+        outputText += "Average fitness: %.4f" % (generationData.averageFitness,
+        ) + "\n"
         outputText += "Average precision0: %.4f" % (
-            generationData[3][0],) + "\n"
+            generationData.averagePrecisions[0],) + "\n"
         outputText += "Average precision1: %.4f" % (
-            generationData[3][1],) + "\n"
-        outputText += "Average recall0: %.4f" % (generationData[4][0],) + "\n"
-        outputText += "Average recall1: %.4f" % (generationData[4][1],) + "\n\n"
+            generationData.averagePrecisions[1],) + "\n"
+        outputText += "Average recall0: %.4f" % (generationData.averageRecalls[
+                                                     0],) + "\n"
+        outputText += "Average recall1: %.4f" % (generationData.averageRecalls[
+                                                     1],) + "\n\n"
 
         outputText += "-----------------------\n"
         outputText += "Top 1 - 10 chromosomes:\n"
@@ -166,10 +185,10 @@ class GeneticAlgorithm:
         for i in xrange(10):
             outputText += "%.4f, %.4f, %.4f, %.4f, %.4f" % \
                           (self.population[i].fitness,
-                           self.population[i].get_precision()[0],
-                           self.population[i].get_precision()[1],
-                           self.population[i].get_recall()[0],
-                           self.population[i].get_recall()[1])
+                           self.population[i].get_precisions()[0],
+                           self.population[i].get_precisions()[1],
+                           self.population[i].get_recalls()[0],
+                           self.population[i].get_recalls()[1])
             outputText += str(self.population[i].genesAsTuple())
             outputText += "\n"
 
@@ -323,19 +342,33 @@ class GeneticAlgorithm:
     def calcGenerationData(self):
         """Calculate average fitness etc.
         """
-        topChromosome = self.population[0]
+        topChromosomes = [self.population[0]]
+        worstChromosomes = [self.population[-0]]
+        medianChromosomes = self.get_median_chromosomes()
         averageNumTime = self.calc_average_num_time()
         averageFitness = self.calc_average_fitness()
+        averagePrecision = self.calc_average_precision()
+        averageRecall = self.calc_average_recall()
+        averageFMeasure = self.calc_average_fmeasure()
         averagePrecisions = self.calc_average_precisions()
         averageRecalls = self.calc_average_recalls()
         averageFMeasures = self.calc_average_fmeasures()
 
-        return (topChromosome,
-                averageFitness,
-                averageNumTime,
-                averagePrecisions,
-                averageRecalls,
-                averageFMeasures)
+        generationResult = GenerationResult(averageFitness,
+                                            averageNumTime[2],
+                                            averageNumTime[1],
+                                            averageNumTime[0],
+                                            averagePrecision,
+                                            averageRecall,
+                                            averageFMeasure,
+                                            averagePrecisions,
+                                            averageRecalls,
+                                            averageFMeasures,
+                                            topChromosomes,
+                                            worstChromosomes,
+                                            medianChromosomes)
+
+        return generationResult
 
     def calc_average_num_time(self):
         avgTime, noOfClusters, noBaseClusters = 0, 0, 0
@@ -349,12 +382,30 @@ class GeneticAlgorithm:
         noBaseClusters /= self.populationSize
         return [avgTime, noOfClusters, noBaseClusters]
 
+    def calc_average_precision(self):
+        avgPrecision = 0
+        for chromosome in self.population:
+            avgPrecision += chromosome.get_precision()
+        return avgPrecision / self.populationSize
+
+    def calc_average_recall(self):
+        avgRecall = 0
+        for chromosome in self.population:
+            avgRecall += chromosome.get_recall()
+        return avgRecall / self.populationSize
+
+    def calc_average_fmeasure(self):
+        avgFMeasure = 0
+        for chromosome in self.population:
+            avgFMeasure += chromosome.get_fmeasure()
+        return avgFMeasure / self.populationSize
+
     def calc_average_precisions(self):
         avgPrecisions = []
         for i in xrange(6):
             avgPrecision = 0
             for chromosome in self.population:
-                avgPrecision += chromosome.get_precision()[i]
+                avgPrecision += chromosome.get_precisions()[i]
             avgPrecisions.append(avgPrecision / self.populationSize)
         return avgPrecisions
 
@@ -363,7 +414,7 @@ class GeneticAlgorithm:
         for i in xrange(6):
             avgRecall = 0
             for chromosome in self.population:
-                avgRecall += chromosome.get_precision()[i]
+                avgRecall += chromosome.get_precisions()[i]
             avgRecalls.append(avgRecall / self.populationSize)
         return avgRecalls
 
@@ -372,7 +423,7 @@ class GeneticAlgorithm:
         for i in xrange(6):
             avgFMeasure = 0
             for chromosome in self.population:
-                avgFMeasure += chromosome.get_precision()[i]
+                avgFMeasure += chromosome.get_precisions()[i]
             avgFMeasures.append(avgFMeasure / self.populationSize)
         return avgFMeasures
 
@@ -382,13 +433,57 @@ class GeneticAlgorithm:
             avgFitness += chromosome.fitness
         return avgFitness / self.populationSize
 
+    def get_median_chromosomes(self):
+        medianChromosomes = []
+        if len(self.population)%2 == 0:
+            firstMedian = int(math.floor(len(self.population)/2))-1
+            secondMedian = int(math.ceil(len(self.population)/2))-1
+            medianChromosomes.extend([self.population[firstMedian],
+                                      self.population[secondMedian]])
+        else:
+            medianChromosomes.append(
+                self.population[int(self.populationSize/2)-1]
+            )
+
+        return medianChromosomes
+
     def make_clustering_tasks(self):
         tasks = []
         for chromosome in self.population:
             tasks.append(CompactTrieClusteringTask(chromosome))
         return tasks
 
+    def algorithm_as_dict(self, generationResult):
+        dictValues = {
+            "generation": self.currentGeneration,
+            "fitness_avg": generationResult.averageFitness,
+            "fmeasure_avg": generationResult.averageFMeasure,
+            "precision_avg": generationResult.averagePrecision,
+            "recall_avg": generationResult.averageRecall,
+            "time_avg": generationResult.averageTime,
+            "number_of_clusters_avg": generationResult.averageClusters,
+            "number_of_base_clusters_avg": generationResult
+            .averageBaseClusters}
+
+        precisionString = "precision_avg_{0}"
+        recallString = "recall_avg_{0}"
+        fMeasureString = "fmeasure_avg_{0}"
+        for i in xrange(6):
+            dictValues[precisionString.format(i)] = \
+                generationResult.averagePrecisions[i]
+
+            dictValues[recallString.format(i)] = \
+                generationResult.averageRecalls[i]
+
+            dictValues[fMeasureString.format(i)] = \
+                generationResult.averageFMeasures[i]
+
+        print dictValues
+
+        return dictValues
+
 
 def writeToFile(filename, textToWrite):
     with open(filename, "a") as outputFile:
         outputFile.write(textToWrite + "\n")
+

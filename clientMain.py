@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """
 The main client module used to start the client worker.
 """
