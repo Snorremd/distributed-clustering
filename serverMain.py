@@ -69,13 +69,31 @@ if __name__ == '__main__':
         dbpasswd = show_input_dialog("Specify password: ")
 
 
+    mainLogger = getLoggerForStdOut('Main')
+    mainLogger.debug("Create genetic algorithm object and initial population")
     try:
+
+        dbHandler = DbHandler(dbhost, dbname, dbuser, dbpasswd)
+        if dbHandler.tables_exists():
+            choice = show_option_dialog("Tables already exist, do you want to "
+                                        "delete and create new ones?", ["yes",
+                                        "no"])
+
+            if choice == "yes":
+                dbHandler.drop_tables()
+
+            else:
+                mainLogger.debug("Please remove/backup tables and recreate "
+                                 "before restarting script.")
+                exit(0)
+
+        dbHandler.create_all_tables()
+
 
         corpus = get_corpus_settings(corpusName)
 
-        mainLogger = getLoggerForStdOut('Main')
-        mainLogger.debug("Create genetic algorithm object and initial population")
-        dbHandler = DbHandler(dbhost, dbname, dbuser, dbpasswd)
+
+
         taskOrganizer = TaskOrganizer(int(timeout), [])
         gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
                                       corpus, int(populationSize), 3,

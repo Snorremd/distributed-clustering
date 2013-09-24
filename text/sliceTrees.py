@@ -10,7 +10,6 @@ from cluster.compactTrie.compactTrie import phraseTree
 from phrases import stringToPhrase
 from xmlsnippets import get_snippet_collection
 from math import floor, ceil
-from guppy import hpy
 
 
  

@@ -137,6 +137,8 @@ class GeneticAlgorithm:
         self.dbHandler.insert_median_chromosomes(
             generationData.medianChromosomes, self.currentGeneration)
 
+        self.dbHandler.drop_saved_population_table()
+        self.dbHandler.create_saved_population_table()
         self.dbHandler.insert_chromosomes_saved_population(self.population)
 
 
@@ -343,7 +345,7 @@ class GeneticAlgorithm:
         """Calculate average fitness etc.
         """
         topChromosomes = [self.population[0]]
-        worstChromosomes = [self.population[-0]]
+        worstChromosomes = [self.population[-1]]
         medianChromosomes = self.get_median_chromosomes()
         averageNumTime = self.calc_average_num_time()
         averageFitness = self.calc_average_fitness()
@@ -365,8 +367,8 @@ class GeneticAlgorithm:
                                             averageRecalls,
                                             averageFMeasures,
                                             topChromosomes,
-                                            worstChromosomes,
-                                            medianChromosomes)
+                                            medianChromosomes,
+                                            worstChromosomes)
 
         return generationResult
 
@@ -435,9 +437,12 @@ class GeneticAlgorithm:
 
     def get_median_chromosomes(self):
         medianChromosomes = []
-        if len(self.population)%2 == 0:
+        if len(self.population) % 2 == 0:
             firstMedian = int(math.floor(len(self.population)/2))-1
-            secondMedian = int(math.ceil(len(self.population)/2))-1
+            secondMedian = firstMedian + 1
+            print firstMedian, secondMedian
+            print self.population[firstMedian]
+            print self.population[secondMedian]
             medianChromosomes.extend([self.population[firstMedian],
                                       self.population[secondMedian]])
         else:

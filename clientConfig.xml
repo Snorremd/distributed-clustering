@@ -1,6 +1,6 @@
 <config>
     <address>localhost</address>
-    <port>9875</port>
+    <port>9876</port>
     <programid>distributed-clustering</programid>
     <username>Snorre</username>
 </config>

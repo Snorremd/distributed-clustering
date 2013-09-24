@@ -1,6 +1,15 @@
 __author__ = 'snorre'
 
 
+LIST_OF_TABLES = [
+    "best_chromosomes",
+    "worst_chromosomes",
+    "median_chromosomes",
+    "genetic_algorithm",
+    "chromosomes",
+    "saved_population"
+]
+
 DB_EXISTS_STRING = ("SELECT schema_name FROM information_schema.schemata WHERE"
                     "schema_name = %s")
 
@@ -288,7 +297,7 @@ INSERT_INTO_CHROMOSOMES = "INSERT INTO chromosomes (" \
                           "%(f_measure_3)s, " \
                           "%(f_measure_4)s, " \
                           "%(f_measure_5)s " \
-                          ")"
+                          ") ON DUPLICATE KEY UPDATE id=id"
 
 INSERT_INTO_GENETIC_ALGORITHM = \
     """
@@ -355,7 +364,7 @@ INSERT_INTO_GENETIC_ALGORITHM = \
 INSERT_INTO_BEST_CHROMOSOMES = \
     """
     INSERT INTO best_chromosomes (`generation_id`, `chromosome_id`)
-    VALUES (%(chromosome_id)s, %(generation_id)s)
+    VALUES (%s, %s)
     """
 
 INSERT_INTO_WORST_CHROMOSOMES = \
@@ -363,13 +372,13 @@ INSERT_INTO_WORST_CHROMOSOMES = \
     INSERT INTO worst_chromosomes
         (`generation_id`, `chromosome_id`)
     VALUES
-        (%(chromosome_id)s, %(generation_id)s)
+        (%s, %s)
     """
 
 INSERT_INTO_MEDIAN_CHROMOSOMES = \
     """
-    INSERT INTO worst_chromosomes
+    INSERT INTO median_chromosomes
         (`generation_id`, `chromosome_id`)
     VALUES
-        (%(chromosome_id)s, %(generation_id)s)
+        (%s, %s)
     """

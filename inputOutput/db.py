@@ -7,7 +7,7 @@ from inputOutput.sqlStatements import INSERT_INTO_SAVED_POPULATION, \
     CHROMOSOME_TABLE_CREATE_STATEMENT, \
     POPULATION_TABLE_CREATE_STATEMENT, INSERT_INTO_GENETIC_ALGORITHM, \
     INSERT_INTO_BEST_CHROMOSOMES, INSERT_INTO_WORST_CHROMOSOMES, \
-    INSERT_INTO_MEDIAN_CHROMOSOMES
+    INSERT_INTO_MEDIAN_CHROMOSOMES, LIST_OF_TABLES
 
 __author__ = 'snorre'
 
@@ -70,6 +70,7 @@ class DbHandler(object):
                                                           e.args[1]))
         else:
             return exists
+
 
     def create_table(self, name, statement):
         tableExist = self.tableExists(name)
@@ -220,30 +221,27 @@ class DbHandler(object):
         con.close()
 
     def insert_generation(self, generationResult):
+        self.logger.debug("Inserting generation into database")
         sql = INSERT_INTO_GENETIC_ALGORITHM
         con = self.__getDatabaseConnection()
         cur = con.cursor()
         cur.execute(sql, generationResult)
+        con.commit()
         cur.close()
         con.close()
 
     def insert_top_chromosomes(self, chromosomes, generation):
-        values = []
-        for chromosome in chromosomes:
-            values.append(chromosome.chromosome_as_dict())
+        self.insert_chromosomes_chromosomes(chromosomes)
 
-        sql = INSERT_INTO_CHROMOSOMES
         con = self.__getDatabaseConnection()
         cur = con.cursor()
-        print sql, values
-        cur.executemany(sql, values)
-        cur.close()
-        cur = con.cursor()
-
         sql = INSERT_INTO_BEST_CHROMOSOMES
         values = []
         for chromosome in chromosomes:
-            values.append([chromosome.id, generation])
+            print chromosome.id
+            values.append([generation, chromosome.id])
+
+        print sql, values
 
         cur.executemany(sql, values)
         con.commit()
@@ -251,21 +249,13 @@ class DbHandler(object):
         con.close()
 
     def insert_worst_chromosomes(self, chromosomes, generation):
-        values = []
-        for chromosome in chromosomes:
-            values.append(chromosome.chromosome_as_dict())
-
-        sql = INSERT_INTO_CHROMOSOMES
+        self.insert_chromosomes_chromosomes(chromosomes)
         con = self.__getDatabaseConnection()
         cur = con.cursor()
-        cur.executemany(sql, values)
-        cur.close()
-        cur = con.cursor()
-
         sql = INSERT_INTO_WORST_CHROMOSOMES
         values = []
         for chromosome in chromosomes:
-            values.append([chromosome.id, generation])
+            values.append([generation, chromosome.id])
 
         cur.executemany(sql, values)
         con.commit()
@@ -273,26 +263,44 @@ class DbHandler(object):
         con.close()
 
     def insert_median_chromosomes(self, chromosomes, generation):
-        values = []
-        for chromosome in chromosomes:
-            values.append(chromosome.chromosome_as_dict())
+        self.insert_chromosomes_chromosomes(chromosomes)
 
-        sql = INSERT_INTO_CHROMOSOMES
         con = self.__getDatabaseConnection()
         cur = con.cursor()
-        cur.executemany(sql, values)
-        cur.close()
-        cur = con.cur()
-
         sql = INSERT_INTO_MEDIAN_CHROMOSOMES
         values = []
         for chromosome in chromosomes:
-            values.append([chromosome.id, generation])
+            values.append([generation, chromosome.id])
 
         cur.executemany(sql, values)
         con.commit()
         cur.close()
         con.close()
+
+    def drop_tables(self):
+        for tableName in LIST_OF_TABLES:
+            try:
+                self.drop_table(tableName)
+            except MySQLdb.Error, e:
+                self.logger.debug("Could not drop table: {0}".format(
+                    tableName))
+
+    def tables_exists(self):
+        existsNum = 0
+        for tableName in LIST_OF_TABLES:
+            try:
+                exists = self.tableExists(tableName)
+            except MySQLdb.Error, e:
+                self.logger.debug("Error {0:d}: {1:s}"
+                                  .format(e.args[0], e.args[1]))
+            else:
+                if exists:
+                    existsNum += 1
+        if existsNum == len(LIST_OF_TABLES):
+            return True
+        else:
+            return False
+
 
 
 if __name__ == '__main__':
