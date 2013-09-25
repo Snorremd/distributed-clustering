@@ -369,10 +369,8 @@ INSERT_INTO_BEST_CHROMOSOMES = \
 
 INSERT_INTO_WORST_CHROMOSOMES = \
     """
-    INSERT INTO worst_chromosomes
-        (`generation_id`, `chromosome_id`)
-    VALUES
-        (%s, %s)
+    INSERT INTO worst_chromosomes (`generation_id`, `chromosome_id`)
+    VALUES (%s, %s)
     """
 
 INSERT_INTO_MEDIAN_CHROMOSOMES = \
