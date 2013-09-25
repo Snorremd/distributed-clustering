@@ -264,7 +264,7 @@ class ClientHandler(asynchat.async_chat):
         """
         results = resultMessage.results
         if self.check_result_authenticity(results):
-            self.logger.debug("Tasks authenticated")
+            self.logger.debug("{0} tasks authenticated".format(len(results)))
             self.taskOrganizer.finish_tasks(results)
             self.scoreBoard.increase_user_score(self.username, len(results))
             self.send_client_scores()

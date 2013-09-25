@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
         taskOrganizer = TaskOrganizer(int(timeout), [])
         gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
-                                      corpus, int(populationSize), 3,
+                                      corpus, int(populationSize), 15,
                                       GeneticAlgorithm.ROULETTEWHEEL,
                                       0.5, 0.10, geneticAlgorithm.VERBOSEFILE)
 

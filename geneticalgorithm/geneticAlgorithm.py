@@ -123,7 +123,7 @@ class GeneticAlgorithm:
         self.logger.info("Calculate data for generation " +
                          str(self.currentGeneration))
         generationData = self.calcGenerationData()
-        self.log_generation_data(generationData)
+        ## self.log_generation_data(generationData)
         ## self.results_to_avg_file(generationData[1:])
         ## self.results_to_top_file(generationData[0])
 
@@ -344,8 +344,8 @@ class GeneticAlgorithm:
     def calcGenerationData(self):
         """Calculate average fitness etc.
         """
-        topChromosomes = [self.population[0]]
-        worstChromosomes = [self.population[-1]]
+        topChromosomes = self.population[0:10]
+        worstChromosomes = self.population[-10:]
         medianChromosomes = self.get_median_chromosomes()
         averageNumTime = self.calc_average_num_time()
         averageFitness = self.calc_average_fitness()
@@ -416,7 +416,7 @@ class GeneticAlgorithm:
         for i in xrange(6):
             avgRecall = 0
             for chromosome in self.population:
-                avgRecall += chromosome.get_precisions()[i]
+                avgRecall += chromosome.get_recalls()[i]
             avgRecalls.append(avgRecall / self.populationSize)
         return avgRecalls
 
@@ -425,7 +425,7 @@ class GeneticAlgorithm:
         for i in xrange(6):
             avgFMeasure = 0
             for chromosome in self.population:
-                avgFMeasure += chromosome.get_precisions()[i]
+                avgFMeasure += chromosome.get_fmeasures()[i]
             avgFMeasures.append(avgFMeasure / self.populationSize)
         return avgFMeasures
 
@@ -440,9 +440,6 @@ class GeneticAlgorithm:
         if len(self.population) % 2 == 0:
             firstMedian = int(math.floor(len(self.population)/2))-1
             secondMedian = firstMedian + 1
-            print firstMedian, secondMedian
-            print self.population[firstMedian]
-            print self.population[secondMedian]
             medianChromosomes.extend([self.population[firstMedian],
                                       self.population[secondMedian]])
         else:
@@ -482,8 +479,6 @@ class GeneticAlgorithm:
 
             dictValues[fMeasureString.format(i)] = \
                 generationResult.averageFMeasures[i]
-
-        print dictValues
 
         return dictValues
 
