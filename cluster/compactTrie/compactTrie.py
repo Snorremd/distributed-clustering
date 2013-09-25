@@ -5,6 +5,7 @@
 #  11.05.2011
 from time import sleep
 import gc
+import weakref
 from easylogging import configLogger
 
 from text.phrases import firstword, getCommonStartSegment
@@ -32,7 +33,7 @@ class CompactTrie:
         if self.parent is None:
             return self.phrase
         else:
-            return self.parent.nodelabel() + self.phrase
+            return self.parent().nodelabel() + self.phrase
 
     def display(self):
         printCTindent(self, 0)
@@ -58,7 +59,7 @@ class CompactTrie:
             ## Branch does not exist, create a new branch
             newBranch = CompactTrie()
             newBranch.phrase = phrase
-            newBranch.parent = self
+            newBranch.parent = weakref.ref(self) if self else None
             newBranch.addSources(sources)
             self.subtrees[first] = newBranch
         else:
@@ -74,11 +75,13 @@ class CompactTrie:
                     ## If phrase "rest" is empty, make new compact trie
                     newNode = CompactTrie()
                     newNode.phrase = commonStartSegment
-                    newNode.parent = self
+                    newNode.parent = weakref.ref(self)  if self else None
                     newNode.addSources(sources)
                     newNode.subtrees = {firstword(branchRest):branch}  # Make branch a subtree of newNode
                     branch.phrase = branchRest
-                    branch.parent = newNode  # Make newNode a parent of branch
+                    branch.parent = weakref.ref(newNode) if newNode else None
+                     # Make newNode a
+                    # parent of branch
                     self.subtrees[first] = newNode  # Make newNode a subtree of self (this trie)"
                 elif not branchRest:
                     branch.insert(phraseRest, sources)  # Insert rest of phrase into branch (recursivly)
@@ -86,12 +89,14 @@ class CompactTrie:
                     ## First create a new trie for the common start segment
                     commonStartSegmentNode = CompactTrie()
                     commonStartSegmentNode.phrase = commonStartSegment
-                    commonStartSegmentNode.parent = self
+                    commonStartSegmentNode.parent = weakref.ref(self) if self else None
                     commonStartSegmentNode.addSources(sources)
                     ## Then create a new compact trie for the rest of the phrase
                     phraseRestNode = CompactTrie()
                     phraseRestNode.phrase = phraseRest
-                    phraseRestNode.parent = commonStartSegmentNode
+                    phraseRestNode.parent = weakref.ref(
+                        commonStartSegmentNode) if commonStartSegmentNode \
+                        else None
                     phraseRestNode.addSources(sources)
                     phraseRestNode.subtrees = {}
                     ## Make branchRest and phraseRest children of the commonStartSegment trie
@@ -100,7 +105,8 @@ class CompactTrie:
 
                     ## Update branch trie and self (this object)
                     branch.phrase = branchRest
-                    branch.parent = commonStartSegmentNode
+                    branch.parent = weakref.ref(commonStartSegmentNode) if \
+                        commonStartSegmentNode else None
                     self.subtrees[first] = commonStartSegmentNode
 
 
