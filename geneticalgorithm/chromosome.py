@@ -6,7 +6,7 @@ Created on Mar 8, 2013
 from random import randint, uniform
 from cluster import clustering
 
-# Map genes to numbers
+##  Map genes to numbers
 TREETYPE = 1
 TOPBASECLUSTERSAMOUNT = 2
 MINTERMOCCURRENCEINCOLLECTION = 3
@@ -16,6 +16,12 @@ MAXLIMITFORBASECLUSTERSCORE = 6
 SHOULDDROPSINGLETONBASECLUSTERS = 7
 SHOULDDROPONEWORDCLUSTERS = 8
 TEXTTYPE = 9
+
+## Constants for tree types
+SUFFIX_TREE = 0
+MID_SLICE = 1
+RANGE_SLICE = 2
+N_SLICE = 3
 
 
 class Chromosome:
@@ -242,13 +248,13 @@ def getRandomTreeType():
     Return a tuple representing a randomized tree type
     """
     treeType = randint(0, 3)
-    if treeType == clustering.SUFFIXTREE:
+    if treeType == SUFFIX_TREE:
         return 0, 0, 0
-    elif treeType == clustering.MIDSLICE:
+    elif treeType == MID_SLICE:
         return 1, 0, 0
-    elif treeType == clustering.RANGESLICE:
+    elif treeType == RANGE_SLICE:
         return getRandomRangeSlice()
-    elif treeType == clustering.NSLICE:
+    elif treeType == N_SLICE:
         return getRandomNSlice()
 
 
@@ -296,7 +302,7 @@ def getRandomShouldDropSingletons():
 def getRandomTextType():
     textTypes = {}
     for i in xrange(6):
-        key = clustering.TEXTTYPES[i]
+        key = clustering.text_types()[i]
         textTypes[key] = randint(0, 1)
     return textTypes
 

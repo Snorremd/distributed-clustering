@@ -1,56 +1,66 @@
-## Compact Trie Clustering
-##  XML-handling of snippets
-## Richard Moe
-## 20.10.2010
+from xml.etree.ElementTree import iterparse, parse
 
-## Parsing a snippet-collection (XML) using Element Trees
 
-from xml.etree.ElementTree import *
-#from lxml.etree import *
-##P = XMLParser(encoding='utf-8')
-
-def get_snippet_collection(filename):
-    ''' Builds a list of snippet, source-tuples.
-    Takes a XML snippet-file on the form:
-    <snippet id="2009-12-07-aa-02"
-     tags="Innenriks-kultur-aaretstroender-oppfordring-trondheim"
-     source="http://www.adressa.no/tema/arets_tronder/article1419602.ece">
-        <snip type="ArticleTitle"> Hvem burde troender</snip>
-        <snip type="ArticleText"> sende forslag</snip>
-    </snippet>
-    and produce a list on the form:
-    [("hvem burde troender", "http://www.adressa.no/tema/arets_tronder/article1419602.ece"), ("terms...", "source"), (..., ...)]
-    '''
-    tree = parse(filename)
+def get_snippet_collection(snippetFilePath):
+    """
+    :type snippetFilePath: str
+    :param snippetFilePath: path to snippet file
+    :rtype: dict
+    :return: a dict on the form {"texttype" -> [("snippet", ["source"]),
+    ...], ...}
+    """
+    ##tree = parse(filename)
     snippetDict = {}
-    documents = tree.findall("snippet")
-    for document in documents:
-        source = document.get("source")
-        for textType in document:
-            snippets = []
-            for snippet in textType:
-                snippets.append((snippet.text, [source]))
-            if not textType.tag in snippetDict:
-                snippetDict[textType.tag] = snippets
-            else:
-                snippetDict[textType.tag].extend(snippets)
+    ## documents = tree.findall("snippet")
+    for event, element in iterparse(snippetFilePath):
+        if event == 'end':
+            if element.tag == 'snippet':
+                source = element.get("source")
+                for textType in element:
+                    snippets = []
+                    for snippet in textType:
+                        snippets.append((snippet.text[:], [source]))
+                    if not textType.tag in snippetDict:
+                        snippetDict[textType.tag] = snippets
+                    else:
+                        snippetDict[textType.tag].extend(snippets)
+                element.clear()
     return snippetDict
 
 
-def make_tag_index(filename):
-    tree = parse(filename)
-    Index = {}
-    for s in tree.findall("snippet"):
-        Index[s.get("source")] = s.get("tags")
-    return Index
+def make_tag_index(snippetFilePath):
+    """
+
+    :type snippetFilePath: str
+    :param snippetFilePath: path to snippet file
+    :rtype: dict
+    :return; a dict on the form {source: ["tag1-tag2-tag3"], ...}
+    """
+    tagIndex = {}
+    for event, element in iterparse(snippetFilePath):
+        if event == 'end':
+            if element.tag == 'snippet':
+                tagIndex[element.get("source")] = element.get("tags")
+        element.clear()
+    return tagIndex
 
 
-def make_groundtruth_clusters(filename):
-    tree = parse(filename)
-    Index = {}
-    for snippet in tree.findall("snippet"):
-        tags = snippet.get("tags")
-        if Index.has_key(tags):
-            Index[tags].append(snippet.get("source"))
-        else: Index[tags] = [snippet.get("source")]
-    return Index
+def make_ground_truth_clusters(snippetFilePath):
+    """
+
+    :type snippetFilePath: str
+    :param snippetFilePath:
+    :return: groundTruthIndex on the form {"tag1-tag2-...-tag5": ["source1",
+    "source2", "...", "sourcex"], ...}
+    """
+    groundTruthIndex = {}
+    for event, element in iterparse(snippetFilePath):
+        if event == "end":
+            if element.tag == "snippet":
+                tags = element.get("tags")
+                if tags in groundTruthIndex:
+                    groundTruthIndex[tags].append(element.get("source"))
+                else:
+                    groundTruthIndex[tags] = [element.get("source")]
+            element.clear()
+    return groundTruthIndex
