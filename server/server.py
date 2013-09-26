@@ -271,7 +271,7 @@ class ClientHandler(asynchat.async_chat):
         else:
             self.logger.debug("Client tasks not authenticated")
             message = TaskAuthenticationError("Task authentication error",
-                                              results.keys())
+                                              list(results.keys()))
             self.send_message(message)
         self.currentTasks = {}
 
@@ -294,6 +294,6 @@ class ClientHandler(asynchat.async_chat):
         Send clients score and top 100 scores to client
         """
         userScore = self.scoreBoard.get_user_score(self.username)
-        scores = self.scoreBoard.get_user_ranks().items()[:100]
+        scores = list(self.scoreBoard.get_user_ranks().items())[:100]
         scoreMessage = ScoreMessage("Scores", userScore, scores)
         self.send_message(scoreMessage)

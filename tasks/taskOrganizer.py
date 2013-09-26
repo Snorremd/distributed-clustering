@@ -1,5 +1,5 @@
 from collections import deque
-from errors import NoTasksError
+from .errors import NoTasksError
 from datetime import datetime
 from easylogging.configLogger import getLoggerForStdOut
 
@@ -83,7 +83,7 @@ class TaskOrganizer(Subject):
             a dict containing taskId, Task pairs
         """
         tasks = []
-        for _ in xrange(noOfTasks):
+        for _ in range(noOfTasks):
             try:
                 task = self.get_task()
             except NoTasksError:
@@ -117,7 +117,7 @@ class TaskOrganizer(Subject):
         pendingTasks deque and remove from active tasks dict.
         '''
         currentTime = datetime.now()
-        for taskId, taskTuple in self.activeTasks.items():
+        for taskId, taskTuple in list(self.activeTasks.items()):
             timestamp = taskTuple[1]
             difference = currentTime - timestamp
             if difference.seconds > self.timeout:
@@ -171,6 +171,6 @@ class TaskOrganizer(Subject):
             return False
 
     def get_all_results(self):
-        allResults = self.results.values()
+        allResults = list(self.results.values())
         self.results = {}
         return allResults

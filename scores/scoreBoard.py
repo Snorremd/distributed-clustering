@@ -1,4 +1,4 @@
-from errors import NoSuchUserError
+from .errors import NoSuchUserError
 from collections import OrderedDict
 
 
@@ -54,7 +54,7 @@ class ScoreBoard(object):
             Scores (OrderedDict) with user -> score mappings
         '''
         ## Sort the key-value-pairs according to score in descending order
-        sorted(self.scores.items(),
+        sorted(list(self.scores.items()),
                key=lambda item:
                                 - item[1])
         return self.scores

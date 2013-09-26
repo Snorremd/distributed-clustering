@@ -36,7 +36,7 @@ class SnippetBuilder(object):
 
         document = SubElement(self.root, 'snippet',
                               {'id': docId, 'tags': tags, 'source': source})
-        for key, list in snippetsLists.iteritems():
+        for key, list in snippetsLists.items():
             self.add_snippets(document, key, list)
 
     def add_snippets(self, document, key, snippetList):

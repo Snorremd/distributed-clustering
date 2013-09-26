@@ -1,7 +1,8 @@
+import gc
+import pdb
 from time import sleep
-from guppy import hpy
 from cluster.clusterSettings import ClusterSettings
-from cluster.clustering import CompactTrieClusterer
+import cluster.clustering as clustering
 from corpora.corpus import Corpus
 from geneticalgorithm.chromosome import createRandomChromosome
 
@@ -9,7 +10,9 @@ __author__ = 'snorre'
 
 
 def cluster(chromosome, corpus, clusterSettings):
-    clusterer = CompactTrieClusterer(corpus, clusterSettings)
+    clusterer = clustering.CompactTrieClusterer(corpus, clusterSettings)
+    value = clusterer.cluster(chromosome)
+    return value
 
 
 def main():
@@ -22,13 +25,15 @@ def main():
                     False)
 
     clusterSettings = ClusterSettings(True, .5)
-    while True:
-        chromosome = createRandomChromosome()
-        cluster(chromosome, corpus, clusterSettings)
-        hippie = hpy()
-        print hippie.heap()
-        sleep(1)
+    chromosome = createRandomChromosome()
+    result = cluster(chromosome, corpus, clusterSettings)
+    # print("Remove from memory")
+    # collected = gc.collect()
+    # print("Garbage collector: collected %d objects." % (collected))
+    #pdb.set_trace()
 
 
 if __name__ == '__main__':
-    main()
+    sleep(1)
+    while True:
+        main()

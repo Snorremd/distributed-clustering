@@ -1,4 +1,4 @@
-from xml.etree.ElementTree import iterparse, parse
+from xml.etree.ElementTree import iterparse
 
 
 def get_snippet_collection(snippetFilePath):
@@ -10,7 +10,7 @@ def get_snippet_collection(snippetFilePath):
     ...], ...}
     """
     ##tree = parse(filename)
-    snippetDict = {}
+    snippetDict = dict()
     ## documents = tree.findall("snippet")
     for event, element in iterparse(snippetFilePath):
         if event == 'end':
@@ -25,6 +25,8 @@ def get_snippet_collection(snippetFilePath):
                     else:
                         snippetDict[textType.tag].extend(snippets)
                 element.clear()
+                del element
+                del event
     return snippetDict
 
 
@@ -36,12 +38,14 @@ def make_tag_index(snippetFilePath):
     :rtype: dict
     :return; a dict on the form {source: ["tag1-tag2-tag3"], ...}
     """
-    tagIndex = {}
+    tagIndex = dict()
     for event, element in iterparse(snippetFilePath):
         if event == 'end':
             if element.tag == 'snippet':
                 tagIndex[element.get("source")] = element.get("tags")
         element.clear()
+        del element
+        del event
     return tagIndex
 
 
@@ -53,7 +57,7 @@ def make_ground_truth_clusters(snippetFilePath):
     :return: groundTruthIndex on the form {"tag1-tag2-...-tag5": ["source1",
     "source2", "...", "sourcex"], ...}
     """
-    groundTruthIndex = {}
+    groundTruthIndex = dict()
     for event, element in iterparse(snippetFilePath):
         if event == "end":
             if element.tag == "snippet":
@@ -63,4 +67,6 @@ def make_ground_truth_clusters(snippetFilePath):
                 else:
                     groundTruthIndex[tags] = [element.get("source")]
             element.clear()
+            del element
+            del event
     return groundTruthIndex

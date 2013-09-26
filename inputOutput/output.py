@@ -35,7 +35,7 @@ def show_confirmation_dialog(question, default="yes"):
 
     while True:
         sys.stdout.write(question + prompt)
-        choice = raw_input().lower()
+        choice = input().lower()
         if default is not None and choice == '':
             return valid[default]
         elif choice in valid:
@@ -60,7 +60,7 @@ def show_option_dialog(question, options):
         sys.stdout.write("Available options are:\n")
         for option in options:
             sys.stdout.write(option + "\n")
-        choice = raw_input().lower().strip()
+        choice = input().lower().strip()
         if choice in options:
             return choice
         else:
@@ -76,7 +76,7 @@ def show_input_dialog(question):
     """
     sys.stdout.write(question)
     while True:
-        choice = raw_input().lower().strip()
+        choice = input().lower().strip()
         if not (choice == '' or choice is None):
             return choice
         else:

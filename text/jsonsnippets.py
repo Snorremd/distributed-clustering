@@ -26,7 +26,7 @@ def get_snippet_collection(filename):
     ## Each document is a dictionary of key value pairs
     for document in documents:
         source = document["@source"]
-        for key in document.keys():
+        for key in list(document.keys()):
             if not key.startswith("@"):  # Do not include attributes
                 snippets = []
                 if not document[key] is None:  # If text type is non-empty
@@ -108,4 +108,4 @@ def get_documents_and_source(filename):
     """
     jsonFile = open(filename)
     jsonTree = json.load(jsonFile)
-    return jsonTree[jsonTree.keys()[0]]
+    return jsonTree[list(jsonTree.keys())[0]]

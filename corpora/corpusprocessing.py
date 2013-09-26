@@ -7,7 +7,7 @@ The corpus module contains classes needed to process corpus files. Each class
  The following classes are implemented:
  - KlimaukenCorpusProcessor
 """
-import snippets
+from . import snippets
 
 from inputOutput.filehandling import sep_file_and_path
 import codecs
@@ -18,9 +18,7 @@ __author__ = 'snorre'
 import abc
 
 
-class CorpusProcessor(object):
-    __metaclass__ = abc.ABCMeta
-
+class CorpusProcessor(object, metaclass=abc.ABCMeta):
     def __init__(self, corpusPath, snippetPath):
         """
         :type corpusPath: str
@@ -84,9 +82,9 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
                 l = self.line_list(line)
                 groundForm = l[0][1:-1]  # Drop the "'s around the ground form
                 if len(l) < 2:
-                    print "FEIL:", groundForm, ":", l, ":FEIL"  # DEBUG REMOVE
+                    print("FEIL:", groundForm, ":", l, ":FEIL")  # DEBUG REMOVE
                 elif groundForm not in self.stopWords and \
-                                l[1] in self.goodWords:
+                        l[1] in self.goodWords:
                     words = words + ' ' + groundForm
                 line = self.scan_to_line(self.endTags)  # skip
                 # remaining
@@ -134,17 +132,17 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
 
             line = self.scan_tag(self.tags)
 
-            frontpageHeadings = []  # Store snippet-list, type tuples
-            frontpageIntroductions = []
+            frontPageHeadings = []  # Store snippet-list, type tuples
+            frontPageIntroductions = []
             articleHeadings = []
             articleBylines = []
             articleIntroductions = []
             articleTexts = []
             while line != '</artikkel>':
                 if line == '<forsideoverskrift>':
-                    frontpageHeadings.append(collectsentences())
+                    frontPageHeadings.append(collectsentences())
                 elif line == '<forsideingress>':
-                    frontpageIntroductions.append(collectsentences())
+                    frontPageIntroductions.append(collectsentences())
                 elif line == '<artikkeloverskrift>':
                     articleHeadings.append(collectsentences())
                 elif line == '<artikkelbildetekst>':
@@ -154,13 +152,13 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
                 elif line == '<artikkeltekst>':
                     articleTexts.append(collectsentences())
                 else:
-                    print "ERROR UNKNOWN TAG"
+                    print("ERROR UNKNOWN TAG")
                 line = self.scan_tag(self.tags)
 
             self.snippetBuilder.add_document(docId, tag, url,
-                                             FrontpageHeading=frontpageHeadings,
-                                             FrontpageIntroduction=
-                                             frontpageIntroductions,
+                                             FrontPageHeading=frontPageHeadings,
+                                             FrontPageIntroduction=
+                                             frontPageIntroductions,
                                              ArticleHeading=
                                              articleHeadings,
                                              ArticleByline=
@@ -176,8 +174,8 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
         snippetTree = self.snippetBuilder.get_element_tree()
         xmlstring = etree.tostring(snippetTree, encoding='ascii',
                                    pretty_print=True)
-        print "Xml string created, write to file"
-        print self.snippetPath
+        print("Xml string created, write to file")
+        print(self.snippetPath)
         outputFile = open(self.snippetPath, "w")
         outputFile.write(xmlstring)
 

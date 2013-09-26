@@ -5,10 +5,10 @@ the corpus processing task. CorpusProcessor-classes need to be implemented
 on a corpus basis."""
 
 from importlib import import_module
-from inputOutput.filehandling import get_root_path, get_corpus_options, get_corpus_settings
+from inputOutput.filehandling import get_corpus_options, \
+    get_corpus_settings
 from inputOutput.output import show_info_dialog, show_option_dialog, \
     show_confirmation_dialog
-import xml.etree.ElementTree as ET
 import os
 import sys
 

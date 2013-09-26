@@ -91,7 +91,7 @@ class Client(asynchat.async_chat):
         return
 
     def process_message(self):
-        print "MEMORY USAGE CLIENT"
+        print("MEMORY USAGE CLIENT")
         receivedString = ''.join(self.receivedData)
         try:
             message = deserialize_message(receivedString)

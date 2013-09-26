@@ -7,6 +7,8 @@ from random import randint, uniform
 from cluster import clustering
 
 ##  Map genes to numbers
+from cluster.clustering import text_types
+
 TREETYPE = 1
 TOPBASECLUSTERSAMOUNT = 2
 MINTERMOCCURRENCEINCOLLECTION = 3
@@ -86,7 +88,7 @@ class Chromosome:
         self.shouldDropOneWordClusters = shouldDropOneWordClusters
         self.fitness = 0
         self.result = None
-        self.textType = textType
+        self.textTypes = textType
 
     def calc_fitness_score(self, compactTrieClusterer):
         """
@@ -99,10 +101,13 @@ class Chromosome:
 
         Calculate fitness as the average of the two
         """
+
         self.result = compactTrieClusterer.cluster(self)
+        compactTrieClusterer = None
         fMeasure0 = self.result[4][0]
         fMeasure1 = self.result[4][1]
         self.fitness = fMeasure0 + fMeasure1
+
 
     def mutate(self):
         """
@@ -140,21 +145,21 @@ class Chromosome:
                 self.maxLimitForBaseClusterScore,
                 self.shouldDropSingletonBaseClusters,
                 self.shouldDropOneWordClusters,
-                self.textType)
+                self.textTypes)
 
     def chromosome_as_dict(self):
-        textTypesKeys = clustering.TEXTTYPES
+        textTypesKeys = text_types()
         chromosomeDict = {
             "id": self.id,
             "tree_type_1": self.treeType[0],
             "tree_type_2": self.treeType[1],
             "tree_type_3": self.treeType[2],
-            "text_type_frontpageheading": self.textType[textTypesKeys[0]],
-            "text_type_frontpageintroduction": self.textType[textTypesKeys[1]],
-            "text_type_articleheading": self.textType[textTypesKeys[2]],
-            "text_type_articlebyline": self.textType[textTypesKeys[3]],
-            "text_type_articleintroduction": self.textType[textTypesKeys[4]],
-            "text_type_articletext": self.textType[textTypesKeys[5]],
+            "text_type_frontpageheading": self.textTypes[textTypesKeys[0]],
+            "text_type_frontpageintroduction": self.textTypes[textTypesKeys[1]],
+            "text_type_articleheading": self.textTypes[textTypesKeys[2]],
+            "text_type_articlebyline": self.textTypes[textTypesKeys[3]],
+            "text_type_articleintroduction": self.textTypes[textTypesKeys[4]],
+            "text_type_articletext": self.textTypes[textTypesKeys[5]],
             "top_base_clusters_amount": self.topBaseClustersAmount,
             "min_term_occurrence_collection": self
             .minTermOccurrenceInCollection,
@@ -301,7 +306,7 @@ def getRandomShouldDropSingletons():
 
 def getRandomTextType():
     textTypes = {}
-    for i in xrange(6):
+    for i in range(6):
         key = clustering.text_types()[i]
         textTypes[key] = randint(0, 1)
     return textTypes

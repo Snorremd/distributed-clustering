@@ -8,7 +8,7 @@ from datetime import datetime
 from random import random, randint
 import math as math
 
-from chromosome import createRandomChromosome, crossChromosomes
+from .chromosome import createRandomChromosome, crossChromosomes
 import __main__
 from geneticalgorithm.result import GenerationResult
 from tasks.task import CompactTrieClusteringTask
@@ -184,7 +184,7 @@ class GeneticAlgorithm:
         outputText += "-----------------------\n"
         outputText += "Top 1 - 10 chromosomes:\n"
         outputText += "Fitness, gt0  , gt1   , gtr0 , gtr1  - chromosome:\n"
-        for i in xrange(10):
+        for i in range(10):
             outputText += "%.4f, %.4f, %.4f, %.4f, %.4f" % \
                           (self.population[i].fitness,
                            self.population[i].get_precisions()[0],
@@ -237,9 +237,9 @@ class GeneticAlgorithm:
 
         # Use fitness as sorting key
         self.population = sorted(self.population, key=fitness_inverse)
-        print "Sorted population by fitness: "
+        print("Sorted population by fitness: ")
         for individual in self.population:
-            print individual.fitness, str(individual.genesAsTuple())
+            print(individual.fitness, str(individual.genesAsTuple()))
 
     def produceOffspring(self):
         """Produce new chromosomes as offspring from the previous
@@ -253,14 +253,14 @@ class GeneticAlgorithm:
         if self.selectionType == GeneticAlgorithm.ROULETTEWHEEL:
             parents = self.rouletteWheelSelection()
         # noinspection PyArgumentList
-        for i in xrange(0, len(parents), 2):
+        for i in range(0, len(parents), 2):
             parent1 = parents[i]
             parent2 = parents[i + 1]
             offsprings = crossChromosomes(parent1, parent2)
             self.population.append(offsprings[0])
             self.population.append(offsprings[1])
-            print ".",
-        print ""
+            print(".", end=' ')
+        print("")
         ## No need to sort here as population is sorted at beginning
         ## of each generation step
 
@@ -290,7 +290,7 @@ class GeneticAlgorithm:
         while len(parents) + self.keepSize < self.populationSize:
             randomProbability = random()
             # noinspection PyArgumentList
-            for i in xrange(0, len(self.selectionProbabilities)):
+            for i in range(0, len(self.selectionProbabilities)):
                 ## O(1) on avg
                 if self.selectionProbabilities[i][1] < randomProbability:
                     ## Need two different parents
@@ -311,14 +311,14 @@ class GeneticAlgorithm:
 
         See http://dx.doi.org/10.1002/0471671746.ch1 for explanation.
         """
-        print "Calculate ranking probabilities"
+        print("Calculate ranking probabilities")
         sumOfRanks = 0
         # noinspection PyArgumentList
-        for rank in xrange(1, self.keepSize):
+        for rank in range(1, self.keepSize):
             sumOfRanks += rank
         accumulatedProbability = 0
         # noinspection PyArgumentList
-        for position in xrange(0, self.keepSize):
+        for position in range(0, self.keepSize):
             probabilityNumerator = self.keepSize - position + 1
             probability = probabilityNumerator / sumOfRanks
             accumulatedProbability += probability
@@ -336,7 +336,7 @@ class GeneticAlgorithm:
         chromosomeSize = len(self.population[0].genesAsTuple())
         noOfMutations = int(math.ceil((self.populationSize - 1)
                                       * self.mutationRate * chromosomeSize))
-        for _ in xrange(noOfMutations):
+        for _ in range(noOfMutations):
             randomChromosome = randint(0, self.populationSize - 1)
             self.population[
                 randomChromosome].mutate()  # Mutates a random chromosome
@@ -404,7 +404,7 @@ class GeneticAlgorithm:
 
     def calc_average_precisions(self):
         avgPrecisions = []
-        for i in xrange(6):
+        for i in range(6):
             avgPrecision = 0
             for chromosome in self.population:
                 avgPrecision += chromosome.get_precisions()[i]
@@ -413,7 +413,7 @@ class GeneticAlgorithm:
 
     def calc_average_recalls(self):
         avgRecalls = []
-        for i in xrange(6):
+        for i in range(6):
             avgRecall = 0
             for chromosome in self.population:
                 avgRecall += chromosome.get_recalls()[i]
@@ -422,7 +422,7 @@ class GeneticAlgorithm:
 
     def calc_average_fmeasures(self):
         avgFMeasures = []
-        for i in xrange(6):
+        for i in range(6):
             avgFMeasure = 0
             for chromosome in self.population:
                 avgFMeasure += chromosome.get_fmeasures()[i]
@@ -470,7 +470,7 @@ class GeneticAlgorithm:
         precisionString = "precision_avg_{0}"
         recallString = "recall_avg_{0}"
         fMeasureString = "fmeasure_avg_{0}"
-        for i in xrange(6):
+        for i in range(6):
             dictValues[precisionString.format(i)] = \
                 generationResult.averagePrecisions[i]
 

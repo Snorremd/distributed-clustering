@@ -65,7 +65,7 @@ class DbHandler(object):
             if len(result) > 0:
                 exists = True
             con.close()
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
         else:
@@ -102,7 +102,7 @@ class DbHandler(object):
             self.create_table("genetic_algorithm",
                               GENETIC_ALGORITHM_TABLE_CREATE_STATEMENT)
 
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -114,7 +114,7 @@ class DbHandler(object):
         try:
             self.create_table("chromosomes",
                               CHROMOSOME_TABLE_CREATE_STATEMENT)
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -126,7 +126,7 @@ class DbHandler(object):
         try:
             self.create_table("saved_population",
                               POPULATION_TABLE_CREATE_STATEMENT)
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -137,7 +137,7 @@ class DbHandler(object):
     def drop_saved_population_table(self):
         try:
             self.drop_table("saved_population")
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
         else:
@@ -147,7 +147,7 @@ class DbHandler(object):
         try:
             self.create_table("best_chromosomes",
                               BEST_CHROMOSOMES_CREATE_STATEMENT)
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -159,7 +159,7 @@ class DbHandler(object):
         try:
             self.create_table("worst_chromosomes",
                               WORST_CHROMOSOMES_CREATE_STATEMENT)
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -171,7 +171,7 @@ class DbHandler(object):
         try:
             self.create_table("median_chromosomes",
                               MEDIAN_CHROMOSOMES_CREATE_STATEMENT)
-        except MySQLdb.Error, e:
+        except MySQLdb.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -192,12 +192,12 @@ class DbHandler(object):
         for chromosome in chromosomes:
             values.append(chromosome.chromosome_as_dict())
         for chromosome in values:
-            for key, value in chromosome.iteritems():
+            for key, value in chromosome.items():
                 if isinstance(value, str):
-                    print "Value is string: {0}".format(value)
+                    print("Value is string: {0}".format(value))
 
         sql = INSERT_INTO_SAVED_POPULATION
-        print sql
+        print(sql)
 
         con = self.__getDatabaseConnection()
         cur = con.cursor()
@@ -238,10 +238,10 @@ class DbHandler(object):
         sql = INSERT_INTO_BEST_CHROMOSOMES
         values = []
         for chromosome in chromosomes:
-            print chromosome.id
+            print(chromosome.id)
             values.append([generation, chromosome.id])
 
-        print sql, values
+        print(sql, values)
 
         cur.executemany(sql, values)
         con.commit()
@@ -281,7 +281,7 @@ class DbHandler(object):
         for tableName in LIST_OF_TABLES:
             try:
                 self.drop_table(tableName)
-            except MySQLdb.Error, e:
+            except MySQLdb.Error as e:
                 self.logger.debug("Could not drop table: {0}".format(
                     tableName))
 
@@ -290,7 +290,7 @@ class DbHandler(object):
         for tableName in LIST_OF_TABLES:
             try:
                 exists = self.tableExists(tableName)
-            except MySQLdb.Error, e:
+            except MySQLdb.Error as e:
                 self.logger.debug("Error {0:d}: {1:s}"
                                   .format(e.args[0], e.args[1]))
             else:
@@ -308,7 +308,7 @@ if __name__ == '__main__':
                           "ctcluster")
     dbHandler.create_all_tables()
     chromosomes = []
-    for _ in xrange(10):
+    for _ in range(10):
         chromosome = createRandomChromosome()
         chromosome.result = ((4, 54, 534),
                              (0.87, 0.34, 0.54),

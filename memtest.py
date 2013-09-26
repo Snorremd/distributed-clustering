@@ -23,7 +23,7 @@ if __name__ == "__main__":
                     "KlimaUkenProcessor",
                     False)
     clusterer = CompactTrieClusterer(corpus, settings)
-    for _ in xrange(100):
+    for _ in range(100):
         chromosome = createRandomChromosome()
         chromosome.calc_fitness_score(clusterer)
         sleep(5)
