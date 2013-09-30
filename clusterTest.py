@@ -27,10 +27,7 @@ def main():
     clusterSettings = ClusterSettings(True, .5)
     chromosome = createRandomChromosome()
     result = cluster(chromosome, corpus, clusterSettings)
-    # print("Remove from memory")
-    # collected = gc.collect()
-    # print("Garbage collector: collected %d objects." % (collected))
-    #pdb.set_trace()
+    gc.collect()
 
 
 if __name__ == '__main__':

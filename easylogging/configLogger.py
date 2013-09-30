@@ -12,7 +12,7 @@ import time
 import __main__
 
 
-def getLoggerForStdOut(nameForLogger):
+def get_logger_for_stdout(nameForLogger):
     """
     Get logger for stdout (console/terminal)
 
@@ -32,7 +32,7 @@ def getLoggerForStdOut(nameForLogger):
     return logger
 
 
-def getLoggerForFile(nameForLogger):
+def get_logger_for_file(nameForLogger):
     """
     Get logger for file (console/terminal)
 

@@ -6,7 +6,7 @@ import os
 import sys
 from xml.etree import ElementTree as ET
 
-from easylogging.configLogger import getLoggerForStdOut
+from easylogging.configLogger import get_logger_for_stdout
 from inputOutput.db import DbHandler
 from inputOutput.filehandling import get_root_path, get_corpus_options, get_server_config, get_corpus_settings
 from inputOutput.output import show_info_dialog, show_input_dialog, \
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         dbpasswd = show_input_dialog("Specify password: ")
 
 
-    mainLogger = getLoggerForStdOut('Main')
+    mainLogger = get_logger_for_stdout('Main')
     mainLogger.debug("Create genetic algorithm object and initial population")
     try:
 

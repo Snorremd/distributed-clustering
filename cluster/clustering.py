@@ -1,7 +1,7 @@
 from copy import deepcopy
 import gc
-from cluster.compactTrie.compactTrie import generate_compact_trie
-from easylogging.configLogger import getLoggerForStdOut
+from cluster.compactTrieCluster.compactTrie import generate_compact_trie
+from easylogging.configLogger import get_logger_for_stdout
 from text.xmlsnippets import get_snippet_collection, make_tag_index,\
     make_ground_truth_clusters
 
@@ -32,7 +32,7 @@ def text_types():
 class CompactTrieClusterer(object):
 
     def __init__(self, corpus, clusterSettings):
-        self.logger = getLoggerForStdOut("CompactTrieClusterer")
+        self.logger = get_logger_for_stdout("CompactTrieClusterer")
         self.corpus = corpus
         self.clusterSettings = clusterSettings
         self.logger.debug("Make indexes and snippet collection")
@@ -66,6 +66,9 @@ class CompactTrieClusterer(object):
         ## Build the compact trie structure
         compactTrie = generate_compact_trie(snippetCollection,
                                          chromosome.treeType)
+
+        ## Get base clusters
+
 
         return compactTrie
 

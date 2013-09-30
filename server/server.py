@@ -9,7 +9,7 @@ import socket
 import asynchat
 import asyncore
 from pickle import PickleError
-from easylogging.configLogger import getLoggerForStdOut
+from easylogging.configLogger import get_logger_for_stdout
 from tasks.errors import NoTasksError
 from messaging.message import *
 from scores.scoreBoard import ScoreBoard
@@ -39,7 +39,7 @@ class Server(asyncore.dispatcher):
         """
         asyncore.dispatcher.__init__(self)
 
-        self.logger = getLoggerForStdOut("Server")
+        self.logger = get_logger_for_stdout("Server")
 
         self.programId = programId
         self.timeoutSeconds = timeoutSeconds  # REMOVE THIS!
@@ -107,7 +107,7 @@ class ClientHandler(asynchat.async_chat):
         :type scoreBoard: scores.scoreBoard.ScoreBoard
         :param scoreBoard: an object that keeps track of scores
         """
-        self.logger = getLoggerForStdOut("ClientHandler")
+        self.logger = get_logger_for_stdout("ClientHandler")
         asynchat.async_chat.__init__(self, sock=clientSock)
         self.serverSocket = serverSocket
 

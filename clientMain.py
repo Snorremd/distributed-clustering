@@ -2,7 +2,7 @@
 """
 The main client module used to start the client worker.
 """
-from easylogging.configLogger import getLoggerForStdOut
+from easylogging.configLogger import get_logger_for_stdout
 from client.client import Client
 import asyncore
 import socket
@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
         username = show_input_dialog("Please input a wanted username: ")
 
-        mainLogger = getLoggerForStdOut("Main")
+        mainLogger = get_logger_for_stdout("Main")
         address = (hostAddress, int(port))
         client = None
         try:

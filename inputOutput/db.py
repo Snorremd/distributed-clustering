@@ -30,7 +30,7 @@ class DbHandler(object):
         :param database: the name of database to use
         :type database: str
         """
-        self.logger = configLogger.getLoggerForStdOut("DbHandler")
+        self.logger = configLogger.get_logger_for_stdout("DbHandler")
         self.hostname = hostname
         self.port = port
         self.username = username

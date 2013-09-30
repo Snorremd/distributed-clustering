@@ -7,7 +7,7 @@ Created on Apr 12, 2013
 import asynchat
 import socket
 
-from easylogging.configLogger import getLoggerForStdOut
+from easylogging.configLogger import get_logger_for_stdout
 from time import sleep
 
 from tasks import taskExecutor
@@ -28,7 +28,7 @@ class Client(asynchat.async_chat):
         '''
         asynchat.async_chat.__init__(self)
 
-        self.logger = getLoggerForStdOut("Client")
+        self.logger = get_logger_for_stdout("Client")
         self.address = address
 
         self.programId = programId

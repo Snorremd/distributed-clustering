@@ -12,7 +12,7 @@ from .chromosome import createRandomChromosome, crossChromosomes
 import __main__
 from geneticalgorithm.result import GenerationResult
 from tasks.task import CompactTrieClusteringTask
-from easylogging.configLogger import getLoggerForFile
+from easylogging.configLogger import get_logger_for_file
 from cluster.clusterSettings import ClusterSettings
 from corpora.corpus import Corpus
 
@@ -54,7 +54,7 @@ class GeneticAlgorithm:
                                                settings to use for clustering
             gaVerbosity (int): wether to write to file or output to terminal
         """
-        self.logger = getLoggerForFile("GeneticAlgorithm")
+        self.logger = get_logger_for_file("GeneticAlgorithm")
         self.dbHandler = dbHandler
 
         self.taskOrganizer = taskOrganizer

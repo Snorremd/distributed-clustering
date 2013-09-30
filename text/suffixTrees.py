@@ -3,15 +3,21 @@ from text.phrases import string_to_phrase
 
 
 def make_suffix_tree(snippetCollection):
+    """
+    :type snippetCollection: list
+    :param snippetCollection: to extract suffixes from
+    :rtype:
+    :return:
+    """
     suffixes = []
     for snippet, source in snippetCollection:
         phrase = string_to_phrase(snippet)
-        for suffix in make_suffixes(phrase):
+        for suffix in extract_suffixes(phrase):
             suffixes.append((suffix, source))
     return suffixes
 
 
-def make_suffixes(snippet):
+def extract_suffixes(snippet):
     """
 
     :type snippet": list

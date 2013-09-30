@@ -1,7 +1,7 @@
 from collections import deque
 from .errors import NoTasksError
 from datetime import datetime
-from easylogging.configLogger import getLoggerForStdOut
+from easylogging.configLogger import get_logger_for_stdout
 
 
 class Subject:
@@ -44,7 +44,7 @@ class TaskOrganizer(Subject):
         """Initialize StringCounterServer
         """
         Subject.__init__(self)
-        self.logger = getLoggerForStdOut("TaskOrganizer")
+        self.logger = get_logger_for_stdout("TaskOrganizer")
         self.taskLength = 0
         self.pendingTasks = deque(tasks)
         self.activeTasks = {}

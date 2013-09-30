@@ -11,3 +11,27 @@ def string_to_phrase(phraseString):
     ## Strip spaces to avoid empty list elements and get all words
     phraseString = phraseString.strip()
     return phraseString.split()
+
+
+def get_common_start_segment(phrase1, phrase2):
+    """
+    :type phrase1: list
+    :param phrase1: first phrase
+    :type phrase2: list
+    :param phrase2: second phrase
+    :rtype: tuple
+    :return: common start segment, phrase1 rest, phrase2 rest
+    """
+    commonStartSegment = []
+    p1 = phrase1[:]
+    p2 = phrase2[:]
+    for term in phrase1:
+        if not p1 or not p2:
+            break
+        elif term == p2[0]:
+            commonStartSegment.append(term)
+            del p1[0]
+            del p2[0]
+        else:
+            break
+    return commonStartSegment, p1, p2
