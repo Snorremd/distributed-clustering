@@ -13,6 +13,16 @@ def string_to_phrase(phraseString):
     return phraseString.split()
 
 
+def phrase_to_string(phrase):
+    """
+    :type phrase: list
+    :param phrase: the list of terms to convert
+    :rtype: str
+    :return: the concatenated string
+    """
+    return " ".join(phrase)
+
+
 def get_common_start_segment(phrase1, phrase2):
     """
     :type phrase1: list

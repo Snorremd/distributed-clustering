@@ -1,6 +1,12 @@
 from copy import deepcopy
 import gc
+from time import time
+from cluster.clusterResults import ClusterResult, calc_overall_precision, calc_overall_recall, calc_overall_fmeasure, calc_tag_accuracy, calc_ground_truth, calc_gt_represented, calc_f_measure
+from cluster.compactTrieCluster.baseCluster import top_base_clusters, drop_singleton_base_clusters
+from cluster.compactTrieCluster.cluster import generate_clusters
 from cluster.compactTrieCluster.compactTrie import generate_compact_trie
+from cluster.compactTrieCluster.mergedClusters import merge_components
+from cluster.compactTrieCluster.similarity import SimilarityMeasurer
 from easylogging.configLogger import get_logger_for_stdout
 from text.xmlsnippets import get_snippet_collection, make_tag_index,\
     make_ground_truth_clusters
@@ -37,6 +43,7 @@ class CompactTrieClusterer(object):
         self.clusterSettings = clusterSettings
         self.logger.debug("Make indexes and snippet collection")
         self.tagIndex = make_tag_index(corpus.snippetFilePath)
+        self.noOfSources = len(self.tagIndex)
         self.groundTruthClusters = \
             make_ground_truth_clusters(corpus.snippetFilePath)
         self.snippetCollection = get_snippet_collection(corpus.snippetFilePath)
@@ -63,14 +70,81 @@ class CompactTrieClusterer(object):
         snippetCollection = filter_snippets(self.snippetCollection,
                                             chromosome.textTypes)
 
+        start = time()
+
         ## Build the compact trie structure
         compactTrie = generate_compact_trie(snippetCollection,
                                          chromosome.treeType)
 
         ## Get base clusters
+        base_clusters = top_base_clusters(compactTrie)
 
+        if chromosome.shouldDropSingletonBaseClusters:
+            drop_singleton_base_clusters(base_clusters)
 
-        return compactTrie
+        no_of_base_clusters = len(base_clusters)
+
+        if no_of_base_clusters < 2:
+            self.logger.info("Can not merge one or fewer base clusters."
+                             "Assume score of zero")
+            return ClusterResult(0, no_of_base_clusters, 0, 0.0, 0.0, 0.0,
+                (.0, .0, .0, .0, .0, .0),
+                (.0, .0, .0, .0, .0, .0),
+                (.0, .0, .0, .0, .0, .0))
+
+        ## Helper object that measures similarity between base clusters
+        similarity_measurer = SimilarityMeasurer(0, {"threshold": .5})
+
+        merged_components = merge_components(base_clusters, similarity_measurer)
+
+        clusters = generate_clusters(merged_components)
+
+        stop = time()
+
+        time_to_cluster = stop - start
+
+        no_of_clusters = len(clusters)
+
+        return self.calculate_results(clusters, groundTruthClusters,
+                                      no_of_base_clusters, no_of_clusters,
+                                      tagIndex, time_to_cluster)
+
+    def calculate_results(self, clusters, groundTruthClusters,
+                          no_of_base_clusters, no_of_clusters, tagIndex,
+                          time_to_cluster):
+        """
+        Calculate two forms of results. Standard precision,
+        recall and f-measure scores as done in ....
+        """
+        precision = calc_overall_precision(groundTruthClusters,
+                                           clusters,
+                                           self.noOfSources)
+        recall = calc_overall_recall(groundTruthClusters,
+                                     clusters,
+                                     self.noOfSources)
+        f_measure = calc_overall_fmeasure(groundTruthClusters,
+                                          clusters,
+                                          self.noOfSources,
+                                          self.clusterSettings.fBetaConstant)
+        tag_accuracy = calc_tag_accuracy(clusters,
+                                         no_of_clusters,
+                                         tagIndex)
+        ground_truths = calc_ground_truth(clusters,
+                                          no_of_clusters,
+                                          groundTruthClusters,
+                                          tagIndex)
+        ground_truth_represented = calc_gt_represented(clusters,
+                                                       groundTruthClusters,
+                                                       tagIndex)
+        f_measures = calc_f_measure(ground_truths,
+                                    ground_truth_represented,
+                                    self.clusterSettings.fBetaConstant)
+        results = ClusterResult(time_to_cluster, no_of_base_clusters,
+                                no_of_clusters, precision, recall, f_measure,
+                                tag_accuracy, ground_truths,
+                                ground_truth_represented,
+                                f_measures)
+        return results
 
 
 def drop_singleton_ground_truth_clusters(groundTruthClusters):
@@ -111,13 +185,11 @@ def empty_result():
     :rtype: tuple
     :return: empty result set
     """
-    return (
-        (0, 0, 0),
-        (.0, .0, .0),
+    return ClusterResult(
+        0, 0, 0, .0, .0, .0,
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
-        (.0, .0, .0, .0, .0, .0)
-    )
+        (.0, .0, .0, .0, .0, .0))
 
 
 def filter_snippets(snippetCollection, textTypes):

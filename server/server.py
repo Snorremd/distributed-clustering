@@ -127,9 +127,9 @@ class ClientHandler(asynchat.async_chat):
 
         self.authorized = False
 
-        self.receivedData = []  # String data from client
+        self.receivedData = []  # Byte data from user
 
-        self.set_terminator('</' + self.programId + '>')
+        self.set_terminator(str.encode('</' + self.programId + '>'))
 
         return
 
@@ -137,7 +137,7 @@ class ClientHandler(asynchat.async_chat):
         """
         Collect data from incoming network stream and insert into data list
 
-        :type data: str
+        :type data: byte
         :param data: incoming data
         """
         self.receivedData.append(data)
@@ -152,11 +152,11 @@ class ClientHandler(asynchat.async_chat):
         """
         Received all command input from client. Send back data
         """
-        stringInput = ''.join(self.receivedData)  # Complete data from client
+        byteInput = b''.join(self.receivedData)  # Complete data from client
         self.taskOrganizer.check_active_tasks()
 
         try:
-            message = deserialize_message(stringInput)
+            message = deserialize_message(byteInput)
         except PickleError:
             errorMessage = ErrorMessage("Could not deserialize message",
                                         "Deserialization error")

@@ -20,12 +20,14 @@ from tasks.taskExecutor import ClusteringTaskExecutor
 
 
 class Client(asynchat.async_chat):
-    '''Counts the length of strings received from server
-    '''
+    """
+    Counts the length of strings received from server
+    """
 
     def __init__(self, address, programId, username):
-        '''Constructor of Client class
-        '''
+        """
+        Constructor of Client class
+        """
         asynchat.async_chat.__init__(self)
 
         self.logger = get_logger_for_stdout("Client")
@@ -33,7 +35,7 @@ class Client(asynchat.async_chat):
 
         self.programId = programId
         self.username = username
-        self.set_terminator('</' + programId + '>')
+        self.set_terminator(str.encode('</' + programId + '>'))
         self.receivedData = []
         self.noOfCompletedTasks = 0
 
@@ -43,8 +45,9 @@ class Client(asynchat.async_chat):
         return
 
     def handle_connect(self):
-        '''Push command to server to authenticate
-        '''
+        """
+        Push command to server to authenticate
+        """
         self.logger.debug("Connected to server, push authentication data")
         authMessage = AuthenticationMessage("Connecting", self.programId,
                                             self.username)
@@ -73,8 +76,9 @@ class Client(asynchat.async_chat):
         return
 
     def disconnect(self, disconnectInfo):
-        '''Disconnect from server and close connection
-        '''
+        """
+        Disconnect from server and close connection
+        """
         message = DisconnectMessage("Client disconnected",
                                     disconnectInfo)
         self.send_message(message)
@@ -91,10 +95,10 @@ class Client(asynchat.async_chat):
         return
 
     def process_message(self):
-        print("MEMORY USAGE CLIENT")
-        receivedString = ''.join(self.receivedData)
+        receivedBytes = b''.join(self.receivedData)
+
         try:
-            message = deserialize_message(receivedString)
+            message = deserialize_message(receivedBytes)
         except PickleError:
             self.logger.debug("Could not deserialise message")
         else:

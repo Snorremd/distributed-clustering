@@ -1,3 +1,4 @@
+import pymysql
 from geneticalgorithm.chromosome import createRandomChromosome
 from inputOutput.sqlStatements import INSERT_INTO_SAVED_POPULATION, \
     INSERT_INTO_CHROMOSOMES, BEST_CHROMOSOMES_CREATE_STATEMENT, \
@@ -11,7 +12,7 @@ from inputOutput.sqlStatements import INSERT_INTO_SAVED_POPULATION, \
 
 __author__ = 'snorre'
 
-import MySQLdb
+
 from easylogging import configLogger
 
 
@@ -39,12 +40,12 @@ class DbHandler(object):
 
     def __getDatabaseConnection(self):
         try:
-            con = MySQLdb.connect(host=self.hostname,
+            con = pymysql.connect(host=self.hostname,
                                   port=self.port,
                                   db=self.database,
                                   user=self.username,
                                   passwd=self.password)
-        except MySQLdb.Error:
+        except pymysql.Error:
             raise
         else:
             return con
@@ -65,7 +66,7 @@ class DbHandler(object):
             if len(result) > 0:
                 exists = True
             con.close()
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
         else:
@@ -80,10 +81,10 @@ class DbHandler(object):
                 cursor = con.cursor()
                 cursor.execute(statement)
                 con.close()
-            except MySQLdb.Error:
+            except pymysql.Error:
                 raise
         else:
-            raise MySQLdb.Error(0, "Warning table {0} already exists".format(
+            raise pymysql.Error(0, "Warning table {0} already exists".format(
                 name))
 
     def drop_table(self, name):
@@ -94,7 +95,7 @@ class DbHandler(object):
                 cursor = con.cursor()
                 cursor.execute(DROP_TABLE_STATEMENT % (name,))
                 con.close()
-            except MySQLdb.Error:
+            except pymysql.Error:
                 raise
 
     def create_ga_table(self):
@@ -102,7 +103,7 @@ class DbHandler(object):
             self.create_table("genetic_algorithm",
                               GENETIC_ALGORITHM_TABLE_CREATE_STATEMENT)
 
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -114,7 +115,7 @@ class DbHandler(object):
         try:
             self.create_table("chromosomes",
                               CHROMOSOME_TABLE_CREATE_STATEMENT)
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -126,7 +127,7 @@ class DbHandler(object):
         try:
             self.create_table("saved_population",
                               POPULATION_TABLE_CREATE_STATEMENT)
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -137,7 +138,7 @@ class DbHandler(object):
     def drop_saved_population_table(self):
         try:
             self.drop_table("saved_population")
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
         else:
@@ -147,7 +148,7 @@ class DbHandler(object):
         try:
             self.create_table("best_chromosomes",
                               BEST_CHROMOSOMES_CREATE_STATEMENT)
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -159,7 +160,7 @@ class DbHandler(object):
         try:
             self.create_table("worst_chromosomes",
                               WORST_CHROMOSOMES_CREATE_STATEMENT)
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -171,7 +172,7 @@ class DbHandler(object):
         try:
             self.create_table("median_chromosomes",
                               MEDIAN_CHROMOSOMES_CREATE_STATEMENT)
-        except MySQLdb.Error as e:
+        except pymysql.Error as e:
             self.logger.debug("Error {0:d}: {1:s}".format(e.args[0],
                                                           e.args[1]))
             return False
@@ -281,7 +282,7 @@ class DbHandler(object):
         for tableName in LIST_OF_TABLES:
             try:
                 self.drop_table(tableName)
-            except MySQLdb.Error as e:
+            except pymysql.Error as e:
                 self.logger.debug("Could not drop table: {0}".format(
                     tableName))
 
@@ -290,7 +291,7 @@ class DbHandler(object):
         for tableName in LIST_OF_TABLES:
             try:
                 exists = self.tableExists(tableName)
-            except MySQLdb.Error as e:
+            except pymysql.Error as e:
                 self.logger.debug("Error {0:d}: {1:s}"
                                   .format(e.args[0], e.args[1]))
             else:

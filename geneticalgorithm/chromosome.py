@@ -90,7 +90,7 @@ class Chromosome:
         self.result = None
         self.textTypes = textType
 
-    def calc_fitness_score(self, compactTrieClusterer):
+    def calc_fitness_score(self, compact_trie_clusterer):
         """
         Returns the fitness of the chromosome
 
@@ -102,10 +102,9 @@ class Chromosome:
         Calculate fitness as the average of the two
         """
 
-        self.result = compactTrieClusterer.cluster(self)
-        compactTrieClusterer = None
-        fMeasure0 = self.result[4][0]
-        fMeasure1 = self.result[4][1]
+        self.result = compact_trie_clusterer.cluster(self)
+        fMeasure0 = self.result.f_measures[0]
+        fMeasure1 = self.result.f_measures[1]
         self.fitness = fMeasure0 + fMeasure1
 
 
@@ -174,31 +173,28 @@ class Chromosome:
             "fitness": self.fitness
         }
         if self.result:
-            chromosomeDict["fmeasure"] = self.result[1][0]
-            chromosomeDict["precision"] = self.result[1][1]
-            chromosomeDict["recall"] = self.result[1][2]
-            chromosomeDict["fmeasure"] = self.result[1][0]
-            chromosomeDict["time"] = self.result[0][0]
-            chromosomeDict["number_of_clusters"] = self.result[0][1]
-            chromosomeDict["number_of_base_clusters"] = self.result[0][2]
-            chromosomeDict["precision_0"] = self.result[2][0]
-            chromosomeDict["precision_1"] = self.result[2][1]
-            chromosomeDict["precision_2"] = self.result[2][2]
-            chromosomeDict["precision_3"] = self.result[2][3]
-            chromosomeDict["precision_4"] = self.result[2][4]
-            chromosomeDict["precision_5"] = self.result[2][5]
-            chromosomeDict["recall_0"] = self.result[3][0]
-            chromosomeDict["recall_1"] = self.result[3][1]
-            chromosomeDict["recall_2"] = self.result[3][2]
-            chromosomeDict["recall_3"] = self.result[3][3]
-            chromosomeDict["recall_4"] = self.result[3][4]
-            chromosomeDict["recall_5"] = self.result[3][5]
-            chromosomeDict["f_measure_0"] = self.result[4][0]
-            chromosomeDict["f_measure_1"] = self.result[4][1]
-            chromosomeDict["f_measure_2"] = self.result[4][2]
-            chromosomeDict["f_measure_3"] = self.result[4][3]
-            chromosomeDict["f_measure_4"] = self.result[4][4]
-            chromosomeDict["f_measure_5"] = self.result[4][5]
+            chromosomeDict["precision"] = self.result.precision
+            chromosomeDict["recall"] = self.result.recall
+            chromosomeDict["fmeasure"] = self.result.f_measure
+            chromosomeDict["time"] = self.result.time
+            chromosomeDict["number_of_clusters"] = self.no_of_clusters
+            chromosomeDict["number_of_base_clusters"] = self\
+                .no_of_base_clusters
+
+            for i in range(6):
+
+                chromosomeDict["tag_accuracy_{0}".format(i)] = self.result\
+                    .tag_accuracies[i]
+
+                chromosomeDict["precision_{0}".format(i)] = self.result\
+                    .precisions[i]
+
+                chromosomeDict["recall_{0}".format(i)] = self.result\
+                    .recalls[i]
+
+                chromosomeDict["f_measure_{0}".format(i)] = self.result\
+                    .f_measures[i]
+
         return chromosomeDict
 
     def get_precision(self):

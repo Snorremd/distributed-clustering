@@ -13,31 +13,31 @@ N_SLICE = 3
 logger = get_logger_for_stdout("compactTrieModule")
 
 
-def generate_compact_trie(snippetCollection, treeTypeTuple):
+def generate_compact_trie(snippet_collection, tree_type_tuple):
     """
 
-    :param treeTypeTuple:
-    :param snippetCollection:
+    :param tree_type_tuple:
+    :param snippet_collection:
     :return:
     """
-    (treeType, sliceLengthRangeMin, rangeMax) = treeTypeTuple  # Expand tuple
-    if treeType == SUFFIX_TREE:
+    (tree_type, slice_length_range_min, range_max) = tree_type_tuple  # Expand tuple
+    if tree_type == SUFFIX_TREE:
         logger.info("Creating suffix tree")
-        return build_compact_trie(make_suffix_tree(snippetCollection))
-    elif treeType == MID_SLICE:
+        return build_compact_trie(make_suffix_tree(snippet_collection))
+    elif tree_type == MID_SLICE:
         logger.info("Creating mid slice tree")
-        return build_compact_trie(make_mid_slice_tree(snippetCollection))
-    elif treeType == RANGE_SLICE:
+        return build_compact_trie(make_mid_slice_tree(snippet_collection))
+    elif tree_type == RANGE_SLICE:
         logger.info("Creating slice tree for min {0} -> max {1}".format(
-            treeTypeTuple[1], treeTypeTuple[2]))
-        return build_compact_trie(make_range_slice_tree(snippetCollection,
-                                                        treeTypeTuple[1],
-                                                        treeTypeTuple[2]))
-    elif treeType == N_SLICE:
+            tree_type_tuple[1], tree_type_tuple[2]))
+        return build_compact_trie(make_range_slice_tree(snippet_collection,
+                                                        tree_type_tuple[1],
+                                                        tree_type_tuple[2]))
+    elif tree_type == N_SLICE:
         logger.info("Creating n-slice tree for n = {0}".format(
-            treeTypeTuple[1]))
-        return build_compact_trie(make_n_slice_tree(snippetCollection,
-                                                    treeTypeTuple[1]))
+            tree_type_tuple[1]))
+        return build_compact_trie(make_n_slice_tree(snippet_collection,
+                                                    tree_type_tuple[1]))
 
 
 def build_compact_trie(phrases):
@@ -78,7 +78,8 @@ class CompactTrieNode(object):
     def __init__(self):
         self.phrase = []
         self.parent = None
-        self.sources = {}
+        self.sources = []
+        self.sources_dict = {}
         self.subtrees = {}
 
     def add_sources(self, sources):
@@ -90,10 +91,25 @@ class CompactTrieNode(object):
         :param sources: to add to phrase in node
         """
         for source in sources:
-            if not source in self.sources:
-                self.sources[source] = 1
+            if not source in self.sources_dict:
+                self.sources_dict[source] = 1
             else:
-                self.sources[source] += 1
+                self.sources_dict[source] += 1
+
+            if not source in self.sources:
+                self.sources.append(source)
+
+    def generate_node_label(self):
+        """
+        Recursively generate a concatenated node label array of self and
+        parents.
+        :return:
+        """
+        if self.parent is None:
+            return self.phrase
+        else:
+            #noinspection PyCallingNonCallable
+            return self.parent().generate_node_label() + self.phrase
 
     def insert(self, phrase, sources):
         """
@@ -109,50 +125,50 @@ class CompactTrieNode(object):
 
         sources = sources[:]
         phrase = phrase[:]
-        firstWord = phrase[0]
+        first_word = phrase[0]
 
-        if not firstWord in self.subtrees:
-            self.insert_new_branch(firstWord, phrase, sources)
+        if not first_word in self.subtrees:
+            self.insert_new_branch(first_word, phrase, sources)
         else:  # first word of phrase exists in subtree
-            self.insert_branch(firstWord, phrase, sources)
+            self.insert_branch(first_word, phrase, sources)
 
-    def insert_new_branch(self, firstWord, phrase, sources):
+    def insert_new_branch(self, first_word, phrase, sources):
         """
         Phrase does not exist in any branch of compact trie node,
         insert phrase as new branch.
-        :param firstWord:
+        :param first_word:
         :param phrase:
         :param sources:
         :return:
         """
         ## Branch does not exist, create new branch
-        newBranchNode = CompactTrieNode()
-        newBranchNode.phrase = phrase
+        new_branch_node = CompactTrieNode()
+        new_branch_node.phrase = phrase
         ## Avoid cyclic references by using weakref
-        newBranchNode.parent = weakref.ref(self) if self else None
-        newBranchNode.add_sources(sources)
-        self.subtrees[firstWord] = newBranchNode
+        new_branch_node.parent = weakref.ref(self) if self else None
+        new_branch_node.add_sources(sources)
+        self.subtrees[first_word] = new_branch_node
 
-    def insert_branch(self, firstWord, phrase, sources):
+    def insert_branch(self, first_word, phrase, sources):
         """
-        Phrase (or subphrase) exist as subtree in compact trie node. If all
+        Phrase (or sub-phrase) exist as subtree in compact trie node. If all
          of phrase exists in compact trie node subtree, add sources to
          respective node. If part of phrase exist in subtree, insert common
          start segment as new subtree, and process existing subtree.
-        :param firstWord:
+        :param first_word:
         :param phrase:
         :param sources:
         :return:
         """
-        branchNode = self.subtrees[firstWord]
-        if branchNode.phrase == phrase:  # Phrase exists in tree, add sources
-            branchNode.add_sources(sources)
+        branch_node = self.subtrees[first_word]
+        if branch_node.phrase == phrase:  # Phrase exists in tree, add sources
+            branch_node.add_sources(sources)
         else:  # Find common start segment of partially matching phrases
-            self.insert_common_start_segment(branchNode, phrase, firstWord,
+            self.insert_common_start_segment(branch_node, phrase, first_word,
                                              sources)
 
-    def insert_common_start_segment(self, branchNode, phrase,
-                                    firstWord, sources):
+    def insert_common_start_segment(self, branch_node, phrase,
+                                    first_word, sources):
         """
         Phrase shares common start segment with a subtree node in compact
          trie node. If there is no phrase rest, replace branch with a new node
@@ -161,95 +177,95 @@ class CompactTrieNode(object):
          is both a phrase rest and a branch rest make a new node for common
          start segment, and make branch rest and phrase rest subtrees of the
          new start segment node.
-        :param branchNode:
+        :param branch_node:
         :param phrase:
-        :param firstWord:
+        :param first_word:
         :param sources:
         :return:
         """
-        (commonStartSegment, branchRest, phraseRest) = \
-            get_common_start_segment(branchNode.phrase, phrase)
-        if not phraseRest:
-            self.insert_new_node(branchNode, branchRest, commonStartSegment,
-                                 firstWord, sources)
-        elif not branchRest:  # Recursively insert phrase rest into branch
-            branchNode.insert(phraseRest, sources)
+        (common_start_segment, branch_rest, phrase_rest) = \
+            get_common_start_segment(branch_node.phrase, phrase)
+        if not phrase_rest:
+            self.insert_new_node(branch_node, branch_rest, common_start_segment,
+                                 first_word, sources)
+        elif not branch_rest:  # Recursively insert phrase rest into branch
+            branch_node.insert(phrase_rest, sources)
         else:  # There is a phrase rest and branch rest
-            self.insert_common_start_segment_node(branchNode, branchRest,
-                                                  commonStartSegment, firstWord,
-                                                  phraseRest, sources)
+            self.insert_common_start_segment_node(branch_node, branch_rest,
+                                                  common_start_segment, first_word,
+                                                  phrase_rest, sources)
 
-    def insert_new_node(self, branchNode, branchRest, commonStartSegment,
-                        firstWord, sources):
+    def insert_new_node(self, branch_node, branch_rest, common_start_segment,
+                        first_word, sources):
         """
         Branch rest should be inserted as subtree node of new common start
          segment node. Common Start Segment node should replace branchNode as
          subtree node of current node.
-        :type branchNode: CompactTrieNode
-        :param branchNode:
-        :type branchRest: list
-        :param branchRest:
-        :type commonStartSegment: CompactTrieNode
-        :param commonStartSegment:
-        :type firstWord: str
-        :param firstWord:
+        :type branch_node: CompactTrieNode
+        :param branch_node:
+        :type branch_rest: list
+        :param branch_rest:
+        :type common_start_segment: CompactTrieNode
+        :param common_start_segment:
+        :type first_word: str
+        :param first_word:
         :type sources: list
         :param sources:
         :return:
         """
         ## phrase rest is empty, insert new node
-        newNode = CompactTrieNode()
-        newNode.phrase = commonStartSegment
-        newNode.parent = weakref.ref(self) if self else None
-        newNode.add_sources(sources)
+        new_node = CompactTrieNode()
+        new_node.phrase = common_start_segment
+        new_node.parent = weakref.ref(self) if self else None
+        new_node.add_sources(sources)
         ## Make branch a subtree of new node-tree
-        newNode.subtrees = {branchRest[0]: branchNode}
-        branchNode.phrase = branchRest
-        branchNode.parent = weakref.ref(newNode) if newNode else None
-        ## Make newnode child node of self
-        self.subtrees[firstWord] = newNode
+        new_node.subtrees = {branch_rest[0]: branch_node}
+        branch_node.phrase = branch_rest
+        branch_node.parent = weakref.ref(new_node) if new_node else None
+        ## Make new_node child node of self
+        self.subtrees[first_word] = new_node
 
-    def insert_common_start_segment_node(self, branchNode, branchRest,
-                                         commonStartSegment, firstWord,
-                                         phraseRest, sources):
+    def insert_common_start_segment_node(self, branch_node, branch_rest,
+                                         common_start_segment, first_word,
+                                         phrase_rest, sources):
         """
         There is both a branch rest and a phrase rest. Replace current branch
          node with common start segment as new subtree node of current compact
          trie node. Make branch rest and phrase rest subtree nodes of common
          start segment node.
-        :type branchNode: CompactTrieNode
-        :param branchNode:
-        :type branchRest: list
-        :param branchRest:
-        :type commonStartSegment: list
-        :param commonStartSegment:
-        :type firstWord: str
-        :param firstWord:
-        :type phraseRest: list
-        :param phraseRest:
+        :type branch_node: CompactTrieNode
+        :param branch_node:
+        :type branch_rest: list
+        :param branch_rest:
+        :type common_start_segment: list
+        :param common_start_segment:
+        :type first_word: str
+        :param first_word:
+        :type phrase_rest: list
+        :param phrase_rest:
         :type sources: list
         :param sources:
         :return:
         """
         ## Create a new trie for common start segment
-        commonStartSegmentNode = CompactTrieNode()
-        commonStartSegmentNode.phrase = commonStartSegment
-        commonStartSegmentNode.parent = weakref.ref(self) if self else None
-        commonStartSegmentNode.add_sources(sources)
+        common_start_segment_node = CompactTrieNode()
+        common_start_segment_node.phrase = common_start_segment
+        common_start_segment_node.parent = weakref.ref(self) if self else None
+        common_start_segment_node.add_sources(sources)
         ## Create a compact trie for phrase rest
-        phraseRestNode = CompactTrieNode()
-        phraseRestNode.phrase = phraseRest
-        phraseRestNode.parent = weakref.ref(commonStartSegmentNode) if \
-            commonStartSegmentNode else None
-        phraseRestNode.add_sources(sources)
-        phraseRestNode.subtrees = {}
-        ## Make branchrest and phrase rest children of common start
+        phrase_rest_node = CompactTrieNode()
+        phrase_rest_node.phrase = phrase_rest
+        phrase_rest_node.parent = weakref.ref(common_start_segment_node) if \
+            common_start_segment_node else None
+        phrase_rest_node.add_sources(sources)
+        phrase_rest_node.subtrees = {}
+        ## Make branch rest and phrase rest children of common start
         ## segment node
-        commonStartSegmentNode.subtrees = {
-            branchRest[0]: branchNode,
-            phraseRest[0]: phraseRestNode}
+        common_start_segment_node.subtrees = {
+            branch_rest[0]: branch_node,
+            phrase_rest[0]: phrase_rest_node}
         ## Update branch trie and self (this node)
-        branchNode.phrase = branchRest
-        branchNode.parent = weakref.ref(commonStartSegmentNode) if \
-            commonStartSegmentNode else None
-        self.subtrees[firstWord] = commonStartSegmentNode
+        branch_node.phrase = branch_rest
+        branch_node.parent = weakref.ref(common_start_segment_node) if \
+            common_start_segment_node else None
+        self.subtrees[first_word] = common_start_segment_node
