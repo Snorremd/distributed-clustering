@@ -352,6 +352,7 @@ class GeneticAlgorithm:
         averagePrecision = self.calc_average_precision()
         averageRecall = self.calc_average_recall()
         averageFMeasure = self.calc_average_fmeasure()
+        averageTagAccuracies = self.calc_average_tag_accuracies()
         averagePrecisions = self.calc_average_precisions()
         averageRecalls = self.calc_average_recalls()
         averageFMeasures = self.calc_average_fmeasures()
@@ -363,6 +364,7 @@ class GeneticAlgorithm:
                                             averagePrecision,
                                             averageRecall,
                                             averageFMeasure,
+                                            averageTagAccuracies,
                                             averagePrecisions,
                                             averageRecalls,
                                             averageFMeasures,
@@ -373,7 +375,7 @@ class GeneticAlgorithm:
         return generationResult
 
     def calc_average_num_time(self):
-        avgTime, noOfClusters, noBaseClusters = 0, 0, 0
+        avgTime, noOfClusters, noBaseClusters = 0.0, 0.0, 0.0
         for chromosome in self.population:
             numTime = chromosome.get_time_number_clusters()
             avgTime += numTime[0]
@@ -385,27 +387,36 @@ class GeneticAlgorithm:
         return [avgTime, noOfClusters, noBaseClusters]
 
     def calc_average_precision(self):
-        avgPrecision = 0
+        avgPrecision = 0.0
         for chromosome in self.population:
             avgPrecision += chromosome.get_precision()
         return avgPrecision / self.populationSize
 
     def calc_average_recall(self):
-        avgRecall = 0
+        avgRecall = 0.0
         for chromosome in self.population:
             avgRecall += chromosome.get_recall()
         return avgRecall / self.populationSize
 
     def calc_average_fmeasure(self):
-        avgFMeasure = 0
+        avgFMeasure = 0.0
         for chromosome in self.population:
             avgFMeasure += chromosome.get_fmeasure()
         return avgFMeasure / self.populationSize
 
+    def calc_average_tag_accuracies(self):
+        avg_tag_accuracies = []
+        for i in range (6):
+            avg_tag_accuracy = 0.0
+            for chromosome in self.population:
+                avg_tag_accuracy += chromosome.get_tag_accuracies()[i]
+            avg_tag_accuracies.append(avg_tag_accuracy / self.populationSize)
+        return avg_tag_accuracies
+
     def calc_average_precisions(self):
         avgPrecisions = []
         for i in range(6):
-            avgPrecision = 0
+            avgPrecision = 0.0
             for chromosome in self.population:
                 avgPrecision += chromosome.get_precisions()[i]
             avgPrecisions.append(avgPrecision / self.populationSize)
@@ -414,7 +425,7 @@ class GeneticAlgorithm:
     def calc_average_recalls(self):
         avgRecalls = []
         for i in range(6):
-            avgRecall = 0
+            avgRecall = 0.0
             for chromosome in self.population:
                 avgRecall += chromosome.get_recalls()[i]
             avgRecalls.append(avgRecall / self.populationSize)
@@ -423,14 +434,14 @@ class GeneticAlgorithm:
     def calc_average_fmeasures(self):
         avgFMeasures = []
         for i in range(6):
-            avgFMeasure = 0
+            avgFMeasure = 0.0
             for chromosome in self.population:
                 avgFMeasure += chromosome.get_fmeasures()[i]
             avgFMeasures.append(avgFMeasure / self.populationSize)
         return avgFMeasures
 
     def calc_average_fitness(self):
-        avgFitness = 0
+        avgFitness = 0.0
         for chromosome in self.population:
             avgFitness += chromosome.fitness
         return avgFitness / self.populationSize
@@ -467,10 +478,14 @@ class GeneticAlgorithm:
             "number_of_base_clusters_avg": generationResult
             .averageBaseClusters}
 
+        accuracy_string = "tag_accuracy_avg_{0}"
         precisionString = "precision_avg_{0}"
         recallString = "recall_avg_{0}"
         fMeasureString = "fmeasure_avg_{0}"
         for i in range(6):
+            dictValues[accuracy_string.format(i)] = \
+                generationResult.averageTagAccuracies[i]
+
             dictValues[precisionString.format(i)] = \
                 generationResult.averagePrecisions[i]
 

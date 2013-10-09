@@ -16,10 +16,6 @@ import geneticalgorithm.geneticAlgorithm as geneticAlgorithm
 from geneticalgorithm.geneticAlgorithm import GeneticAlgorithm
 from tasks.taskOrganizer import TaskOrganizer
 
-
-
-
-
 if __name__ == '__main__':
     show_info_dialog("This server runs a distributed genetic algorithm for "
                      "optimization of parameters for the compact trie "
@@ -27,8 +23,6 @@ if __name__ == '__main__':
                      "to organize chromosomes for which to calculate fitness,"
                      " and the asynchat library to communicate with clients"
                      ".\n")
-
-    show_info_dialog("")
 
     choice = show_option_dialog("Do you want to use config file?",
                                 ["yes", "no"])

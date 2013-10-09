@@ -1,5 +1,4 @@
 import math
-from operator import contains
 from cluster.compactTrieCluster.cluster import common
 from text.phrases import string_to_phrase
 
@@ -80,7 +79,8 @@ def calc_ground_truth(clusters,
     for cluster in clusters:
         best_match = 0
         for gtc_key in ground_truth_clusters.keys():
-            if contains(cluster.sources, ground_truth_clusters[gtc_key]):
+            if list_contains_list(cluster.sources,
+                                  ground_truth_clusters[gtc_key]):
                 ## Make a list of tags occurring in the cluster's sources
                 tag_list = []
                 for source in cluster.sources:
@@ -88,7 +88,9 @@ def calc_ground_truth(clusters,
                     tag_list.append(string_to_phrase(string))
                 gtc_key_string = gtc_key.replace('-', ' ')
                 tag_list.append(string_to_phrase(gtc_key_string))
-                d = len(common(map(lambda cluster: cluster, tag_list)))
+                common_elements = common(map(lambda cluster: cluster,
+                                             tag_list))
+                d = len(common_elements)
                 if d > best_match:
                     best_match = d
         count[best_match] += 1
@@ -113,7 +115,8 @@ def calc_gt_represented(clusters,
     for gtc_key in ground_truth_clusters.keys():
         best_match = 0
         for cluster in clusters:
-            if contains(cluster.sources, ground_truth_clusters[gtc_key]):
+            if list_contains_list(cluster.sources, ground_truth_clusters[
+                gtc_key]):
                 tag_list = []
                 for source in cluster.sources:
                     string = tag_index[source].replace('-', ' ')
@@ -288,3 +291,18 @@ def calc_overall_fmeasure(ground_truth_clusters,
         overall_f_measure += category_factor * max_f_measure
 
     return overall_f_measure
+
+
+def list_contains_list(list1, list2):
+    """
+    See if list 2 is contained within list 1
+    :type list1: list
+    :param list1: first list
+    :type list2: list
+    :param list2: second list
+    :return: True if list1 contains list 2, else False
+    """
+    for element in list2:
+        if element not in list1:
+            return False
+    return True

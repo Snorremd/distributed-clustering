@@ -107,7 +107,6 @@ class Chromosome:
         fMeasure1 = self.result.f_measures[1]
         self.fitness = fMeasure0 + fMeasure1
 
-
     def mutate(self):
         """
         Mutates one of the chromosome's "genes"
@@ -177,8 +176,8 @@ class Chromosome:
             chromosomeDict["recall"] = self.result.recall
             chromosomeDict["fmeasure"] = self.result.f_measure
             chromosomeDict["time"] = self.result.time
-            chromosomeDict["number_of_clusters"] = self.no_of_clusters
-            chromosomeDict["number_of_base_clusters"] = self\
+            chromosomeDict["number_of_clusters"] = self.result.no_of_clusters
+            chromosomeDict["number_of_base_clusters"] = self.result\
                 .no_of_base_clusters
 
             for i in range(6):
@@ -198,25 +197,29 @@ class Chromosome:
         return chromosomeDict
 
     def get_precision(self):
-        return self.result[1][0]
+        return self.result.precision
 
     def get_recall(self):
-        return self.result[1][1]
+        return self.result.recall
 
     def get_fmeasure(self):
-        return self.result[1][2]
+        return self.result.f_measure
+
+    def get_tag_accuracies(self):
+        return self.result.tag_accuracies
 
     def get_precisions(self):
-        return self.result[2]
+        return self.result.precisions
 
     def get_recalls(self):
-        return self.result[3]
+        return self.result.recalls
 
     def get_fmeasures(self):
-        return self.result[4]
+        return self.result.f_measures
 
     def get_time_number_clusters(self):
-        return self.result[0]
+        return (self.result.time, self.result.no_of_clusters,
+                self.result.no_of_base_clusters)
 
 
 def createRandomChromosome():

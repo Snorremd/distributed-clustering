@@ -91,11 +91,12 @@ def flatten(lists):
 def common(lists):
     """
     Returns a list of all the elements common in lists
-    :type lists: map
+    :type lists: list
     :param lists: a list of lists of elements
     :rtype: list
     :return: all common elements of lists
     """
+    lists = list(lists)
     all_elements = flatten(lists)
     common = []
     for element in all_elements:
@@ -106,5 +107,6 @@ def common(lists):
         for a_list in lists:
             if not element in a_list:
                 del common[common.index(element)]
+                break
 
     return common

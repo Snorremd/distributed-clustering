@@ -87,7 +87,9 @@ class CompactTrieClusterer(object):
         if no_of_base_clusters < 2:
             self.logger.info("Can not merge one or fewer base clusters."
                              "Assume score of zero")
-            return ClusterResult(0, no_of_base_clusters, 0, 0.0, 0.0, 0.0,
+            return ClusterResult(
+                0, no_of_base_clusters, 0,
+                0.0, 0.0, 0.0,
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0))
@@ -129,22 +131,48 @@ class CompactTrieClusterer(object):
         tag_accuracy = calc_tag_accuracy(clusters,
                                          no_of_clusters,
                                          tagIndex)
+        tag_accuracy_tuple = make_result_tuple(tag_accuracy, 2)
+
         ground_truths = calc_ground_truth(clusters,
                                           no_of_clusters,
                                           groundTruthClusters,
                                           tagIndex)
+        ground_truth_tuple = make_result_tuple(ground_truths, 2)
+
         ground_truth_represented = calc_gt_represented(clusters,
                                                        groundTruthClusters,
                                                        tagIndex)
+        ground_truth_represented_tuple = \
+            make_result_tuple(ground_truth_represented, 2)
+
         f_measures = calc_f_measure(ground_truths,
                                     ground_truth_represented,
                                     self.clusterSettings.fBetaConstant)
+        f_measure_tuple = make_result_tuple(f_measures, 1)
+
+
+
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
                                 no_of_clusters, precision, recall, f_measure,
-                                tag_accuracy, ground_truths,
-                                ground_truth_represented,
-                                f_measures)
+                                tag_accuracy_tuple, ground_truth_tuple,
+                                ground_truth_represented_tuple,
+                                f_measure_tuple)
         return results
+
+
+def make_result_tuple(results_list, position):
+    """
+    Takes a list of tuple results on the form (discrepancy, .......) and
+    converts it to a one dimensional tuple (result0, result1, .., result5)
+    :param results_list:
+    :param position:
+    :return:
+    """
+    result_tuple = ()
+    for results_overlap_x in results_list:
+        # Get the fraction of clusters to the total amount...
+        result_tuple += (results_overlap_x[position],)
+    return result_tuple
 
 
 def drop_singleton_ground_truth_clusters(groundTruthClusters):
@@ -187,6 +215,7 @@ def empty_result():
     """
     return ClusterResult(
         0, 0, 0, .0, .0, .0,
+        (.0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0))

@@ -100,6 +100,12 @@ GENETIC_ALGORITHM_TABLE_CREATE_STATEMENT = \
         `time_avg` int NOT NULL,
         `number_of_clusters_avg` int NOT NULL,
         `number_of_base_clusters_avg` int NOT NULL,
+        `tag_accuracy_avg_0` double NOT NULL,
+        `tag_accuracy_avg_1` double NOT NULL,
+        `tag_accuracy_avg_2` double NOT NULL,
+        `tag_accuracy_avg_3` double NOT NULL,
+        `tag_accuracy_avg_4` double NOT NULL,
+        `tag_accuracy_avg_5` double NOT NULL,
         `precision_avg_0` double NOT NULL,
         `precision_avg_1` double NOT NULL,
         `precision_avg_2` double NOT NULL,
@@ -150,6 +156,12 @@ CHROMOSOME_TABLE_CREATE_STATEMENT = \
         `time` int NOT NULL,
         `number_of_clusters` int NOT NULL,
         `number_of_base_clusters` int NOT NULL,
+        `tag_accuracy_0` double NOT NULL,
+        `tag_accuracy_1` double NOT NULL,
+        `tag_accuracy_2` double NOT NULL,
+        `tag_accuracy_3` double NOT NULL,
+        `tag_accuracy_4` double NOT NULL,
+        `tag_accuracy_5` double NOT NULL,
         `precision_0` double NOT NULL,
         `precision_1` double NOT NULL,
         `precision_2` double NOT NULL,
@@ -236,6 +248,12 @@ INSERT_INTO_CHROMOSOMES = "INSERT INTO chromosomes (" \
                           "`precision`, " \
                           "`recall`, " \
                           "`fmeasure`, " \
+                          "`tag_accuracy_0`, " \
+                          "`tag_accuracy_1`, " \
+                          "`tag_accuracy_2`, " \
+                          "`tag_accuracy_3` ," \
+                          "`tag_accuracy_4`, " \
+                          "`tag_accuracy_5`, " \
                           "`precision_0`, " \
                           "`precision_1`, " \
                           "`precision_2`, " \
@@ -279,6 +297,12 @@ INSERT_INTO_CHROMOSOMES = "INSERT INTO chromosomes (" \
                           "%(precision)s, " \
                           "%(recall)s, " \
                           "%(fmeasure)s, " \
+                          "%(tag_accuracy_0)s, " \
+                          "%(tag_accuracy_1)s, " \
+                          "%(tag_accuracy_2)s, " \
+                          "%(tag_accuracy_3)s ," \
+                          "%(tag_accuracy_4)s, " \
+                          "%(tag_accuracy_5)s, " \
                           "%(precision_0)s, " \
                           "%(precision_1)s, " \
                           "%(precision_2)s, " \
@@ -311,6 +335,12 @@ INSERT_INTO_GENETIC_ALGORITHM = \
             `time_avg`,
             `number_of_clusters_avg`,
             `number_of_base_clusters_avg`,
+            `tag_accuracy_avg_0`,
+            `tag_accuracy_avg_1`,
+            `tag_accuracy_avg_2`,
+            `tag_accuracy_avg_3`,
+            `tag_accuracy_avg_4`,
+            `tag_accuracy_avg_5`,
             `precision_avg_0`,
             `precision_avg_1`,
             `precision_avg_2`,
@@ -340,6 +370,12 @@ INSERT_INTO_GENETIC_ALGORITHM = \
             %(time_avg)s,
             %(number_of_clusters_avg)s,
             %(number_of_base_clusters_avg)s,
+            %(tag_accuracy_avg_0)s,
+            %(tag_accuracy_avg_1)s,
+            %(tag_accuracy_avg_2)s,
+            %(tag_accuracy_avg_3)s,
+            %(tag_accuracy_avg_4)s,
+            %(tag_accuracy_avg_5)s,
             %(precision_avg_0)s,
             %(precision_avg_1)s,
             %(precision_avg_2)s,
