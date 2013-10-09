@@ -41,7 +41,7 @@ class CompactTrieClusterer(object):
     def __init__(self, corpus, clusterSettings):
         self.logger = get_logger_for_stdout("CompactTrieClusterer")
         self.corpus = get_corpus_settings(corpus.name)
-        self.snippetFilePath = self.corpus.name
+        self.snippetFilePath = self.corpus.snippetFilePath
         self.clusterSettings = clusterSettings
         self.logger.debug("Make indexes and snippet collection")
         self.tagIndex = make_tag_index(corpus.snippetFilePath)
