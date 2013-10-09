@@ -8,6 +8,7 @@ from cluster.compactTrieCluster.compactTrie import generate_compact_trie
 from cluster.compactTrieCluster.mergedClusters import merge_components
 from cluster.compactTrieCluster.similarity import SimilarityMeasurer
 from easylogging.configLogger import get_logger_for_stdout
+from inputOutput.filehandling import get_corpus_settings
 from text.xmlsnippets import get_snippet_collection, make_tag_index,\
     make_ground_truth_clusters
 
@@ -39,7 +40,8 @@ class CompactTrieClusterer(object):
 
     def __init__(self, corpus, clusterSettings):
         self.logger = get_logger_for_stdout("CompactTrieClusterer")
-        self.corpus = corpus
+        self.corpus = get_corpus_settings(corpus.name)
+        self.snippetFilePath = corpus.name
         self.clusterSettings = clusterSettings
         self.logger.debug("Make indexes and snippet collection")
         self.tagIndex = make_tag_index(corpus.snippetFilePath)
