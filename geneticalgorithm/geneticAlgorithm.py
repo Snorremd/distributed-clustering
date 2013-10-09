@@ -406,7 +406,7 @@ class GeneticAlgorithm:
 
     def calc_average_tag_accuracies(self):
         avg_tag_accuracies = []
-        for i in range (6):
+        for i in range(6):
             avg_tag_accuracy = 0.0
             for chromosome in self.population:
                 avg_tag_accuracy += chromosome.get_tag_accuracies()[i]

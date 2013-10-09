@@ -1,6 +1,6 @@
 <serverconfig>
     <hostaddress>0.0.0.0</hostaddress>
-    <port>9876</port>
+    <port>9875</port>
     <programid>distributed-clustering</programid>
     <batchsize>5</batchsize>
     <timeout>400</timeout>

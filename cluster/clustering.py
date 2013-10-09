@@ -44,26 +44,23 @@ class CompactTrieClusterer(object):
         self.snippetFilePath = self.corpus.snippetFilePath
         self.clusterSettings = clusterSettings
         self.logger.debug("Make indexes and snippet collection")
-        self.tagIndex = make_tag_index(corpus.snippetFilePath)
+        self.tagIndex = make_tag_index(self.snippetFilePath)
         self.noOfSources = len(self.tagIndex)
         self.groundTruthClusters = \
-            make_ground_truth_clusters(corpus.snippetFilePath)
-        self.snippetCollection = get_snippet_collection(corpus.snippetFilePath)
+            make_ground_truth_clusters(self.snippetFilePath)
+        self.snippetCollection = get_snippet_collection(self.snippetFilePath)
 
         if self.clusterSettings.dropSingletonGTClusters:
             self.groundTruthClusters = drop_singleton_ground_truth_clusters(
                 self.groundTruthClusters)
-
 
     def cluster(self, chromosome):
 
 
         ## Various clustering settings
         tagIndex = self.tagIndex
-        filename = self.corpus.snippetFilePath
         groundTruthClusters = self.groundTruthClusters
-        fBetaConstant = self.clusterSettings.fBetaConstant
-
+        
         ## If text types are empty (no text to be included) return empty result
         if not is_nonempty_text_types(chromosome.textTypes):
             return empty_result()
