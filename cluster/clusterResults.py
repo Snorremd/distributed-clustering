@@ -1,3 +1,4 @@
+from lib2to3.patcomp import _type_of_literal
 import math
 from cluster.compactTrieCluster.cluster import common
 from text.phrases import string_to_phrase
@@ -23,6 +24,13 @@ class ClusterResult(object):
         self.precisions = precisions
         self.recalls = recalls
         self.f_measures = f_measures
+
+    def __str__(self):
+        stringRep = ""
+
+        for property, value in vars(self).items():
+            stringRep += str(property) + ": " + str(value) + "\n"
+        return stringRep
 
 
 def calc_tag_accuracy(clusters,

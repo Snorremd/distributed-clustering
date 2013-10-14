@@ -11,7 +11,7 @@ from . import snippets
 
 from inputOutput.filehandling import sep_file_and_path
 import codecs
-import lxml.etree as etree
+import xml.etree as etree
 
 __author__ = 'snorre'
 
@@ -172,12 +172,13 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
         """
         """
         snippetTree = self.snippetBuilder.get_element_tree()
-        xmlstring = etree.tostring(snippetTree, encoding='ascii',
-                                   pretty_print=True)
+        snippetTree.write(self.snippetPath, encoding='ascii')
+        #xmlstring = etree.tostring(snippetTree, encoding='ascii',
+        #                           pretty_print=True)
         print("Xml string created, write to file")
         print(self.snippetPath)
-        outputFile = open(self.snippetPath, "w")
-        outputFile.write(xmlstring)
+        #outputFile = open(self.snippetPath, "w")
+        #outputFile.write(xmlstring)
 
         ##snippetTree.write(self.snippetPath, encoding="UTF-8",
         ##                  xml_declaration=False, pretty_print=True)

@@ -3,7 +3,7 @@ from guppy import hpy
 
 from cluster.clusterSettings import ClusterSettings
 from cluster.clustering import CompactTrieClusterer
-from geneticalgorithm.chromosome import createRandomChromosome
+from geneticalgorithm.chromosome import create_random_chromosome
 from corpora.corpus import Corpus
 
 memheap = hpy()
@@ -24,7 +24,7 @@ if __name__ == "__main__":
                     False)
     clusterer = CompactTrieClusterer(corpus, settings)
     for _ in range(100):
-        chromosome = createRandomChromosome()
+        chromosome = create_random_chromosome()
         chromosome.calc_fitness_score(clusterer)
         sleep(5)
 

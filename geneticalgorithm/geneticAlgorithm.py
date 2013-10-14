@@ -8,7 +8,7 @@ from datetime import datetime
 from random import random, randint
 import math as math
 
-from .chromosome import createRandomChromosome, crossChromosomes
+from .chromosome import create_random_chromosome, crossChromosomes
 import __main__
 from geneticalgorithm.result import GenerationResult
 from tasks.task import CompactTrieClusteringTask
@@ -99,7 +99,7 @@ class GeneticAlgorithm:
         of the chromosome are given random values.
         """
         for _ in range(self.populationSize):
-            chromosome = createRandomChromosome()
+            chromosome = create_random_chromosome()
             self.population.append(chromosome)
 
     def update(self):

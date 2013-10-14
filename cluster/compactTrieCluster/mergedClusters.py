@@ -51,6 +51,7 @@ def merge(component1, component2):
         if base_cluster not in component1.base_clusters:
             component1.base_clusters.append(base_cluster)
 
+
 def merge_components(base_clusters, similarity_measurer):
 
     component_index = generate_initial_components(base_clusters)

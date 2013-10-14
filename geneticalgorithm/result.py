@@ -23,3 +23,4 @@ class GenerationResult(object):
         self.topChromosomes = topChromosomes
         self.medianChromosomes = medianChromosomes
         self.worstChromosomes = worstChromosomes
+

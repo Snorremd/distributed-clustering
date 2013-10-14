@@ -2,6 +2,7 @@ from text.phrases import phrase_to_string
 
 
 class Cluster(object):
+
     def __init__(self):
         self.label = []  # label for the cluster as a whole ?
         self.labels = []
@@ -98,15 +99,15 @@ def common(lists):
     """
     lists = list(lists)
     all_elements = flatten(lists)
-    common = []
+    common_elements = []
     for element in all_elements:
-        if not element in common:
-            common.append(element)
+        if not element in common_elements:
+            common_elements.append(element)
 
-    for element in common[:]:
+    for element in common_elements[:]:
         for a_list in lists:
             if not element in a_list:
-                del common[common.index(element)]
+                del common_elements[common_elements.index(element)]
                 break
 
-    return common
+    return common_elements

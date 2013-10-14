@@ -11,7 +11,6 @@ class SimilarityMeasurer(object):
             0: self.jaccard_similarity
         }
 
-
     def similar(self, base_cluster_1, base_cluster_2):
         """
         Calculate the boolean similarity between two base clusters with one

@@ -1,6 +1,5 @@
 # coding=utf-8
-#from xml.etree.ElementTree import ElementTree, Element, SubElement
-from lxml.etree import ElementTree, Element, SubElement
+from xml.etree.ElementTree import ElementTree, Element, SubElement
 
 __author__ = 'Snorre Magnus Davøen'
 
@@ -21,6 +20,7 @@ class SnippetBuilder(object):
         :param sourceFilename: the filename of the source corpus file
         """
         self.root = Element('snippetcollection', {'source': sourceFilename})
+        self.counter = 0
 
     def add_document(self, docId, tags, source, **snippetsLists):
         """
@@ -33,11 +33,13 @@ class SnippetBuilder(object):
         :type snippetsLists: dict
         :param snippetsLists: lists of snippets contained in the document
         """
+        if self.counter % 100 == 0 or self.counter == 0:
 
-        document = SubElement(self.root, 'snippet',
-                              {'id': docId, 'tags': tags, 'source': source})
-        for key, list in snippetsLists.items():
-            self.add_snippets(document, key, list)
+            document = SubElement(self.root, 'snippet',
+                                  {'id': docId, 'tags': tags, 'source': source})
+            for key, list in snippetsLists.items():
+                self.add_snippets(document, key, list)
+        self.counter += 1
 
     def add_snippets(self, document, key, snippetList):
         """

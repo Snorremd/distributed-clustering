@@ -36,7 +36,7 @@ def get_word_sources(compactTrie):
     word_dict = {}
 
     for word in compactTrie.phrase:
-        word_dict[word] = compactTrie.sources.copy()
+        word_dict[word] = compactTrie.sources[:]
 
     for subtree in compactTrie.subtrees.values():
         sources = collect_sources(subtree)
@@ -66,7 +66,7 @@ def merge_dictionaries(dict1, dict2):
         if phrase in dict1:
             for source in dict2[phrase]:
                 if not source in dict1[phrase]:
-                    dict1[phrase].append(dict2[phrase])
+                    dict1[phrase].append(source)
         else:
             dict1[phrase] = dict2[phrase]
     return dict1

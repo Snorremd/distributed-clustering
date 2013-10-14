@@ -32,28 +32,9 @@ class BaseCluster(object):
         print(self.sources)
 
 
-def top_base_clusters(compactTrie,
-                      topBaseClustersAmount=500,
-                      minNoInCollection=3,
-                      maxRatioInCollection=0.4,
-                      minLimitForBaseClusterScore=1,
-                      maxLimitForBaseClusterScore=6
-                      ):
-    """
-
-    :param compactTrie:
-    :param topBaseClustersAmount:
-    :param minNoInCollection:
-    :param maxRatioInCollection:
-    :param minLimitForBaseClusterScore:
-    :param maxLimitForBaseClusterScore:
-    :return:
-    """
-
-    baseClusters = generate_base_cluster(compactTrie.root)
-
-    noOfSources = count_sources(compactTrie.root)
-    wordSources = get_word_sources(compactTrie.root)
+def sort_base_clusters(baseClusters, noOfSources, wordSources, minNoInCollection,
+                       maxRatioInCollection, minLimitForBaseClusterScore,
+                       maxLimitForBaseClusterScore):
 
     def compute_score(baseCluster):
         """
@@ -86,18 +67,47 @@ def top_base_clusters(compactTrie,
             for word in label:
                 wordSourcesLength = len(wordSources[word])
                 ratioInCollection = float(wordSourcesLength) / \
-                    float(noOfSources)
+                                    float(noOfSources)
                 if wordSourcesLength > minNoInCollection and \
-                   ratioInCollection <= maxRatioInCollection:
+                                ratioInCollection <= maxRatioInCollection:
                     ## If word contributes to phrase length
                     n += 1
             return n
 
-        return baseCluster.size * f(effective_words(baseCluster.label))
+        base_cluster_score = baseCluster.size * f(effective_words(baseCluster.label))
+        return base_cluster_score
 
-    baseClusters.sort(key=compute_score)
+    baseClusters.sort(key=compute_score, reverse=True)
 
-    #del wordSources
+
+def top_base_clusters(compactTrie,
+                      topBaseClustersAmount=500,
+                      minNoInCollection=3,
+                      maxRatioInCollection=0.4,
+                      minLimitForBaseClusterScore=1,
+                      maxLimitForBaseClusterScore=6
+                      ):
+    """
+
+    :param compactTrie:
+    :param topBaseClustersAmount:
+    :param minNoInCollection:
+    :param maxRatioInCollection:
+    :param minLimitForBaseClusterScore:
+    :param maxLimitForBaseClusterScore:
+    :return:
+    """
+
+    baseClusters = generate_base_cluster(compactTrie.root)
+    noOfSources = count_sources(compactTrie.root)
+    wordSources = get_word_sources(compactTrie.root)
+
+    sort_base_clusters(baseClusters, noOfSources, wordSources, minNoInCollection,
+                       maxRatioInCollection, minLimitForBaseClusterScore,
+                       maxLimitForBaseClusterScore)
+
+    smallerSet = baseClusters[:10]
+
     if topBaseClustersAmount > len(baseClusters):
         return baseClusters
     else:

@@ -1,10 +1,10 @@
 <serverconfig>
     <hostaddress>0.0.0.0</hostaddress>
-    <port>9875</port>
+    <port>9876</port>
     <programid>distributed-clustering</programid>
     <batchsize>5</batchsize>
-    <timeout>400</timeout>
-    <populationsize>500</populationsize>
+    <timeout>500</timeout>
+    <populationsize>1000</populationsize>
     <corpus>klimauken</corpus>
     <dbhost>localhost</dbhost>
     <dbname>ctcluster</dbname>

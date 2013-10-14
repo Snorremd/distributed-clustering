@@ -1,5 +1,5 @@
 import pymysql
-from geneticalgorithm.chromosome import createRandomChromosome
+from geneticalgorithm.chromosome import create_random_chromosome
 from inputOutput.sqlStatements import INSERT_INTO_SAVED_POPULATION, \
     INSERT_INTO_CHROMOSOMES, BEST_CHROMOSOMES_CREATE_STATEMENT, \
     WORST_CHROMOSOMES_CREATE_STATEMENT, MEDIAN_CHROMOSOMES_CREATE_STATEMENT, \
@@ -310,7 +310,7 @@ if __name__ == '__main__':
     dbHandler.create_all_tables()
     chromosomes = []
     for _ in range(10):
-        chromosome = createRandomChromosome()
+        chromosome = create_random_chromosome()
         chromosome.result = ((4, 54, 534),
                              (0.87, 0.34, 0.54),
                              (0.5, 0.5, 0.5, 0.5, 0.5, 0.5),

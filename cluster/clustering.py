@@ -1,7 +1,6 @@
-from copy import deepcopy
-import gc
 from time import time
-from cluster.clusterResults import ClusterResult, calc_overall_precision, calc_overall_recall, calc_overall_fmeasure, calc_tag_accuracy, calc_ground_truth, calc_gt_represented, calc_f_measure
+from cluster.clusterResults import ClusterResult, calc_overall_precision, calc_overall_recall, calc_overall_fmeasure, \
+    calc_tag_accuracy, calc_ground_truth, calc_gt_represented, calc_f_measure
 from cluster.compactTrieCluster.baseCluster import top_base_clusters, drop_singleton_base_clusters
 from cluster.compactTrieCluster.cluster import generate_clusters
 from cluster.compactTrieCluster.compactTrie import generate_compact_trie
@@ -38,47 +37,51 @@ def text_types():
 
 class CompactTrieClusterer(object):
 
-    def __init__(self, corpus, clusterSettings):
+    def __init__(self, corpus, cluster_settings):
         self.logger = get_logger_for_stdout("CompactTrieClusterer")
         self.corpus = get_corpus_settings(corpus.name)
-        self.snippetFilePath = self.corpus.snippetFilePath
-        self.clusterSettings = clusterSettings
+        self.snippet_file_path = self.corpus.snippetFilePath
+        self.cluster_settings = cluster_settings
         self.logger.debug("Make indexes and snippet collection")
-        self.tagIndex = make_tag_index(self.snippetFilePath)
-        self.noOfSources = len(self.tagIndex)
-        self.groundTruthClusters = \
-            make_ground_truth_clusters(self.snippetFilePath)
-        self.snippetCollection = get_snippet_collection(self.snippetFilePath)
+        self.tag_index = make_tag_index(self.snippet_file_path)
+        self.no_of_sources = len(self.tag_index)
+        self.ground_truth_clusters = \
+            make_ground_truth_clusters(self.snippet_file_path)
+        self.snippet_collection = get_snippet_collection(self.snippet_file_path)
 
-        if self.clusterSettings.dropSingletonGTClusters:
-            self.groundTruthClusters = drop_singleton_ground_truth_clusters(
-                self.groundTruthClusters)
+        if self.cluster_settings.dropSingletonGTClusters:
+            self.ground_truth_clusters = drop_singleton_ground_truth_clusters(
+                self.ground_truth_clusters)
 
     def cluster(self, chromosome):
 
-
         ## Various clustering settings
-        tagIndex = self.tagIndex
-        groundTruthClusters = self.groundTruthClusters
-        
+        tag_index = self.tag_index
+        ground_truth_clusters = self.ground_truth_clusters
+
         ## If text types are empty (no text to be included) return empty result
-        if not is_nonempty_text_types(chromosome.textTypes):
+        if not is_nonempty_text_types(chromosome.text_types):
             return empty_result()
 
         ## Filter snippet collection based on text types
-        snippetCollection = filter_snippets(self.snippetCollection,
-                                            chromosome.textTypes)
+        snippet_collection = filter_snippets(self.snippet_collection,
+                                             chromosome.text_types)
 
         start = time()
 
         ## Build the compact trie structure
-        compactTrie = generate_compact_trie(snippetCollection,
-                                         chromosome.treeType)
+        compact_trie = generate_compact_trie(snippet_collection,
+                                             chromosome.tree_type)
 
         ## Get base clusters
-        base_clusters = top_base_clusters(compactTrie)
+        base_clusters = top_base_clusters(compact_trie,
+                                          chromosome.top_base_clusters_amount,
+                                          chromosome.min_term_occurrence_in_collection,
+                                          chromosome.max_term_ratio_in_collection,
+                                          chromosome.min_limit_for_base_cluster_score,
+                                          chromosome.max_limit_for_base_cluster_score)
 
-        if chromosome.shouldDropSingletonBaseClusters:
+        if chromosome.should_drop_singleton_base_clusters:
             drop_singleton_base_clusters(base_clusters)
 
         no_of_base_clusters = len(base_clusters)
@@ -89,6 +92,7 @@ class CompactTrieClusterer(object):
             return ClusterResult(
                 0, no_of_base_clusters, 0,
                 0.0, 0.0, 0.0,
+                (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0))
@@ -106,50 +110,48 @@ class CompactTrieClusterer(object):
 
         no_of_clusters = len(clusters)
 
-        return self.calculate_results(clusters, groundTruthClusters,
+        return self.calculate_results(clusters, ground_truth_clusters,
                                       no_of_base_clusters, no_of_clusters,
-                                      tagIndex, time_to_cluster)
+                                      tag_index, time_to_cluster)
 
-    def calculate_results(self, clusters, groundTruthClusters,
-                          no_of_base_clusters, no_of_clusters, tagIndex,
+    def calculate_results(self, clusters, ground_truth_clusters,
+                          no_of_base_clusters, no_of_clusters, tag_index,
                           time_to_cluster):
         """
         Calculate two forms of results. Standard precision,
         recall and f-measure scores as done in ....
         """
-        precision = calc_overall_precision(groundTruthClusters,
+        precision = calc_overall_precision(ground_truth_clusters,
                                            clusters,
-                                           self.noOfSources)
-        recall = calc_overall_recall(groundTruthClusters,
+                                           self.no_of_sources)
+        recall = calc_overall_recall(ground_truth_clusters,
                                      clusters,
-                                     self.noOfSources)
-        f_measure = calc_overall_fmeasure(groundTruthClusters,
+                                     self.no_of_sources)
+        f_measure = calc_overall_fmeasure(ground_truth_clusters,
                                           clusters,
-                                          self.noOfSources,
-                                          self.clusterSettings.fBetaConstant)
+                                          self.no_of_sources,
+                                          self.cluster_settings.fBetaConstant)
         tag_accuracy = calc_tag_accuracy(clusters,
                                          no_of_clusters,
-                                         tagIndex)
+                                         tag_index)
         tag_accuracy_tuple = make_result_tuple(tag_accuracy, 2)
 
         ground_truths = calc_ground_truth(clusters,
                                           no_of_clusters,
-                                          groundTruthClusters,
-                                          tagIndex)
+                                          ground_truth_clusters,
+                                          tag_index)
         ground_truth_tuple = make_result_tuple(ground_truths, 2)
 
         ground_truth_represented = calc_gt_represented(clusters,
-                                                       groundTruthClusters,
-                                                       tagIndex)
+                                                       ground_truth_clusters,
+                                                       tag_index)
         ground_truth_represented_tuple = \
             make_result_tuple(ground_truth_represented, 2)
 
         f_measures = calc_f_measure(ground_truths,
                                     ground_truth_represented,
-                                    self.clusterSettings.fBetaConstant)
+                                    self.cluster_settings.fBetaConstant)
         f_measure_tuple = make_result_tuple(f_measures, 1)
-
-
 
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
                                 no_of_clusters, precision, recall, f_measure,
@@ -174,33 +176,33 @@ def make_result_tuple(results_list, position):
     return result_tuple
 
 
-def drop_singleton_ground_truth_clusters(groundTruthClusters):
+def drop_singleton_ground_truth_clusters(ground_truth_clusters):
     """
-    :type groundTruthClusters: dict
-    :param groundTruthClusters: index of ground truth clusters on the form: {
+    :type ground_truth_clusters: dict
+    :param ground_truth_clusters: index of ground truth clusters on the form: {
     "tags": [
     "source1", ..., "sourceX"], ..., "tags": [...]}
     :rtype: dict
     :return: a filtered index of non-singleton ground truth clusters
     """
-    newIndex = {}
-    for tags in list(groundTruthClusters.keys()):
-        sources = groundTruthClusters[tags]
+    new_index = {}
+    for tags in list(ground_truth_clusters.keys()):
+        sources = ground_truth_clusters[tags]
         if len(sources) > 1:
-            newIndex[tags] = sources
-    return newIndex
+            new_index[tags] = sources
+    return new_index
 
 
-def is_nonempty_text_types(textTypes):
+def is_nonempty_text_types(text_types_dict):
     """
     Utility method to check if no text types are to be included
-    :param textTypes: key value pairs for text type inclusion
-    :type textTypes: dict
+    :param text_types_dict: key value pairs for text type inclusion
+    :type text_types_dict: dict
     :return: true if all text types are set to false, false if not
     :rtype: bool
     """
     nonempty = False
-    for value in list(textTypes.values()):
+    for value in list(text_types_dict.values()):
         if value:
             nonempty = True
     return nonempty
@@ -220,18 +222,18 @@ def empty_result():
         (.0, .0, .0, .0, .0, .0))
 
 
-def filter_snippets(snippetCollection, textTypes):
+def filter_snippets(snippet_collection, text_types_dict):
     """
 
-    :type snippetCollection: dict
-    :param snippetCollection: snippets to filter based on type
-    :type textTypes: dict
-    :param textTypes: boolean values for inclusion/exclusion of text types
+    :type snippet_collection: dict
+    :param snippet_collection: snippets to filter based on type
+    :type text_types_dict: dict
+    :param text_types_dict: boolean values for inclusion/exclusion of text types
     :rtype: list
     :return: list of snippet, [source]-pairs.
     """
-    filteredCollection = list()
-    for textType, snippets in snippetCollection.items():
-        if textTypes[textType]:  # If text type is true, do include
-            filteredCollection.extend(snippets)
-    return filteredCollection
+    filtered_collection = list()
+    for textType, snippets in snippet_collection.items():
+        if text_types_dict[textType]:  # If text type is true, do include
+            filtered_collection.extend(snippets)
+    return filtered_collection

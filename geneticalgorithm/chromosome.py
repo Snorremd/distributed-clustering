@@ -78,17 +78,17 @@ class Chromosome:
         """
         self.id = Chromosome.idCounter
         Chromosome.idCounter += 1
-        self.treeType = treeType
-        self.topBaseClustersAmount = topBaseClustersAmount
-        self.minTermOccurrenceInCollection = minTermOccurrenceInCollection
-        self.maxTermRatioInCollection = maxTermRatioInCollection
-        self.minLimitForBaseClusterScore = minLimitForBaseClusterScore
-        self.maxLimitForBaseClusterScore = maxLimitForBaseClusterScore
-        self.shouldDropSingletonBaseClusters = shouldDropSingletonBaseClusters
-        self.shouldDropOneWordClusters = shouldDropOneWordClusters
+        self.tree_type = treeType
+        self.top_base_clusters_amount = topBaseClustersAmount
+        self.min_term_occurrence_in_collection = minTermOccurrenceInCollection
+        self.max_term_ratio_in_collection = maxTermRatioInCollection
+        self.min_limit_for_base_cluster_score = minLimitForBaseClusterScore
+        self.max_limit_for_base_cluster_score = maxLimitForBaseClusterScore
+        self.should_drop_singleton_base_clusters = shouldDropSingletonBaseClusters
+        self.should_drop_one_word_clusters = shouldDropOneWordClusters
         self.fitness = 0
         self.result = None
-        self.textTypes = textType
+        self.text_types = textType
 
     def calc_fitness_score(self, compact_trie_clusterer):
         """
@@ -116,85 +116,85 @@ class Chromosome:
         """
         geneToMutate = randint(1, 8)
         if geneToMutate == TREETYPE:
-            self.treeType = getRandomTreeType()
+            self.tree_type = getRandomTreeType()
         elif geneToMutate == TOPBASECLUSTERSAMOUNT:
-            self.topBaseClustersAmount = getRandomTopBaseClustersAmount()
+            self.top_base_clusters_amount = getRandomTopBaseClustersAmount()
         elif geneToMutate == MINTERMOCCURRENCEINCOLLECTION:
-            self.minTermOccurrenceInCollection = getRandomMinTermOccurrence()
+            self.min_term_occurrence_in_collection = getRandomMinTermOccurrence()
         elif geneToMutate == MAXTERMRATIOINCOLLECTION:
-            self.maxTermRatioInCollection = getRandomMaxTermRatio()
+            self.max_term_ratio_in_collection = getRandomMaxTermRatio()
         elif geneToMutate == MINLIMITFORBASECLUSTERSCORE:
-            self.minLimitForBaseClusterScore = getRandomMinLimitBCScore()
+            self.min_limit_for_base_cluster_score = getRandomMinLimitBCScore()
         elif geneToMutate == MAXLIMITFORBASECLUSTERSCORE:
-            self.maxLimitForBaseClusterScore = getRandomMaxLimitBCScore()
+            self.max_limit_for_base_cluster_score = getRandomMaxLimitBCScore()
         elif geneToMutate == SHOULDDROPSINGLETONBASECLUSTERS:
-            self.shouldDropSingletonBaseClusters = randint(0, 1)
+            self.should_drop_singleton_base_clusters = randint(0, 1)
         elif geneToMutate == SHOULDDROPONEWORDCLUSTERS:
-            self.shouldDropOneWordClusters = randint(0, 1)
+            self.should_drop_one_word_clusters = randint(0, 1)
         else:  # Just in case
             pass
 
     def genesAsTuple(self):
-        return (self.treeType,
-                self.topBaseClustersAmount,
-                self.minTermOccurrenceInCollection,
-                self.maxTermRatioInCollection,
-                self.minLimitForBaseClusterScore,
-                self.maxLimitForBaseClusterScore,
-                self.shouldDropSingletonBaseClusters,
-                self.shouldDropOneWordClusters,
-                self.textTypes)
+        return (self.tree_type,
+                self.top_base_clusters_amount,
+                self.min_term_occurrence_in_collection,
+                self.max_term_ratio_in_collection,
+                self.min_limit_for_base_cluster_score,
+                self.max_limit_for_base_cluster_score,
+                self.should_drop_singleton_base_clusters,
+                self.should_drop_one_word_clusters,
+                self.text_types)
 
     def chromosome_as_dict(self):
-        textTypesKeys = text_types()
-        chromosomeDict = {
+        text_types_keys = text_types()
+        chromosome_dict = {
             "id": self.id,
-            "tree_type_1": self.treeType[0],
-            "tree_type_2": self.treeType[1],
-            "tree_type_3": self.treeType[2],
-            "text_type_frontpageheading": self.textTypes[textTypesKeys[0]],
-            "text_type_frontpageintroduction": self.textTypes[textTypesKeys[1]],
-            "text_type_articleheading": self.textTypes[textTypesKeys[2]],
-            "text_type_articlebyline": self.textTypes[textTypesKeys[3]],
-            "text_type_articleintroduction": self.textTypes[textTypesKeys[4]],
-            "text_type_articletext": self.textTypes[textTypesKeys[5]],
-            "top_base_clusters_amount": self.topBaseClustersAmount,
+            "tree_type_1": self.tree_type[0],
+            "tree_type_2": self.tree_type[1],
+            "tree_type_3": self.tree_type[2],
+            "text_type_frontpageheading": self.text_types[text_types_keys[0]],
+            "text_type_frontpageintroduction": self.text_types[text_types_keys[1]],
+            "text_type_articleheading": self.text_types[text_types_keys[2]],
+            "text_type_articlebyline": self.text_types[text_types_keys[3]],
+            "text_type_articleintroduction": self.text_types[text_types_keys[4]],
+            "text_type_articletext": self.text_types[text_types_keys[5]],
+            "top_base_clusters_amount": self.top_base_clusters_amount,
             "min_term_occurrence_collection": self
-            .minTermOccurrenceInCollection,
-            "max_term_ratio_collection": self.maxTermRatioInCollection,
+            .min_term_occurrence_in_collection,
+            "max_term_ratio_collection": self.max_term_ratio_in_collection,
             "min_limit_base_cluster_score": self
-            .minLimitForBaseClusterScore,
+            .min_limit_for_base_cluster_score,
             "max_limit_base_cluster_score": self
-            .maxLimitForBaseClusterScore,
+            .max_limit_for_base_cluster_score,
             "drop_singleton_base_clusters": self
-            .shouldDropSingletonBaseClusters,
-            "drop_one_word_clusters": self.shouldDropOneWordClusters,
+            .should_drop_singleton_base_clusters,
+            "drop_one_word_clusters": self.should_drop_one_word_clusters,
             "fitness": self.fitness
         }
         if self.result:
-            chromosomeDict["precision"] = self.result.precision
-            chromosomeDict["recall"] = self.result.recall
-            chromosomeDict["fmeasure"] = self.result.f_measure
-            chromosomeDict["time"] = self.result.time
-            chromosomeDict["number_of_clusters"] = self.result.no_of_clusters
-            chromosomeDict["number_of_base_clusters"] = self.result\
+            chromosome_dict["precision"] = self.result.precision
+            chromosome_dict["recall"] = self.result.recall
+            chromosome_dict["fmeasure"] = self.result.f_measure
+            chromosome_dict["time"] = self.result.time
+            chromosome_dict["number_of_clusters"] = self.result.no_of_clusters
+            chromosome_dict["number_of_base_clusters"] = self.result\
                 .no_of_base_clusters
 
             for i in range(6):
 
-                chromosomeDict["tag_accuracy_{0}".format(i)] = self.result\
+                chromosome_dict["tag_accuracy_{0}".format(i)] = self.result\
                     .tag_accuracies[i]
 
-                chromosomeDict["precision_{0}".format(i)] = self.result\
+                chromosome_dict["precision_{0}".format(i)] = self.result\
                     .precisions[i]
 
-                chromosomeDict["recall_{0}".format(i)] = self.result\
+                chromosome_dict["recall_{0}".format(i)] = self.result\
                     .recalls[i]
 
-                chromosomeDict["f_measure_{0}".format(i)] = self.result\
+                chromosome_dict["f_measure_{0}".format(i)] = self.result\
                     .f_measures[i]
 
-        return chromosomeDict
+        return chromosome_dict
 
     def get_precision(self):
         return self.result.precision
@@ -222,12 +222,12 @@ class Chromosome:
                 self.result.no_of_base_clusters)
 
 
-def createRandomChromosome():
+def create_random_chromosome():
     """
     Create and return a chromosome with random values
     """
-    treeType = getRandomTreeType()
-    topBaseClustersAmount = randint(0, 5000)
+    tree_type = getRandomTreeType()
+    top_base_clusters_amount = randint(0, 5000)
     minTermOccurrenceInCollection = randint(1, 100)
     maxTermRatioInCollection = uniform(.1, 1)
     minLimitForBaseClusterScore = randint(1, 5)
@@ -236,8 +236,8 @@ def createRandomChromosome():
     shouldDropOneWordClusters = randint(0, 1)
     textType = getRandomTextType()
 
-    return Chromosome(treeType,
-                      topBaseClustersAmount,
+    return Chromosome(tree_type,
+                      top_base_clusters_amount,
                       minTermOccurrenceInCollection,
                       maxTermRatioInCollection,
                       minLimitForBaseClusterScore,

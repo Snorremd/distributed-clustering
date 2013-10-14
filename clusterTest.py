@@ -5,11 +5,12 @@ from cluster.clusterSettings import ClusterSettings
 import cluster.clustering as clustering
 from corpora.corpus import Corpus
 from easylogging.configLogger import get_logger_for_stdout
-from geneticalgorithm.chromosome import createRandomChromosome
+from geneticalgorithm.chromosome import create_random_chromosome, Chromosome
 
 __author__ = 'snorre'
 
 logger = get_logger_for_stdout("clusterTestModule")
+
 
 def cluster(chromosome, corpus, clusterSettings):
     clusterer = clustering.CompactTrieClusterer(corpus, clusterSettings)
@@ -27,15 +28,17 @@ def main():
                     False)
 
     clusterSettings = ClusterSettings(True, .5)
-    chromosome = createRandomChromosome()
+    chromosome = Chromosome((0,0,0), 500, 5, 0.7, 1, 7, 1, 1,
+                            {"FrontPageHeading": 1,
+                             "FrontPageIntroduction": 1,
+                             "ArticleHeading": 1,
+                             "ArticleByline": 1,
+                             "ArticleIntroduction": 1,
+                             "ArticleText": 1})
     result = cluster(chromosome, corpus, clusterSettings)
-    result = None
+    print(result)
     logger.info("Sleep to let memory clear")
-    sleep(1)
-    gc.collect()
 
 
 if __name__ == '__main__':
-    sleep(1)
-    while True:
-        main()
+    main()
