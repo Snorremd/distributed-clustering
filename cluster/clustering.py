@@ -109,6 +109,14 @@ class CompactTrieClusterer(object):
         time_to_cluster = stop - start
 
         no_of_clusters = len(clusters)
+        if no_of_clusters == 0:
+            return ClusterResult(
+                no_of_clusters, no_of_base_clusters, 0,
+                0.0, 0.0, 0.0,
+                (.0, .0, .0, .0, .0, .0),
+                (.0, .0, .0, .0, .0, .0),
+                (.0, .0, .0, .0, .0, .0),
+                (.0, .0, .0, .0, .0, .0))
 
         return self.calculate_results(clusters, ground_truth_clusters,
                                       no_of_base_clusters, no_of_clusters,
@@ -216,7 +224,7 @@ def empty_result():
     """
     return ClusterResult(
         0, 0, 0, .0, .0, .0,
-        (.0, .0, .0, .0, .0),
+        (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0))
