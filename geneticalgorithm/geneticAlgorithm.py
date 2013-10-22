@@ -107,8 +107,7 @@ class GeneticAlgorithm:
         a cutoff criteria like population convergence or lack of change in
         fitness over several generations...
         """
-        self.logger.info("Calculate data for generation " +
-                         str(self.currentGeneration))
+        self.logger.info("Calculate data for generation {0}".format(self.currentGeneration))
         generationData = self.calcGenerationData()
         ## self.log_generation_data(generationData)
         ## self.results_to_avg_file(generationData[1:])
@@ -127,8 +126,6 @@ class GeneticAlgorithm:
         self.dbHandler.drop_saved_population_table()
         self.dbHandler.create_saved_population_table()
         self.dbHandler.insert_chromosomes_saved_population(self.population)
-
-
 
         if self.currentGeneration < self.noOfGenerations:
             self.currentGeneration += 1

@@ -154,22 +154,19 @@ class Client(asynchat.async_chat):
             tasks (list): a map of taskIds and task objects
 
         '''
-        self.logger.debug("Process tasks received from server")
+        self.logger.info("Process tasks received from server")
         if isinstance(message, ClusterTaskMessage):
-            self.logger.debug("Messages are of type ClusterTaskMessage")
-            taskExecutor = ClusteringTaskExecutor(message)
+            task_executor = ClusteringTaskExecutor(message)
             try:
-                self.logger.debug("Execute tasks")
-                results = taskExecutor.execute_tasks()
+                results = task_executor.execute_tasks()
             except TaskExecutionError as error:
-                self.logger.debug("Could not execute task: " + \
-                                  str(error.task))
+                self.logger.debug("Could not execute task: {0}".format(error.task))
 
                 self.disconnect("Could not execute tasks")
                 self.logger.debug("Client disconnected from the server as " + \
                                   "it could not execute given tasks.")
             else:
-                self.logger.debug("Send results to server")
+                self.logger.debug("Send results to server\n\n\n\n")
                 self.send_task_results(results)
                 self.noOfCompletedTasks += len(results)
         return
@@ -195,14 +192,13 @@ class Client(asynchat.async_chat):
              "Tasks remaining: {1}    Tasks done: {2}\n"
              "#################\n"
              "Your score: {3}\n"
-             "{4}\n"
-             "        "
-            )
+             "{4}\n")
+
         top_scores = self.get_scoreboard_string(score_message.topScores)
         score_output = score_output.format(score_message.tasks_total, score_message.tasks_remaining,
-                           score_message.tasks_done, score_message.userScore,
-                           top_scores)
-        self.logger.debug(score_output)
+                                           score_message.tasks_done, score_message.userScore,
+                                           top_scores)
+        self.logger.debug(score_output + "\n\n\n")
 
     def get_scoreboard_string(self, top_scores):
         no_of_scores = len(top_scores)

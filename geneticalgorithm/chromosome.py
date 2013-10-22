@@ -386,8 +386,7 @@ def genesTupleToChromosome(geneTuple):
                       geneTuple[7],
                       geneTuple[8],
                       geneTuple[9],
-                      geneTuple[10],
-                      geneTuple[11])
+                      geneTuple[10])
 
 
 def crossChromosomes(chromosome1, chromosome2):
