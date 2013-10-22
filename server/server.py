@@ -30,8 +30,8 @@ class Server(asyncore.dispatcher):
         :param address: the ip/domain:socket pair the server should listen to
         :type timeoutSeconds: int
         :param timeoutSeconds: number of seconds until a task time out
-        :type taskOrganizer: tasks.taskOrganizer.TaskOrganizer
-        :param taskOrganizer: the object responsible for organizing tasks
+        :type TaskOrganizer: tasks.taskOrganizer.TaskOrganizer
+        :param TaskOrganizer: the object responsible for organizing tasks
         :type gAlgorithm: geneticalgorithm.geneticAlgorithm.GeneticAlgorithm
         :param gAlgorithm: the genetic algorithm responsible for evolution
         :type batchSize: int
@@ -109,17 +109,17 @@ class ClientHandler(asynchat.async_chat):
         """
         self.logger = get_logger_for_stdout("ClientHandler")
         asynchat.async_chat.__init__(self, sock=clientSock)
-        self.serverSocket = serverSocket
+        self.server_socket = serverSocket
 
         self.logger.debug("Create ClientHandler")
 
         self.clientId = clientAddress
         self.username = "Unspecified"
-        self.programId = serverSocket.programId
+        self.program_id = serverSocket.programId
         self.batchSize = serverSocket.batchSize
 
         self.taskOrganizer = serverSocket.taskOrganizer
-        self.currentTasks = {}
+        self.current_tasks = {}
 
         self.gAlgorithm = serverSocket.gAlgorithm
 
@@ -127,9 +127,9 @@ class ClientHandler(asynchat.async_chat):
 
         self.authorized = False
 
-        self.receivedData = []  # Byte data from user
+        self.received_data = []  # Byte data from user
 
-        self.set_terminator(str.encode('</' + self.programId + '>'))
+        self.set_terminator(str.encode('</' + self.program_id + '>'))
 
         return
 
@@ -140,7 +140,7 @@ class ClientHandler(asynchat.async_chat):
         :type data: byte
         :param data: incoming data
         """
-        self.receivedData.append(data)
+        self.received_data.append(data)
 
     def found_terminator(self):
         """
@@ -152,15 +152,15 @@ class ClientHandler(asynchat.async_chat):
         """
         Received all command input from client. Send back data
         """
-        byteInput = b''.join(self.receivedData)  # Complete data from client
+        byte_input = b''.join(self.received_data)  # Complete data from client
         self.taskOrganizer.check_active_tasks()
 
         try:
-            message = deserialize_message(byteInput)
+            message = deserialize_message(byte_input)
         except PickleError:
-            errorMessage = ErrorMessage("Could not deserialize message",
+            error_message = ErrorMessage("Could not deserialize message",
                                         "Deserialization error")
-            self.send_message(errorMessage)
+            self.send_message(error_message)
         else:
             if isinstance(message, RequestMessage):
                 self.send_client_tasks()
@@ -170,7 +170,7 @@ class ClientHandler(asynchat.async_chat):
                 self.authenticate_client(message)
             elif isinstance(message, DisconnectMessage):
                 self.disconnect_client(message)
-        self.receivedData = []
+        self.received_data = []
 
     def send_message(self, message):
         """
@@ -179,36 +179,36 @@ class ClientHandler(asynchat.async_chat):
         :type message: messaging.message.Message
         :param message: Message (or subclass) object to send to client
         """
-        pickledMessage = serialize_message(message)
-        self.push(pickledMessage + self.get_terminator())
+        pickled_message = serialize_message(message)
+        self.push(pickled_message + self.get_terminator())
 
-    def authenticate_client(self, messageObj):
+    def authenticate_client(self, message_obj):
         """
         Authenticate client by checking messages auth data against program id.
         If successful send an positive auth-message, if not send an negative
         AuthenticationErrorMessage.
 
-        :type messageObj: messaging.message.AuthenticationMessage
-        :param messageObj: the auth message containing auth info
+        :type message_obj: messaging.message.AuthenticationMessage
+        :param message_obj: the auth message containing auth info
         """
-        if messageObj.authData == self.programId:
+        if message_obj.authData == self.program_id:
             self.authorized = True
-            self.username = messageObj.username
+            self.username = message_obj.username
             self.scoreBoard.increase_user_score(self.username, 0)
-            authMessage = AuthenticationMessage("Authentification suceeded",
-                                                "Authentification data was "
-                                                "correct", self.username)
+            auth_message = AuthenticationMessage("Authentication succeeded",
+                                                 "Authentication data was "
+                                                 "correct", self.username)
             self.logger.debug("Client with username {0} and id {1} "
                               "successfully authenticated!"
                               .format(self.username, self.clientId))
-            self.send_message(authMessage)
+            self.send_message(auth_message)
 
         else:
-            errorMessage = AuthErrorMessage("Authentification failed",
-                                            messageObj.authData,
-                                            "Auth data was not correct")
-            self.send_message(errorMessage)
-            self.serverSocket.remove_client(self.clientId)
+            error_message = AuthErrorMessage("Authentification failed",
+                                             message_obj.authData,
+                                             "Auth data was not correct")
+            self.send_message(error_message)
+            self.server_socket.remove_client(self.clientId)
             self.close_when_done()
 
     def disconnect_client(self, message):
@@ -219,7 +219,7 @@ class ClientHandler(asynchat.async_chat):
         :type message: messaging.message.DisonnectMessage
         :param message: message from client
         """
-        self.serverSocket.remove_client(self.clientId)
+        self.server_socket.remove_client(self.clientId)
         self.close_when_done()
         self.logger.debug("Client disconnected (id: " + str(self.clientId) +
                           " ), because " + message.disconnectInfo)
@@ -232,15 +232,15 @@ class ClientHandler(asynchat.async_chat):
         try:
             tasks = self.taskOrganizer.get_tasks(self.batchSize)
         except NoTasksError:
-            errorMessage = NoTasksMessage("No tasks error",
+            error_message = NoTasksMessage("No tasks error",
                                           "Currently no tasks to execute")
-            self.send_message(errorMessage)
+            self.send_message(error_message)
         else:
             self.set_current_tasks(tasks)
-            taskMessage = ClusterTaskMessage("Task:", tasks,
+            task_message = ClusterTaskMessage("Task:", tasks,
                                              self.gAlgorithm.corpus,
                                              self.gAlgorithm.clusterSettings)
-            self.send_message(taskMessage)
+            self.send_message(task_message)
 
     def set_current_tasks(self, tasks):
         """
@@ -250,19 +250,19 @@ class ClientHandler(asynchat.async_chat):
         :type tasks: list
         :param tasks: task objects being worked on
         """
-        self.currentTasks = {}  # Just in case
+        self.current_tasks = {}  # Just in case
         for task in tasks:
-            self.currentTasks[task.taskId] = task
+            self.current_tasks[task.taskId] = task
 
-    def handle_client_results(self, resultMessage):
+    def handle_client_results(self, result_message):
         """
         Checks authenticity of results in result message and sends results to
          the task organizer. Also updates the user's score.
 
-        :type resultMessage: messaging.message.ResultMessage
-        :param resultMessage: message containing tasks results
+        :type result_message: messaging.message.ResultMessage
+        :param result_message: message containing tasks results
         """
-        results = resultMessage.results
+        results = result_message.results
         if self.check_result_authenticity(results):
             self.logger.debug("{0} tasks authenticated".format(len(results)))
             self.taskOrganizer.finish_tasks(results)
@@ -273,7 +273,7 @@ class ClientHandler(asynchat.async_chat):
             message = TaskAuthenticationError("Task authentication error",
                                               list(results.keys()))
             self.send_message(message)
-        self.currentTasks = {}
+        self.current_tasks = {}
 
     def check_result_authenticity(self, results):
         """
@@ -284,7 +284,7 @@ class ClientHandler(asynchat.async_chat):
         :rtype: bool
         :return: if taskIds match with activeTasks
         """
-        if all(result.taskId in self.currentTasks for result in results):
+        if all(result.taskId in self.current_tasks for result in results):
             return True
         else:
             return False
@@ -293,7 +293,10 @@ class ClientHandler(asynchat.async_chat):
         """
         Send clients score and top 100 scores to client
         """
-        userScore = self.scoreBoard.get_user_score(self.username)
-        scores = list(self.scoreBoard.get_user_ranks().items())[:100]
-        scoreMessage = ScoreMessage("Scores", userScore, scores)
-        self.send_message(scoreMessage)
+        user_score = self.scoreBoard.get_user_score(self.username)
+        scores = list(self.scoreBoard.get_user_ranks().items())[:10]
+        tasks_total = self.taskOrganizer.task_length
+        tasks_done = self.taskOrganizer.get_no_completed_tasks()
+        tasks_remaining = self.taskOrganizer.get_no_remaining_tasks()
+        score_message = ScoreMessage("Scores", user_score, scores, tasks_done, tasks_total, tasks_remaining)
+        self.send_message(score_message)

@@ -184,18 +184,29 @@ class Client(asynchat.async_chat):
         self.send_message(message)
         return
 
-    def output_scores(self, scoreMessage):
-        '''Outputs scores to the logger defined in self
-        '''
-        scoreOutput = "\n#####################################\n" + \
-                      "Your score: " + str(scoreMessage.userScore) + "\n" + \
-                      "-----------\n" + \
-                      self.get_scoreboard_string(scoreMessage.topScores)
-        self.logger.debug(scoreOutput)
+    def output_scores(self, score_message):
+        """
+        Outputs scores to the logger defined in self
+        """
+        score_output = \
+            ("\n"
+             "#####################################\n"
+             "Total Tasks: {0}\n"
+             "Tasks remaining: {1}    Tasks done: {2}\n"
+             "#################\n"
+             "Your score: {3}\n"
+             "{4}\n"
+             "        "
+            )
+        top_scores = self.get_scoreboard_string(score_message.topScores)
+        score_output = score_output.format(score_message.tasks_total, score_message.tasks_remaining,
+                           score_message.tasks_done, score_message.userScore,
+                           top_scores)
+        self.logger.debug(score_output)
 
-    def get_scoreboard_string(self, topScores):
-        noOfScores = len(topScores)
-        scoreBoardString = "Top " + str(noOfScores) + " users:\n"
-        for user, score in topScores:
-            scoreBoardString += "{0:15} : {1}\n".format(user, score)
-        return scoreBoardString
+    def get_scoreboard_string(self, top_scores):
+        no_of_scores = len(top_scores)
+        score_board_string = "Top " + str(no_of_scores) + " users:\n"
+        for user, score in top_scores:
+            score_board_string += "{0:15} : {1}\n".format(user, score)
+        return score_board_string

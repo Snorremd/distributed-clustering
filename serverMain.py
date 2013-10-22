@@ -92,7 +92,7 @@ if __name__ == '__main__':
         gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
                                       corpus, int(populationSize), 15,
                                       GeneticAlgorithm.ROULETTEWHEEL,
-                                      0.5, 0.10, geneticAlgorithm.VERBOSEFILE)
+                                      0.5, 0.01, geneticAlgorithm.VERBOSEFILE)
 
         ## Start server and asyncore loop
         server = Server((hostAddress, int(port)), programId, int(timeout),

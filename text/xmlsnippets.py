@@ -11,10 +11,11 @@ def get_snippet_collection(snippetFilePath):
     """
     ##tree = parse(filename)
     snippetDict = dict()
-    ## documents = tree.findall("snippet")
+    no_of_documnets = 0
     for event, element in iterparse(snippetFilePath):
         if event == 'end':
             if element.tag == 'snippet':
+                no_of_documnets += 1
                 source = element.get("source")
                 for textType in element:
                     snippets = []
@@ -27,7 +28,7 @@ def get_snippet_collection(snippetFilePath):
                 element.clear()
                 del element
                 del event
-    return snippetDict
+    return snippetDict, no_of_documnets
 
 
 def make_tag_index(snippetFilePath):

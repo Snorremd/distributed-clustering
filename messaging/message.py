@@ -149,7 +149,7 @@ class ScoreMessage(Message):
     """
     Message containing scoreboard info
     """
-    def __init__(self, message, userScore, topScores):
+    def __init__(self, message, userScore, topScores, tasks_done, tasks_total, tasks_remaining):
         """
         :type message: str
         :param message: message to send
@@ -161,6 +161,9 @@ class ScoreMessage(Message):
         Message.__init__(self, message)
         self.userScore = userScore
         self.topScores = topScores
+        self.tasks_done = tasks_done
+        self.tasks_total = tasks_total
+        self.tasks_remaining = tasks_remaining
 
 
 class DisconnectMessage(Message):

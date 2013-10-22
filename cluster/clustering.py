@@ -1,13 +1,15 @@
+from random import randint
 from time import time
 from cluster.clusterResults import ClusterResult, calc_overall_precision, calc_overall_recall, calc_overall_fmeasure, \
     calc_tag_accuracy, calc_ground_truth, calc_gt_represented, calc_f_measure
 from cluster.compactTrieCluster.baseCluster import top_base_clusters, drop_singleton_base_clusters
-from cluster.compactTrieCluster.cluster import generate_clusters
+from cluster.compactTrieCluster.cluster import generate_clusters, drop_one_word_clusters
 from cluster.compactTrieCluster.compactTrie import generate_compact_trie
 from cluster.compactTrieCluster.mergedClusters import merge_components
 from cluster.compactTrieCluster.similarity import SimilarityMeasurer
 from easylogging.configLogger import get_logger_for_stdout
 from inputOutput.filehandling import get_corpus_settings
+from text.wordOccurrence import get_word_frequencies
 from text.xmlsnippets import get_snippet_collection, make_tag_index,\
     make_ground_truth_clusters
 
@@ -47,13 +49,18 @@ class CompactTrieClusterer(object):
         self.no_of_sources = len(self.tag_index)
         self.ground_truth_clusters = \
             make_ground_truth_clusters(self.snippet_file_path)
-        self.snippet_collection = get_snippet_collection(self.snippet_file_path)
+        self.snippet_collection, self.no_of_sources = \
+            get_snippet_collection(self.snippet_file_path)
+        self.word_frequencies = get_word_frequencies(self.snippet_collection, self.no_of_sources)
 
         if self.cluster_settings.dropSingletonGTClusters:
             self.ground_truth_clusters = drop_singleton_ground_truth_clusters(
                 self.ground_truth_clusters)
 
     def cluster(self, chromosome):
+
+        self.logger.info("Cluster corpus {0} with parameter set:\n{1}".format(self.corpus.name,
+                                                                              chromosome.genesAsTuple()))
 
         ## Various clustering settings
         tag_index = self.tag_index
@@ -65,7 +72,8 @@ class CompactTrieClusterer(object):
 
         ## Filter snippet collection based on text types
         snippet_collection = filter_snippets(self.snippet_collection,
-                                             chromosome.text_types)
+                                             chromosome.text_types,
+                                             chromosome.text_amount)
 
         start = time()
 
@@ -74,6 +82,7 @@ class CompactTrieClusterer(object):
                                              chromosome.tree_type)
 
         ## Get base clusters
+        self.logger.info("Generate top base clusters")
         base_clusters = top_base_clusters(compact_trie,
                                           chromosome.top_base_clusters_amount,
                                           chromosome.min_term_occurrence_in_collection,
@@ -98,15 +107,23 @@ class CompactTrieClusterer(object):
                 (.0, .0, .0, .0, .0, .0))
 
         ## Helper object that measures similarity between base clusters
-        similarity_measurer = SimilarityMeasurer(0, {"threshold": .5})
+        similarity_measurer = SimilarityMeasurer(chromosome.similarity_measure,
+                                                 self.no_of_sources,
+                                                 self.word_frequencies[0],
+                                                 self.word_frequencies[1],
+                                                 self.word_frequencies[2])
 
+        self.logger.info("Merge base clusters and make cluster components")
         merged_components = merge_components(base_clusters, similarity_measurer)
 
         clusters = generate_clusters(merged_components)
 
+        if chromosome.should_drop_one_word_clusters:
+            clusters = drop_one_word_clusters(clusters)
         stop = time()
 
         time_to_cluster = stop - start
+        self.logger.info("Made {0} clusters in {1} seconds".format(len(clusters), time_to_cluster))
 
         no_of_clusters = len(clusters)
         if no_of_clusters == 0:
@@ -118,6 +135,7 @@ class CompactTrieClusterer(object):
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0))
 
+        self.logger.info("Calculate results")
         return self.calculate_results(clusters, ground_truth_clusters,
                                       no_of_base_clusters, no_of_clusters,
                                       tag_index, time_to_cluster)
@@ -230,7 +248,7 @@ def empty_result():
         (.0, .0, .0, .0, .0, .0))
 
 
-def filter_snippets(snippet_collection, text_types_dict):
+def filter_snippets(snippet_collection, text_types_dict, text_amount):
     """
 
     :type snippet_collection: dict
@@ -242,6 +260,24 @@ def filter_snippets(snippet_collection, text_types_dict):
     """
     filtered_collection = list()
     for textType, snippets in snippet_collection.items():
+        if text_types_dict['ArticleText']:
+            amount = len(snippets) / text_amount
+            snippets = random_snippets(snippets[:], amount)
         if text_types_dict[textType]:  # If text type is true, do include
-            filtered_collection.extend(snippets)
+            filtered_collection.extend(snippets[:])
     return filtered_collection
+
+
+def random_snippets(snippets, amount):
+    """
+    Return random amount selection of snippets from snippets list
+    """
+    result = [snippets[0]]
+    del snippets[0]
+    counter = 1
+    while len(snippets) > 0 and counter < amount:
+        random_pos = randint(0, len(snippets)-1)
+        result.append(snippets[random_pos])
+        del snippets[random_pos]
+
+    return result

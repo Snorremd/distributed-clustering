@@ -106,8 +106,6 @@ def top_base_clusters(compactTrie,
                        maxRatioInCollection, minLimitForBaseClusterScore,
                        maxLimitForBaseClusterScore)
 
-    smallerSet = baseClusters[:10]
-
     if topBaseClustersAmount > len(baseClusters):
         return baseClusters
     else:

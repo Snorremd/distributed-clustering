@@ -76,6 +76,21 @@ def generate_clusters(component_list):
     return clusters
 
 
+def drop_one_word_clusters(clusters):
+    """
+    Drop all clusters with labels shorter than two terms/words
+    :type clusters: list
+    :param clusters: cluster list to filter
+    :rtype: list
+    :return: a filtered list of clusters
+    """
+    result = []
+    for cluster in clusters:
+        if len(cluster.labels) > 1 or len(cluster.labels[0]) > 1:
+            result.append(cluster)
+    return result
+
+
 def flatten(lists):
     """
     type lists: list

@@ -75,11 +75,16 @@ POPULATION_TABLE_CREATE_STATEMENT = \
       `text_type_articlebyline` tinyint NOT NULL,
       `text_type_articleintroduction` tinyint NOT NULL,
       `text_type_articletext` tinyint NOT NULL,
+      `text_amount` double NOT NULL,
       `top_base_clusters_amount` int(11) NOT NULL,
       `min_term_occurrence_collection` int(11) NOT NULL,
       `max_term_ratio_collection` int(11) NOT NULL,
       `min_limit_base_cluster_score` int(11) NOT NULL,
       `max_limit_base_cluster_score` int(11) NOT NULL,
+      `similarity_measure_method` int(11) NOT NULL,
+      `similarity_measure_threshold` double NOT NULL,
+      `similarity_measure_avg_cf_threshold` int(11) NOT NULL,
+      `similarity_measure_cf_intersect_min` int(11) NOT NULL,
       `drop_singleton_base_clusters` tinyint(1) NOT NULL,
       `drop_one_word_clusters` tinyint(1) NOT NULL,
       `fitness` double NOT NULL,
@@ -142,11 +147,16 @@ CHROMOSOME_TABLE_CREATE_STATEMENT = \
         `text_type_articlebyline` tinyint NOT NULL,
         `text_type_articleintroduction` tinyint NOT NULL,
         `text_type_articletext` tinyint NOT NULL,
+        `text_amount` double NOT NULL,
         `top_base_clusters_amount` int(11) NOT NULL,
         `min_term_occurrence_collection` int(11) NOT NULL,
         `max_term_ratio_collection` int(11) NOT NULL,
         `min_limit_base_cluster_score` int(11) NOT NULL,
         `max_limit_base_cluster_score` int(11) NOT NULL,
+        `similarity_measure_method` int(11) NOT NULL,
+        `similarity_measure_threshold` double NOT NULL,
+        `similarity_measure_avg_cf_threshold` int(11) NOT NULL,
+        `similarity_measure_cf_intersect_min` int(11) NOT NULL,
         `drop_singleton_base_clusters` tinyint(1) NOT NULL,
         `drop_one_word_clusters` tinyint(1) NOT NULL,
         `fitness` double NOT NULL,
@@ -195,11 +205,16 @@ INSERT_INTO_SAVED_POPULATION = "INSERT INTO saved_population (" \
                                "`text_type_articlebyline`, " \
                                "`text_type_articleintroduction`, " \
                                "`text_type_articletext`, " \
+                               "`text_amount`, " \
                                "`top_base_clusters_amount`, " \
                                "`min_term_occurrence_collection`, " \
                                "`max_term_ratio_collection`, " \
                                "`min_limit_base_cluster_score`, " \
                                "`max_limit_base_cluster_score`, " \
+                               "`similarity_measure_method`, " \
+                               "`similarity_measure_threshold`, " \
+                               "`similarity_measure_avg_cf_threshold`, " \
+                               "`similarity_measure_cf_intersect_min`, " \
                                "`drop_singleton_base_clusters`, " \
                                "`drop_one_word_clusters`, " \
                                "`fitness`" \
@@ -214,11 +229,16 @@ INSERT_INTO_SAVED_POPULATION = "INSERT INTO saved_population (" \
                                "%(text_type_articlebyline)s, " \
                                "%(text_type_articleintroduction)s, " \
                                "%(text_type_articletext)s, " \
+                               "%(text_amount)s, " \
                                "%(top_base_clusters_amount)s, " \
                                "%(min_term_occurrence_collection)s, " \
                                "%(max_term_ratio_collection)s, " \
                                "%(min_limit_base_cluster_score)s, " \
                                "%(max_limit_base_cluster_score)s, " \
+                               "%(similarity_measure_method)s, " \
+                               "%(similarity_measure_threshold)s, " \
+                               "%(similarity_measure_avg_cf_threshold)s, " \
+                               "%(similarity_measure_cf_intersect_min)s, " \
                                "%(drop_singleton_base_clusters)s, " \
                                "%(drop_one_word_clusters)s, " \
                                "%(fitness)s )"
@@ -234,11 +254,16 @@ INSERT_INTO_CHROMOSOMES = "INSERT INTO chromosomes (" \
                           "`text_type_articlebyline`, " \
                           "`text_type_articleintroduction`, " \
                           "`text_type_articletext`, " \
+                          "`text_amount`, " \
                           "`top_base_clusters_amount`, " \
                           "`min_term_occurrence_collection`, " \
                           "`max_term_ratio_collection`, " \
                           "`min_limit_base_cluster_score`, " \
                           "`max_limit_base_cluster_score`, " \
+                          "`similarity_measure_method`, " \
+                          "`similarity_measure_threshold`, " \
+                          "`similarity_measure_avg_cf_threshold`, " \
+                          "`similarity_measure_cf_intersect_min`, " \
                           "`drop_singleton_base_clusters`, " \
                           "`drop_one_word_clusters`, " \
                           "`fitness`, " \
@@ -283,11 +308,16 @@ INSERT_INTO_CHROMOSOMES = "INSERT INTO chromosomes (" \
                           "%(text_type_articlebyline)s, " \
                           "%(text_type_articleintroduction)s, " \
                           "%(text_type_articletext)s, " \
+                          "%(text_amount)s, " \
                           "%(top_base_clusters_amount)s, " \
                           "%(min_term_occurrence_collection)s, " \
                           "%(max_term_ratio_collection)s, " \
                           "%(min_limit_base_cluster_score)s, " \
                           "%(max_limit_base_cluster_score)s, " \
+                          "%(similarity_measure_method)s, " \
+                          "%(similarity_measure_threshold)s, " \
+                          "%(similarity_measure_avg_cf_threshold)s, " \
+                          "%(similarity_measure_cf_intersect_min)s, " \
                           "%(drop_singleton_base_clusters)s, " \
                           "%(drop_one_word_clusters)s, " \
                           "%(fitness)s, " \

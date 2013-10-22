@@ -1,4 +1,5 @@
 import weakref
+from easylogging.configLogger import get_logger_for_stdout
 from text.phrases import phrase_to_string
 
 __author__ = 'snorre'
@@ -54,6 +55,7 @@ def merge(component1, component2):
 
 def merge_components(base_clusters, similarity_measurer):
 
+    logger = get_logger_for_stdout("Merge Components")
     component_index = generate_initial_components(base_clusters)
     components = []
     base_index = []
@@ -68,7 +70,7 @@ def merge_components(base_clusters, similarity_measurer):
         j = i + 1
         while j < count:
             if base_index[i] != base_index[j] and \
-               similarity_measurer.similar(base_clusters[i], base_clusters[j]):
+                    similarity_measurer.similar(base_clusters[i], base_clusters[j]):
                 if base_index[i] < base_index[j]:
                     min = base_index[i]
                     max = base_index[j]
@@ -80,6 +82,7 @@ def merge_components(base_clusters, similarity_measurer):
                 base_index[max] = base_index[min]
             j += 1
         i += 1
+    logger.debug("Merging complete, make component list")
     component = component_index[0]
     while component is not None:
         components.append(component.base_clusters)

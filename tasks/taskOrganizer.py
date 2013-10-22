@@ -40,22 +40,22 @@ class TaskOrganizer(Subject):
         timeout (int): task timeout-limit in seconds
     """
 
-    def __init__(self, timeoutSeconds, tasks):
+    def __init__(self, timeout_seconds, tasks):
         """Initialize StringCounterServer
         """
         Subject.__init__(self)
         self.logger = get_logger_for_stdout("TaskOrganizer")
-        self.taskLength = 0
-        self.pendingTasks = deque(tasks)
-        self.activeTasks = {}
+        self.task_length = 0
+        self.pending_tasks = deque(tasks)
+        self.active_tasks = {}
         self.results = {}
-        self.timeout = timeoutSeconds
+        self.timeout = timeout_seconds
 
     def add_tasks(self, tasks):
         """Add all elements of tasks to pending tasks
         """
-        self.pendingTasks.extend(tasks)
-        self.taskLength = len(tasks)
+        self.pending_tasks.extend(tasks)
+        self.task_length = len(tasks)
 
     def get_task(self):
         """Get first remaning Task if any
@@ -65,7 +65,7 @@ class TaskOrganizer(Subject):
             If none available, raise NoTasksError.
         """
         try:
-            task = self.pendingTasks.popleft()
+            task = self.pending_tasks.popleft()
         except IndexError:
             raise NoTasksError("There are no remaining tasks in" +
                                " pendingTasks deque")
@@ -73,7 +73,7 @@ class TaskOrganizer(Subject):
             self.make_task_active(task)
             return task
 
-    def get_tasks(self, noOfTasks):
+    def get_tasks(self, no_of_tasks):
         """Get n number of tasks from Task list
 
         Args:
@@ -83,7 +83,7 @@ class TaskOrganizer(Subject):
             a dict containing taskId, Task pairs
         """
         tasks = []
-        for _ in range(noOfTasks):
+        for _ in range(no_of_tasks):
             try:
                 task = self.get_task()
             except NoTasksError:
@@ -97,80 +97,108 @@ class TaskOrganizer(Subject):
                                " pendingTasks deque")
 
     def make_task_active(self, task):
-        '''Add a Task to the active jobs dictionary
+        """Add a Task to the active jobs dictionary
 
         Args:
             Task (Task): The Task to make active
 
         Returns:
             currentTime (object) of when Task was created
-        '''
-        currentTime = datetime.now()
-        self.activeTasks[task.taskId] = (task, currentTime)
-        return currentTime
+        """
+        current_time = datetime.now()
+        self.active_tasks[task.taskId] = (task, current_time)
+        return current_time
 
     def check_active_tasks(self):
-        '''Check active tasks for timeouts
+        """Check active tasks for timeouts
 
         For each Task in active tasks, check if the
         Task has timed out, and if so reinsert into
         pendingTasks deque and remove from active tasks dict.
-        '''
-        currentTime = datetime.now()
-        for taskId, taskTuple in list(self.activeTasks.items()):
+        """
+        current_time = datetime.now()
+        for taskId, taskTuple in list(self.active_tasks.items()):
             timestamp = taskTuple[1]
-            difference = currentTime - timestamp
+            difference = current_time - timestamp
             if difference.seconds > self.timeout:
-                self.pendingTasks.append(self.activeTasks[taskId][0])
-                del self.activeTasks[taskId]
+                self.pending_tasks.append(self.active_tasks[taskId][0])
+                del self.active_tasks[taskId]
 
-    def task_active(self, taskId):
-        '''Check if a Task is still active
+    def task_active(self, task_id):
+        """
+        Check if a Task is still active
 
         Args:
             taskId (object): the id of the Task to be checked
 
         Returns:
             True if Task still active, False if not
-        '''
-        if taskId in self.activeTasks:
+        """
+        if task_id in self.active_tasks:
             return True
         else:
             return False
 
     def finish_task(self, result):
-        '''Finish Task
+        """
+        Finish Task
 
         Args:
             taskId (object): the idTaskthe task to finish
             result (Result): the finished result
-        '''
+        """
         self.results[result.taskId] = result
-        del self.activeTasks[result.taskId]
+        del self.active_tasks[result.taskId]
 
     def finish_tasks(self, results):
-        '''Finish the identified tasks with the given results
+        """
+        Finish the identified tasks with the given results
 
         Args:
             results (list): result objects with task id and result
-        '''
+        """
         for result in results:
             if self.task_active(result.taskId):
                 self.finish_task(result)
         if self.tasks_finished():
             self.notify()
+        self.logger.debug("{0} out of {1} tasks completed!"\
+            .format(self.get_no_completed_tasks(), self.task_length))
+
 
     def tasks_finished(self):
-        '''Check if results are finished
-        '''
-        if len(self.pendingTasks) == 0 and \
-           len(self.activeTasks) == 0 and \
-           len(self.results) == self.taskLength:
+        """
+        Check if results are finished
+        """
+        if len(self.pending_tasks) == 0 and \
+           len(self.active_tasks) == 0 and \
+           len(self.results) == self.task_length:
             return True
         else:
             return False
 
     def get_all_results(self):
-        allResults = list(self.results.values())
+        """
+        Get all results from task TaskOrganizer
+        :rtype: list
+        :return: task results
+        """
+        all_results = list(self.results.values())
         self.results = {}
-        return allResults
+        return all_results
+
+    def get_no_remaining_tasks(self):
+        """
+        Find the number of remaining tasks
+        :rtype: int
+        :return: number of remaining tasks|
+        """
+        return len(self.pending_tasks)
+
+    def get_no_completed_tasks(self):
+        """
+        Get the number of completed tasks
+        :rtype: int
+        :return: number of completed tasks
+        """
+        return len(self.results)

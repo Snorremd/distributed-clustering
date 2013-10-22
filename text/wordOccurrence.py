@@ -1,3 +1,5 @@
+from math import log
+from text.phrases import string_to_phrase
 
 
 def count_sources(compactTrie):
@@ -70,3 +72,40 @@ def merge_dictionaries(dict1, dict2):
         else:
             dict1[phrase] = dict2[phrase]
     return dict1
+
+
+def get_word_frequencies(snippet_collection, corpus_size):
+    """
+    Original author: Richard Elling Moe
+    """
+    corpus_frequency = dict()
+    raw_frequency = dict()
+    document_frequency = dict()
+    for (snippet_type, snippets) in snippet_collection.items():
+        for (snippet, [source]) in snippets:
+            word_list = string_to_phrase(snippet)
+
+            for word in word_list:
+                ## CORPUS FREQUENCY
+                if word in corpus_frequency:
+                    corpus_frequency[word] += 1
+                else:
+                    corpus_frequency[word] = 1
+
+                ## RAW FREQUENCY
+                if word in raw_frequency:
+                    if source in raw_frequency[word]:
+                        raw_frequency[word][source] += 1
+                    else:
+                        raw_frequency[word][source] = 1
+                else:
+                    raw_frequency[word] = {source: 1}
+
+                ## DOCUMENT FREQUENCY
+                if word in document_frequency:
+                    if source not in document_frequency[word]:
+                        document_frequency[word].append(source)
+                else:
+                    document_frequency[word] = [source]
+
+    return corpus_frequency, raw_frequency, document_frequency

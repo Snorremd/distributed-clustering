@@ -18,12 +18,19 @@ MAXLIMITFORBASECLUSTERSCORE = 6
 SHOULDDROPSINGLETONBASECLUSTERS = 7
 SHOULDDROPONEWORDCLUSTERS = 8
 TEXTTYPE = 9
+TEXTAMOUNT = 10
+SIMILARITYMEASURE = 11
 
 ## Constants for tree types
 SUFFIX_TREE = 0
 MID_SLICE = 1
 RANGE_SLICE = 2
 N_SLICE = 3
+
+## Constants for similarity types
+JACCARD_SIMILARITY = 0
+AMENDMENT_1C_SIMILARITY = 1
+COSINE_SIMILARITY = 2
 
 
 class Chromosome:
@@ -54,7 +61,9 @@ class Chromosome:
                  maxLimitForBaseClusterScore,
                  shouldDropSingletonBaseClusters,
                  shouldDropOneWordClusters,
-                 textType):
+                 textType,
+                 text_amount,
+                 similarity_measure):
         """
         Constructor for the Chromosome class.
 
@@ -89,6 +98,8 @@ class Chromosome:
         self.fitness = 0
         self.result = None
         self.text_types = textType
+        self.text_amount = text_amount
+        self.similarity_measure = similarity_measure
 
     def calc_fitness_score(self, compact_trie_clusterer):
         """
@@ -114,7 +125,7 @@ class Chromosome:
         Mutates one of the objects fields/properties given a probability
         function. The method randomly select one property to mutate.
         """
-        geneToMutate = randint(1, 8)
+        geneToMutate = randint(1, 11)
         if geneToMutate == TREETYPE:
             self.tree_type = getRandomTreeType()
         elif geneToMutate == TOPBASECLUSTERSAMOUNT:
@@ -131,6 +142,12 @@ class Chromosome:
             self.should_drop_singleton_base_clusters = randint(0, 1)
         elif geneToMutate == SHOULDDROPONEWORDCLUSTERS:
             self.should_drop_one_word_clusters = randint(0, 1)
+        elif geneToMutate == TEXTTYPE:
+            self.text_types = getRandomTextType()
+        elif geneToMutate == TEXTAMOUNT:
+            self.text_amount = get_random_text_amount()
+        elif geneToMutate == SIMILARITYMEASURE:
+            self.similarity_measure = get_random_similarity_measure()
         else:  # Just in case
             pass
 
@@ -143,7 +160,9 @@ class Chromosome:
                 self.max_limit_for_base_cluster_score,
                 self.should_drop_singleton_base_clusters,
                 self.should_drop_one_word_clusters,
-                self.text_types)
+                self.text_types,
+                self.text_amount,
+                self.similarity_measure)
 
     def chromosome_as_dict(self):
         text_types_keys = text_types()
@@ -158,6 +177,7 @@ class Chromosome:
             "text_type_articlebyline": self.text_types[text_types_keys[3]],
             "text_type_articleintroduction": self.text_types[text_types_keys[4]],
             "text_type_articletext": self.text_types[text_types_keys[5]],
+            "text_amount": self.text_amount,
             "top_base_clusters_amount": self.top_base_clusters_amount,
             "min_term_occurrence_collection": self
             .min_term_occurrence_in_collection,
@@ -166,6 +186,14 @@ class Chromosome:
             .min_limit_for_base_cluster_score,
             "max_limit_base_cluster_score": self
             .max_limit_for_base_cluster_score,
+            "similarity_measure_method": self
+            .similarity_measure["similarity_method"],
+            "similarity_measure_threshold": self
+            .similarity_measure["params"][0],
+            "similarity_measure_avg_cf_threshold": self
+            .similarity_measure["params"][1],
+            "similarity_measure_cf_intersect_min": self
+            .similarity_measure["params"][2],
             "drop_singleton_base_clusters": self
             .should_drop_singleton_base_clusters,
             "drop_one_word_clusters": self.should_drop_one_word_clusters,
@@ -236,6 +264,8 @@ def create_random_chromosome():
     shouldDropSingletonBaseClusters = randint(0, 1)
     shouldDropOneWordClusters = randint(0, 1)
     textType = getRandomTextType()
+    text_amount = get_random_text_amount()
+    similarity_measure = get_random_similarity_measure()
 
     return Chromosome(tree_type,
                       top_base_clusters_amount,
@@ -245,7 +275,9 @@ def create_random_chromosome():
                       maxLimitForBaseClusterScore,
                       shouldDropSingletonBaseClusters,
                       shouldDropOneWordClusters,
-                      textType)
+                      textType,
+                      text_amount,
+                      similarity_measure)
 
 
 def getRandomTreeType():
@@ -312,6 +344,33 @@ def getRandomTextType():
     return textTypes
 
 
+def get_random_text_amount():
+    return round(uniform(0.1, 1.0), 2)
+
+
+def get_random_similarity_measure():
+    type = randint(0, 2)
+    similarity_params = {}
+    threshold = round(uniform(0, 1), 2)
+
+    if type == JACCARD_SIMILARITY:
+        similarity_params = {"similarity_method": 0,
+                             "params": (threshold, 0, 0)}
+
+    elif type == COSINE_SIMILARITY:
+        similarity_params = {"similarity_method": 1,
+                             "params": (threshold, 0, 0)}
+
+    elif type == AMENDMENT_1C_SIMILARITY:
+        avg_cf_threshold = randint(0, 100)  # TODO: Find reasonable values
+        cf_intersect_min = randint(0, 100)
+        similarity_params = {"similarity_method": 2,
+                             "params": (threshold, avg_cf_threshold, cf_intersect_min)}
+
+    return similarity_params
+
+
+
 def genesTupleToChromosome(geneTuple):
     """
     Takes a tuple of genes and transforms it to a chromosome
@@ -325,7 +384,10 @@ def genesTupleToChromosome(geneTuple):
                       geneTuple[5],
                       geneTuple[6],
                       geneTuple[7],
-                      geneTuple[8])
+                      geneTuple[8],
+                      geneTuple[9],
+                      geneTuple[10],
+                      geneTuple[11])
 
 
 def crossChromosomes(chromosome1, chromosome2):

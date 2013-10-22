@@ -9,7 +9,6 @@ from random import random, randint
 import math as math
 
 from .chromosome import create_random_chromosome, crossChromosomes
-import __main__
 from geneticalgorithm.result import GenerationResult
 from tasks.task import CompactTrieClusteringTask
 from easylogging.configLogger import get_logger_for_file
@@ -73,18 +72,6 @@ class GeneticAlgorithm:
 
         self.clusterSettings = ClusterSettings(True, 1.0)
         self.corpus = corpus
-
-        timeNow = str(datetime.now())
-        pathToMain = os.path.dirname(__main__.__file__)
-        resultPath = os.path.join(pathToMain, "results",
-                                  self.corpus.name,
-                                  self.corpus.name + timeNow)
-        self.topFile = resultPath + "_top.csv"
-        self.avgFile = resultPath + "_avg.csv"
-        if self.gaVerbosity == VERBOSEFILE:
-            writeToFile(self.topFile, ";".join(COLUMNHEADERS +
-                                               CHROMOSOMEHEADERS))
-            writeToFile(self.avgFile, ";".join(COLUMNHEADERS))
 
         self.logger.info("Generate initial population")
         self.generateInitialPopulation()
