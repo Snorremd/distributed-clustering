@@ -104,7 +104,7 @@ class CompactTrieClusterer(object):
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
-                (.0, .0, .0, .0, .0, .0), "")
+                (.0, .0, .0, .0, .0, .0), "empty")
 
         ## Helper object that measures similarity between base clusters
         similarity_measurer = SimilarityMeasurer(chromosome.similarity_measure,
@@ -133,7 +133,7 @@ class CompactTrieClusterer(object):
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
-                (.0, .0, .0, .0, .0, .0), "")
+                (.0, .0, .0, .0, .0, .0), "empty")
 
         self.logger.info("Calculate results")
         return self.calculate_results(clusters, ground_truth_clusters,
@@ -250,7 +250,7 @@ def empty_result():
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
-        (.0, .0, .0, .0, .0, .0), "")
+        (.0, .0, .0, .0, .0, .0), "empty")
 
 
 def filter_snippets(snippet_collection, text_types_dict, text_amount):
