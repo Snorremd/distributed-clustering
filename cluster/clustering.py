@@ -246,7 +246,7 @@ def empty_result():
     :return: empty result set
     """
     return ClusterResult(
-        0, 0, 0, .0, .0, .0,
+        0, 0, 0, 0, .0, .0, .0,
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
