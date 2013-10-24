@@ -25,8 +25,8 @@ if __name__ == '__main__':
                      ".\n")
 
     choice = show_option_dialog("Do you want to use config file?",
-                                ["yes", "no"])
-    if choice == "yes":
+                                ["y", "n"])
+    if choice == "y":
         hostAddress, port, programId, batchSize,\
             timeout, populationSize, corpusName,\
             dbhost, dbname, dbuser, dbpasswd = get_server_config()
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
         taskOrganizer = TaskOrganizer(int(timeout), [])
         gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
-                                      corpus, int(populationSize), 15,
+                                      corpus, int(populationSize), 100,
                                       GeneticAlgorithm.ROULETTEWHEEL,
                                       0.5, 0.01, geneticAlgorithm.VERBOSEFILE)
 

@@ -96,7 +96,7 @@ class CompactTrieNode(object):
             else:
                 self.sources_dict[source] += 1
 
-            if not source in self.sources:
+            if source not in self.sources:
                 self.sources.append(source)
 
     def generate_node_label(self):

@@ -99,12 +99,12 @@ class CompactTrieClusterer(object):
             self.logger.info("Can not merge one or fewer base clusters."
                              "Assume score of zero")
             return ClusterResult(
-                0, no_of_base_clusters, 0,
+                0, no_of_base_clusters, 0, len(self.ground_truth_clusters),
                 0.0, 0.0, 0.0,
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
-                (.0, .0, .0, .0, .0, .0))
+                (.0, .0, .0, .0, .0, .0), "")
 
         ## Helper object that measures similarity between base clusters
         similarity_measurer = SimilarityMeasurer(chromosome.similarity_measure,
@@ -113,7 +113,7 @@ class CompactTrieClusterer(object):
                                                  self.word_frequencies[1],
                                                  self.word_frequencies[2])
 
-        self.logger.info("Merge base clusters and make cluster components")
+        self.logger.info("Merge {0} base clusters and make cluster components".format(no_of_base_clusters))
         merged_components = merge_components(base_clusters, similarity_measurer)
 
         clusters = generate_clusters(merged_components)
@@ -128,12 +128,12 @@ class CompactTrieClusterer(object):
         no_of_clusters = len(clusters)
         if no_of_clusters == 0:
             return ClusterResult(
-                no_of_clusters, no_of_base_clusters, 0,
-                0.0, 0.0, 0.0,
+                no_of_clusters, no_of_base_clusters, len(self.ground_truth_clusters),
+                0, 0.0, 0.0, 0.0,
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
-                (.0, .0, .0, .0, .0, .0))
+                (.0, .0, .0, .0, .0, .0), "")
 
         self.logger.info("Calculate results")
         return self.calculate_results(clusters, ground_truth_clusters,
@@ -179,11 +179,16 @@ class CompactTrieClusterer(object):
                                     self.cluster_settings.fBetaConstant)
         f_measure_tuple = make_result_tuple(f_measures, 1)
 
+        results_string = make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
+                            no_of_clusters, len(ground_truth_clusters))
+
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
-                                no_of_clusters, precision, recall, f_measure,
+                                no_of_clusters, len(self.ground_truth_clusters),
+                                precision, recall, f_measure,
                                 tag_accuracy_tuple, ground_truth_tuple,
                                 ground_truth_represented_tuple,
-                                f_measure_tuple)
+                                f_measure_tuple, results_string)
+
         return results
 
 
@@ -245,7 +250,7 @@ def empty_result():
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
-        (.0, .0, .0, .0, .0, .0))
+        (.0, .0, .0, .0, .0, .0), "")
 
 
 def filter_snippets(snippet_collection, text_types_dict, text_amount):
@@ -281,3 +286,38 @@ def random_snippets(snippets, amount):
         del snippets[random_pos]
 
     return result
+
+
+def make_results_string(resultsTagAccuracy,
+                        resultsGroundTruth,
+                        resultsGroundTruthRep,
+                        noOfClusters,
+                        noOfGTClusters):
+    tagAccuracy = "Tag Accuracy:\n"
+    tagAccuracy += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
+    tagAccuracy += "----------------------------------------------------\n"
+    for (i, countMatch, fraction, accumulated) in resultsTagAccuracy:
+        tagAccuracy += str(i) + "\t %2i" % (countMatch) + "/" + \
+                            str(noOfClusters) + \
+                            "\t\t%.3f" % (fraction) + "\t " + \
+                            "%.3f" % (accumulated) + "\n"
+
+    groundTruthString = "Ground truth:\n"
+    groundTruthString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
+    groundTruthString += "----------------------------------------------------\n"
+    for (i, countMatch, fraction, accumulated) in resultsGroundTruth:
+        groundTruthString += str(i) + "\t %2i" % (countMatch) + "/" + \
+                            str(noOfClusters) + \
+                            "\t\t%.3f" % (fraction) + "\t " + \
+                            "%.3f" % (accumulated) + "\n"
+
+    groundTruthRepString = "Ground truth represented:\n"
+    groundTruthRepString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
+    groundTruthRepString += "----------------------------------------------------\n"
+    for (i, countMatch, fraction, accumulated) in resultsGroundTruthRep:
+        groundTruthRepString += str(i) + "\t %2i" % (countMatch) + "/" + \
+                                str(noOfGTClusters) + \
+                                "\t\t%.3f" % (fraction) + "\t " + \
+                                "%.3f" % (accumulated) + "\n"
+
+    return tagAccuracy + "\n" + groundTruthString + "\n" + groundTruthRepString

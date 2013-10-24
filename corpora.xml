@@ -3,7 +3,7 @@
     <corpus name="klimauken">
         <directory>klimauken</directory>
         <corpusfile>klimaukenOBT.xml</corpusfile>
-        <snippetfile>klimaukenSnippetsNew3.xml</snippetfile>
+        <snippetfile>klimaukenSnippetsNew4.xml</snippetfile>
         <processorname>KlimaukenCorpusProcessor</processorname>
         <singletag>False</singletag>
     </corpus>

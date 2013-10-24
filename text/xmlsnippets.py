@@ -40,6 +40,7 @@ def make_tag_index(snippetFilePath):
     :return; a dict on the form {source: ["tag1-tag2-tag3"], ...}
     """
     tagIndex = dict()
+    print(snippetFilePath)
     for event, element in iterparse(snippetFilePath):
         if event == 'end':
             if element.tag == 'snippet':
@@ -61,12 +62,14 @@ def make_ground_truth_clusters(snippetFilePath):
     groundTruthIndex = dict()
     for event, element in iterparse(snippetFilePath):
         if event == "end":
-            if element.tag == "snippet":
+            tag = element.tag
+            if tag == "snippet":
                 tags = element.get("tags")
                 if tags in groundTruthIndex:
-                    groundTruthIndex[tags].append(element.get("source"))
+                    groundTruthIndex[tags].append(element.get("source")[:])
                 else:
-                    groundTruthIndex[tags] = [element.get("source")]
+                    source = element.get("source")
+                    groundTruthIndex[tags] = [source]
             element.clear()
             del element
             del event

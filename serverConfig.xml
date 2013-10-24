@@ -4,7 +4,7 @@
     <programid>distributed-clustering</programid>
     <batchsize>5</batchsize>
     <timeout>500</timeout>
-    <populationsize>20</populationsize>
+    <populationsize>500</populationsize>
     <corpus>klimauken</corpus>
     <dbhost>localhost</dbhost>
     <dbname>ctcluster</dbname>

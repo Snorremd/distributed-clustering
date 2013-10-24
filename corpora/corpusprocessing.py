@@ -28,6 +28,7 @@ class CorpusProcessor(object, metaclass=abc.ABCMeta):
         """
         filePath, filename = sep_file_and_path(corpusPath)
         self.snippetPath = snippetPath
+        print(corpusPath)
         self.corpusFile = codecs.open(corpusPath, 'r', 'utf-8')
         self.snippetBuilder = snippets.SnippetBuilder(filename)
 
@@ -59,8 +60,8 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
         self.goodWords = ['subst', 'verb', 'adj',
                           'adv']
         ## OBS OBS laget etter frekvens i klimauken-dataene OBS
-        self.stopWords = ['', 'v\xc3\xa6re', 'ha', 'bli', 'AV', 'ikke',
-                          '\xc3\xa5r', 'f\xc3\xa5',
+        self.stopWords = ['', 'være', 'ha', 'bli', 'AV', 'ikke',
+                          'år', 'få',
                           'kunne']
 
     def process_file(self):
@@ -110,6 +111,7 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
 
         line = self.scan_to_line(['<artikkel>'])
 
+        counter = 0
         while line.strip() == '<artikkel>':
 
             self.scan_to_line(['<id>'])
@@ -155,6 +157,8 @@ class KlimaukenCorpusProcessor(CorpusProcessor):
                     print("ERROR UNKNOWN TAG")
                 line = self.scan_tag(self.tags)
 
+            counter += 1
+            print(counter)
             self.snippetBuilder.add_document(docId, tag, url,
                                              FrontPageHeading=frontPageHeadings,
                                              FrontPageIntroduction=

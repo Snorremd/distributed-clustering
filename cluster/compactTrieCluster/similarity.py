@@ -155,9 +155,11 @@ class SimilarityMeasurer(object):
             for word in label_union:
                 label_union_frequencies.append(self.corpus_frequencies[word])
 
-
-            return guarded_average(label_union_frequencies) < self.params[1] and \
-                len(label_intersection) > self.params[2]
+            average_frequency = guarded_average(label_union_frequencies)
+            label_intersection_len = len(label_intersection)
+            amendment1c_similar = average_frequency < self.params[1] and \
+                label_intersection_len > self.params[2]
+            return amendment1c_similar
         else:
             return False
 
@@ -168,8 +170,9 @@ def guarded_average(numbers):
     if not numbers:
         return 0
     else:
-        return float(sum(numbers)) / len(numbers)
-
+        length = len(numbers)
+        avg = float(sum(numbers)) / length
+        return avg
 
 def scalar_product(vector1, vector2):
     """

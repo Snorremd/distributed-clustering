@@ -99,6 +99,10 @@ def top_base_clusters(compactTrie,
     """
 
     baseClusters = generate_base_cluster(compactTrie.root)
+    some_base_clusters = []
+    for cluster in baseClusters:
+        if len(cluster.sources) > 2:
+            some_base_clusters.append(cluster)
     noOfSources = count_sources(compactTrie.root)
     wordSources = get_word_sources(compactTrie.root)
 

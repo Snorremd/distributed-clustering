@@ -1,22 +1,9 @@
-import gc
-import pdb
-from time import sleep
+from cluster import clustering
 from cluster.clusterSettings import ClusterSettings
-import cluster.clustering as clustering
 from corpora.corpus import Corpus
-from easylogging.configLogger import get_logger_for_stdout
-from geneticalgorithm.chromosome import create_random_chromosome, Chromosome
+from geneticalgorithm.chromosome import Chromosome
 
 __author__ = 'snorre'
-
-logger = get_logger_for_stdout("clusterTestModule")
-
-
-def cluster(chromosome, corpus, clusterSettings):
-    clusterer = clustering.CompactTrieClusterer(corpus, clusterSettings)
-    value = clusterer.cluster(chromosome)
-    return value
-
 
 def main():
     corpus = Corpus("klimauken",
@@ -27,18 +14,20 @@ def main():
                     "KlimaukenCorpusProcessor",
                     False)
 
-    clusterSettings = ClusterSettings(True, .5)
-    chromosome = Chromosome((0,0,0), 500, 5, 0.7, 1, 7, 1, 1,
+    cluster_settings = ClusterSettings(True, .5)
+
+    chromosome = Chromosome((0,0,0), 3000, 3, 0.7, 1, 7, 1, 1,
                             {"FrontPageHeading": 1,
                              "FrontPageIntroduction": 1,
                              "ArticleHeading": 1,
                              "ArticleByline": 1,
                              "ArticleIntroduction": 1,
-                             "ArticleText": 1})
-    result = cluster(chromosome, corpus, clusterSettings)
-    print(result)
-    logger.info("Sleep to let memory clear")
+                             "ArticleText": 1}, 1, {"similarity_method": 0,
+                             "params": (0.5, 0, 0)})
 
+    clusterer = clustering.CompactTrieClusterer(corpus, cluster_settings)
+    results = clusterer.cluster(chromosome)
+    print(results.results_string)
 
 if __name__ == '__main__':
     main()

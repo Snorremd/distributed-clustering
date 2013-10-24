@@ -11,12 +11,13 @@ class ClusterResult(object):
     A container class for clustering results
     """
 
-    def __init__(self, time, no_of_base_clusters, no_of_clusters,
+    def __init__(self, time, no_of_base_clusters, no_of_clusters, no_of_gt_clusters,
                  precision, recall, f_measure, tag_accuracies, precisions,
-                 recalls, f_measures):
+                 recalls, f_measures, results_string):
         self.time = time
         self.no_of_base_clusters = no_of_base_clusters
         self.no_of_clusters = no_of_clusters
+        self.no_of_gt_clusters = no_of_gt_clusters
         self.precision = precision
         self.recall = recall
         self.f_measure = f_measure
@@ -24,6 +25,7 @@ class ClusterResult(object):
         self.precisions = precisions
         self.recalls = recalls
         self.f_measures = f_measures
+        self.results_string = results_string
 
     def __str__(self):
         stringRep = ""

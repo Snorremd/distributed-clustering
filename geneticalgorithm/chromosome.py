@@ -29,8 +29,8 @@ N_SLICE = 3
 
 ## Constants for similarity types
 JACCARD_SIMILARITY = 0
-AMENDMENT_1C_SIMILARITY = 1
-COSINE_SIMILARITY = 2
+COSINE_SIMILARITY = 1
+AMENDMENT_1C_SIMILARITY = 2
 
 
 class Chromosome:
@@ -256,11 +256,11 @@ def create_random_chromosome():
     Create and return a chromosome with random values
     """
     tree_type = getRandomTreeType()
-    top_base_clusters_amount = randint(0, 5000)
-    minTermOccurrenceInCollection = randint(1, 100)
-    maxTermRatioInCollection = uniform(.1, 1)
-    minLimitForBaseClusterScore = randint(1, 5)
-    maxLimitForBaseClusterScore = randint(6, 10)
+    top_base_clusters_amount = getRandomTopBaseClustersAmount()
+    minTermOccurrenceInCollection = getRandomMinTermOccurrence()
+    maxTermRatioInCollection = getRandomMaxTermRatio()
+    minLimitForBaseClusterScore = getRandomMinLimitBCScore()
+    maxLimitForBaseClusterScore = getRandomMaxLimitBCScore()
     shouldDropSingletonBaseClusters = randint(0, 1)
     shouldDropOneWordClusters = randint(0, 1)
     textType = getRandomTextType()
@@ -362,10 +362,10 @@ def get_random_similarity_measure():
                              "params": (threshold, 0, 0)}
 
     elif type == AMENDMENT_1C_SIMILARITY:
-        avg_cf_threshold = randint(0, 100)  # TODO: Find reasonable values
-        cf_intersect_min = randint(0, 100)
+        avg_cf_threshold = randint(5, 100)  # TODO: Find reasonable values
+        cf_intersect_min = randint(0, 10)
         similarity_params = {"similarity_method": 2,
-                             "params": (threshold, avg_cf_threshold, cf_intersect_min)}
+                             "params": (0.5, avg_cf_threshold, cf_intersect_min)}
 
     return similarity_params
 

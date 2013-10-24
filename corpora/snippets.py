@@ -33,13 +33,11 @@ class SnippetBuilder(object):
         :type snippetsLists: dict
         :param snippetsLists: lists of snippets contained in the document
         """
-        if self.counter % 100 == 0 or self.counter == 0:
 
-            document = SubElement(self.root, 'snippet',
-                                  {'id': docId, 'tags': tags, 'source': source})
-            for key, list in snippetsLists.items():
-                self.add_snippets(document, key, list)
-        self.counter += 1
+        document = SubElement(self.root, 'snippet',
+                              {'id': docId, 'tags': tags, 'source': source})
+        for key, list in snippetsLists.items():
+            self.add_snippets(document, key, list)
 
     def add_snippets(self, document, key, snippetList):
         """

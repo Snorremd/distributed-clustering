@@ -108,4 +108,11 @@ def get_word_frequencies(snippet_collection, corpus_size):
                 else:
                     document_frequency[word] = [source]
 
+    #most_frequent = []
+    #for (word, frequency) in corpus_frequency.items():
+    #    if frequency > 100:
+    #        most_frequent.append((word, frequency))
+    #
+    #print("Most frequent word is {0} with frequency {1}".format(most_frequent[0], most_frequent[1]))
+
     return corpus_frequency, raw_frequency, document_frequency
