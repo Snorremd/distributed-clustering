@@ -1,9 +1,10 @@
 from lib2to3.patcomp import _type_of_literal
 import math
+from operator import contains
 from cluster.compactTrieCluster.cluster import common
 from text.phrases import string_to_phrase
 
-__author__ = 'snorre'
+__author__ = 'Snorre'
 
 
 class ClusterResult(object):
@@ -13,7 +14,7 @@ class ClusterResult(object):
 
     def __init__(self, time, no_of_base_clusters, no_of_clusters, no_of_gt_clusters,
                  precision, recall, f_measure, tag_accuracies, precisions,
-                 recalls, f_measures, results_string):
+                 recalls, f_measures, results_string, clusters_result_strings):
         self.time = time
         self.no_of_base_clusters = no_of_base_clusters
         self.no_of_clusters = no_of_clusters
@@ -26,13 +27,25 @@ class ClusterResult(object):
         self.recalls = recalls
         self.f_measures = f_measures
         self.results_string = results_string
+        self.clusters_result_strings = clusters_result_strings
 
     def __str__(self):
-        stringRep = ""
+        string_rep = ""
 
-        for property, value in vars(self).items():
-            stringRep += str(property) + ": " + str(value) + "\n"
-        return stringRep
+        for obj_property, value in vars(self).items():
+            string_rep += str(obj_property) + ": " + str(value) + "\n"
+        return string_rep
+
+
+class MeasuredCluster:
+    """
+    Helper class to sort clusters
+    """
+
+    def __init__(self):
+        self.cluster = None
+        self.tag_accuracy = 0
+        self.ground_truth_best_match = 0
 
 
 def calc_tag_accuracy(clusters,
@@ -45,6 +58,7 @@ def calc_tag_accuracy(clusters,
     :param tag_index:
     :return:
     """
+
     def count_matches(discrepancy):
         count = 0
         for cluster in clusters:
@@ -66,9 +80,9 @@ def calc_tag_accuracy(clusters,
             p += count_matches(k)
             ## Tuple (index, countMatch, ratio, accumulated)
         match_result.append((i,
-                            count_match,
-                            count_match / float(no_of_clusters),
-                            (p + count_match) / float(no_of_clusters)))
+                             count_match,
+                             count_match / float(no_of_clusters),
+                             (p + count_match) / float(no_of_clusters)))
     return match_result
 
 
@@ -111,9 +125,9 @@ def calc_ground_truth(clusters,
         for k in range(i, 6):
             p += count[k]
         ground_truth_results.append((5 - i,
-                                    count[i],
-                                    count[i] / float(no_of_clusters),
-                                    p / float(no_of_clusters)))
+                                     count[i],
+                                     count[i] / float(no_of_clusters),
+                                     p / float(no_of_clusters)))
     return ground_truth_results
 
 
@@ -204,7 +218,7 @@ def calc_overall_precision(ground_truth_clusters, clusters, no_of_sources):
         for cluster in clusters:
 
             intersection_length = float(len(set(sources) &
-                                           set(cluster.sources)))
+                                            set(cluster.sources)))
 
             precision = intersection_length / float(len(cluster.sources))
 
@@ -281,20 +295,20 @@ def calc_overall_fmeasure(ground_truth_clusters,
         max_f_measure = 0.0
         ## Find max precision out of all clusters j given category i
         for cluster in clusters:
-            intersectionLength = float(len(set(sources) &
-                                           set(cluster.sources)))
+            intersection_length = float(len(set(sources) &
+                                            set(cluster.sources)))
 
-            precision = intersectionLength / float(len(cluster.sources))
+            precision = intersection_length / float(len(cluster.sources))
 
-            recall = intersectionLength / float(len(sources))
+            recall = intersection_length / float(len(sources))
 
             f_measure = 0.0
             f_beta_constant = math.pow(f_beta_constant, 2)
-            fMeasureNum = (f_beta_constant + 1) * precision * recall
-            fMeasureDen = (f_beta_constant * precision) + recall
+            f_measure_num = (f_beta_constant + 1) * precision * recall
+            f_measure_den = (f_beta_constant * precision) + recall
 
-            if not fMeasureDen == 0:
-                f_measure = fMeasureNum / fMeasureDen
+            if not f_measure_den == 0:
+                f_measure = f_measure_num / f_measure_den
             if f_measure > max_f_measure:
                 max_f_measure = f_measure
 
@@ -316,3 +330,39 @@ def list_contains_list(list1, list2):
         if element not in list1:
             return False
     return True
+
+
+def sort_clusters(clusters, tag_index, ground_truth_clusters):
+    def measure(cluster):
+        tag_match = cluster.tag_accuracy
+        cluster_size = cluster.cluster.number_of_sources
+        lo = len(cluster.cluster.label_overlap)
+        so = len(cluster.cluster.source_overlap)
+        wc = cluster.cluster.number_of_words
+        return wc + ((so + 1) * 10) + ((lo + 1) * 100) + ((cluster_size + 1) * 1000) + \
+            ((tag_match + 1) * 1000000) + ((cluster.ground_truth_best_match + 1) * 10000000)
+
+    measured_clusters = []
+    for cluster in clusters:
+        measured_cluster = MeasuredCluster()
+        measured_cluster.cluster = cluster
+        tag_list = []
+        for source in cluster.sources:
+            tag_list.append(string_to_phrase(tag_index[source].replace('-', ' ')))
+        measured_cluster.tag_accuracy = len(common(map(lambda cluster: cluster, tag_list)))
+
+        for y in ground_truth_clusters.keys(): ## iterate through all tags
+            if contains(cluster.sources, ground_truth_clusters[y]) and \
+                    contains(ground_truth_clusters[y], cluster.sources):  ## and vice versa??
+                tag_list = []
+                for source in cluster.sources:
+                    tag_list.append(string_to_phrase(tag_index[source].replace('-', ' ')))
+                tag_list.append(string_to_phrase(y.replace('-', ' ')))
+                d = len(common(map(lambda cluster: cluster, tag_list)))
+                if d > measured_cluster.ground_truth_best_match:
+                    measured_cluster.ground_truth_best_match = d
+
+        measured_clusters.append(measured_cluster)
+
+    measured_clusters.sort(reverse=True, key=measure)
+    return measured_clusters

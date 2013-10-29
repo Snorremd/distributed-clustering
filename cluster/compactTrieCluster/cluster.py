@@ -40,14 +40,25 @@ class Cluster(object):
             self.label.append(y)
 
     def __str__(self):
+        sources = []
+        labels = []
+        for label in self.labels:
+            labels.append(phrase_to_string(label))
+        for source in self.sources:
+            sources.append(source[7:])
         string_rep = "<{0}>\n" \
                      "Labels: {1}\n" \
-                     "Sources: {2}\n" \
-                     "Label overlap: {3}\n" \
+                     "Label overlap: {2}\n" \
+                     "Num of sources: {3}\n" \
+                     "Source overlap: {4}\n" \
+                     "Sources:\n{5}"\
             .format(phrase_to_string(self.label),
-                    "|".join(self.labels),
+                    "|".join(labels),
                     ", ".join(self.label_overlap),
-                    self.source_overlap)
+                    self.number_of_sources,
+                    self.source_overlap,
+                    "\n".join(sources)
+                    )
 
         return string_rep
 

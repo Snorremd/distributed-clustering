@@ -1,7 +1,7 @@
 from random import randint
 from time import time
 from cluster.clusterResults import ClusterResult, calc_overall_precision, calc_overall_recall, calc_overall_fmeasure, \
-    calc_tag_accuracy, calc_ground_truth, calc_gt_represented, calc_f_measure
+    calc_tag_accuracy, calc_ground_truth, calc_gt_represented, calc_f_measure, sort_clusters
 from cluster.compactTrieCluster.baseCluster import top_base_clusters, drop_singleton_base_clusters
 from cluster.compactTrieCluster.cluster import generate_clusters, drop_one_word_clusters
 from cluster.compactTrieCluster.compactTrie import generate_compact_trie
@@ -10,7 +10,7 @@ from cluster.compactTrieCluster.similarity import SimilarityMeasurer
 from easylogging.configLogger import get_logger_for_stdout
 from inputOutput.filehandling import get_corpus_settings
 from text.wordOccurrence import get_word_frequencies
-from text.xmlsnippets import get_snippet_collection, make_tag_index,\
+from text.xmlsnippets import get_snippet_collection, make_tag_index, \
     make_ground_truth_clusters
 
 __author__ = 'snorre'
@@ -38,7 +38,6 @@ def text_types():
 
 
 class CompactTrieClusterer(object):
-
     def __init__(self, corpus, cluster_settings):
         self.logger = get_logger_for_stdout("CompactTrieClusterer")
         self.corpus = get_corpus_settings(corpus.name)
@@ -104,7 +103,7 @@ class CompactTrieClusterer(object):
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
-                (.0, .0, .0, .0, .0, .0), "empty")
+                (.0, .0, .0, .0, .0, .0), "empty", "empty")
 
         ## Helper object that measures similarity between base clusters
         similarity_measurer = SimilarityMeasurer(chromosome.similarity_measure,
@@ -133,7 +132,7 @@ class CompactTrieClusterer(object):
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
-                (.0, .0, .0, .0, .0, .0), "empty")
+                (.0, .0, .0, .0, .0, .0), "empty", "empty")
 
         self.logger.info("Calculate results")
         return self.calculate_results(clusters, ground_truth_clusters,
@@ -179,15 +178,21 @@ class CompactTrieClusterer(object):
                                     self.cluster_settings.fBetaConstant)
         f_measure_tuple = make_result_tuple(f_measures, 1)
 
+        sorted_clusters = sort_clusters(clusters, tag_index, ground_truth_clusters)
+
+
+
         results_string = make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
-                            no_of_clusters, len(ground_truth_clusters))
+                                             no_of_clusters, len(ground_truth_clusters))
+
+        clusters_result_strings = make_clusters_details_string(sorted_clusters, tag_index)
 
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
                                 no_of_clusters, len(self.ground_truth_clusters),
                                 precision, recall, f_measure,
                                 tag_accuracy_tuple, ground_truth_tuple,
                                 ground_truth_represented_tuple,
-                                f_measure_tuple, results_string)
+                                f_measure_tuple, results_string, clusters_result_strings)
 
         return results
 
@@ -250,7 +255,7 @@ def empty_result():
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
-        (.0, .0, .0, .0, .0, .0), "empty")
+        (.0, .0, .0, .0, .0, .0), "empty", "empty")
 
 
 def filter_snippets(snippet_collection, text_types_dict, text_amount):
@@ -281,7 +286,7 @@ def random_snippets(snippets, amount):
     del snippets[0]
     counter = 1
     while len(snippets) > 0 and counter < amount:
-        random_pos = randint(0, len(snippets)-1)
+        random_pos = randint(0, len(snippets) - 1)
         result.append(snippets[random_pos])
         del snippets[random_pos]
 
@@ -298,18 +303,18 @@ def make_results_string(resultsTagAccuracy,
     tagAccuracy += "----------------------------------------------------\n"
     for (i, countMatch, fraction, accumulated) in resultsTagAccuracy:
         tagAccuracy += str(i) + "\t %2i" % (countMatch) + "/" + \
-                            str(noOfClusters) + \
-                            "\t\t%.3f" % (fraction) + "\t " + \
-                            "%.3f" % (accumulated) + "\n"
+                       str(noOfClusters) + \
+                       "\t\t%.3f" % (fraction) + "\t " + \
+                       "%.3f" % (accumulated) + "\n"
 
     groundTruthString = "Ground truth:\n"
     groundTruthString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
     groundTruthString += "----------------------------------------------------\n"
     for (i, countMatch, fraction, accumulated) in resultsGroundTruth:
         groundTruthString += str(i) + "\t %2i" % (countMatch) + "/" + \
-                            str(noOfClusters) + \
-                            "\t\t%.3f" % (fraction) + "\t " + \
-                            "%.3f" % (accumulated) + "\n"
+                             str(noOfClusters) + \
+                             "\t\t%.3f" % (fraction) + "\t " + \
+                             "%.3f" % (accumulated) + "\n"
 
     groundTruthRepString = "Ground truth represented:\n"
     groundTruthRepString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
@@ -321,3 +326,33 @@ def make_results_string(resultsTagAccuracy,
                                 "%.3f" % (accumulated) + "\n"
 
     return tagAccuracy + "\n" + groundTruthString + "\n" + groundTruthRepString
+
+
+def make_clusters_details_string(sorted_clusters, tag_index):
+
+    sorted_clusters_result_strings = []
+    for cluster in sorted_clusters:
+        cluster_string = \
+            ("\n"
+             "{0}/{1}\n"
+             "< {2} > :\n"
+            ).format(cluster.tag_accuracy,
+                     cluster.cluster.number_of_sources,
+                     cluster.cluster.label)
+        if cluster.ground_truth_best_match == 5:
+            cluster_string = " ".join("*", cluster_string)
+
+        for source in cluster.cluster.sources:
+            cluster_string += "  {0}\n".format(tag_index[source])
+
+        cluster_string += "\n"
+        cluster_string += str(cluster.cluster)
+        cluster_string += "\n---------------------\n"
+        sorted_clusters_result_strings.append(cluster_string)
+
+    return sorted_clusters_result_strings
+
+
+
+
+
