@@ -78,3 +78,19 @@ def get_corpus_settings(choice):
                     corpusFile, processorName, singleTag)
 
     return corpus
+
+
+def write_to_file(filepath, some_string):
+    """
+    Filepath relative to project root
+    """
+    file = open(filepath, "w", encoding="utf8")
+    file.write(some_string)
+
+
+def append_to_file(filepath, some_string):
+    """
+    Filepath relative to project root
+    """
+    file = open(filepath, "a", encoding="utf8")
+    file.write(some_string)
