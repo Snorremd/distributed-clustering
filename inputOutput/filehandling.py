@@ -50,6 +50,14 @@ def get_corpus_options():
 
 
 def get_corpus_settings(choice):
+    """
+    Given a corpus name, get all settings for that corpus
+
+    :type choice: str
+    :param choice: corpus name
+    :rtype: Corpus
+    :return: A corpus object with all settings for given corpus
+    """
     ## Get path of corpus and snippet files from corpora.xml
     corpusTree = ET.parse(get_root_path() + os.sep + "corpora.xml")
     corpusSettings = corpusTree.getroot().findall(
@@ -80,17 +88,47 @@ def get_corpus_settings(choice):
     return corpus
 
 
-def write_to_file(filepath, some_string):
+def get_parameters():
+    """
+    Reads the textParameters.xml file to load a parameter
+    set into a chromosome which can then be used to cluster
+    a snippet file.
+    :rtype: Chromosome
+    :return: A chromosome object with parameters
+    """
+    ## Get parameters for CTC from testParameters.xml
+    paramsTree = ET.parse(get_root_path() + os.sep + "testParameters.xml")
+    params = paramsTree.getroot()
+    print(str(params))
+
+    tree_types = eval(params.findall(".tree_type")[0].text)  # Eval text to tuple
+    top_base_clusters_amount = int(params.findall(".top_base_clusters_amount")[0].text)
+    min_term_occurence_in_collection = int(params.findall(".min_term_occurence_in_collection")[0].text)
+    max_term_ratio_in_collection = float(params.findall(".max_term_ratio_in_collection")[0].text)
+    min_limit_for_base_cluster_score = int(params.findall(".min_limit_for_base_cluster_score")[0].text)
+    max_limit_for_base_cluster_score = int(params.findall(".max_limit_for_base_cluster_score")[0].text)
+    should_drop_singleton_base_clusters = int(params.findall(".should_drop_singleton_base_clusters")[0].text)
+    should_drop_one_word_clusters = int(params.findall(".should_drop_one_word_clusters")[0].text)
+    text_amount = float(params.findall(".text_amount")[0].text)
+    text_types = eval(params.findall(".text_types")[0].text)
+    similarity_measure = eval(params.findall(".similarity_measure")[0].text)
+
+    return (tree_types, top_base_clusters_amount, min_term_occurence_in_collection,
+            max_term_ratio_in_collection, min_limit_for_base_cluster_score,
+            max_limit_for_base_cluster_score, should_drop_singleton_base_clusters,
+            should_drop_one_word_clusters, text_types, text_amount, similarity_measure)
+
+def write_to_file(file_path, some_string):
     """
     Filepath relative to project root
     """
-    file = open(filepath, "w", encoding="utf8")
+    file = open(get_root_path() + os.sep + file_path, "w", encoding="utf8")
     file.write(some_string)
 
 
-def append_to_file(filepath, some_string):
+def append_to_file(file_path, some_string):
     """
     Filepath relative to project root
     """
-    file = open(filepath, "a", encoding="utf8")
+    file = open(get_root_path() + os.sep + file_path, "a", encoding="utf8")
     file.write(some_string)

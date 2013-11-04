@@ -137,11 +137,11 @@ class CompactTrieClusterer(object):
         self.logger.info("Calculate results")
         return self.calculate_results(clusters, ground_truth_clusters,
                                       no_of_base_clusters, no_of_clusters,
-                                      tag_index, time_to_cluster)
+                                      tag_index, time_to_cluster, chromosome)
 
     def calculate_results(self, clusters, ground_truth_clusters,
                           no_of_base_clusters, no_of_clusters, tag_index,
-                          time_to_cluster):
+                          time_to_cluster, chromosome):
         """
         Calculate two forms of results. Standard precision,
         recall and f-measure scores as done in ....
@@ -180,10 +180,12 @@ class CompactTrieClusterer(object):
 
         sorted_clusters = sort_clusters(clusters, tag_index, ground_truth_clusters)
 
+        param_string = make_parameter_string(chromosome)
 
-
-        results_string = make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
-                                             no_of_clusters, len(ground_truth_clusters))
+        results_string = param_string + \
+            "\n\n" + \
+            make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
+                                no_of_clusters, len(ground_truth_clusters))
 
         clusters_result_strings = make_clusters_details_string(sorted_clusters, tag_index)
 
@@ -353,6 +355,65 @@ def make_clusters_details_string(sorted_clusters, tag_index):
     return sorted_clusters_result_strings
 
 
+def make_parameter_string(chromosome):
+    param_string = "###################################\n" \
+                   "Parameter set for clustering:\n\n"
 
+    tree_type = ""
+    if chromosome.tree_type[0] == 0:
+        tree_type = "Suffix Tree"
+    elif chromosome.tree_type[0] == 1:
+        tree_type = "Midslice trie"
+    elif chromosome.tree_type == 2:
+        tree_type = "{0}-slice trie".format(chromosome.tree_type[1])
+    elif chromosome.tree_type == 3:
+        tree_type = "Range-slice trie (min = {0}, max = {1}".format(
+            chromosome.tree_type[1], chromosome.tree_type[2]
+        )
 
+    top_base_cluster = "Top base clusters: {0}".format(chromosome.top_base_clusters_amount)
 
+    min_max_term_occurrence = "Min term occurrence: {0}, Max term ratio: {1}".format(
+        chromosome.min_term_occurrence_in_collection,
+        chromosome.max_term_ratio_in_collection
+    )
+
+    min_max_limit_bc_score = "Min & Max limit bc score: {0}, {1}".format(
+        chromosome.min_limit_for_base_cluster_score,
+        chromosome.max_limit_for_base_cluster_score
+    )
+
+    drop_clusters = "Drop clusters:"
+    if chromosome.should_drop_singleton_base_clusters:
+        drop_clusters += "\n\tSingleton Base Clusters"
+    if chromosome.should_drop_one_word_clusters:
+        drop_clusters += "\n\tOne Word Clusters"
+    drop_clusters += "\n"
+
+    text_types = "Text types: "
+    for (text_type, include) in chromosome.text_types.items():
+        if include:
+            text_types += text_type + ", "
+
+    text_amount = "Amount of article text: {0}".format(chromosome.text_amount)
+
+    similarity_measure = "Similarity measure: "
+    if chromosome.similarity_measure["similarity_method"] == 0:
+        similarity_measure = "Jaccard similarity, threshold: {0}".format(chromosome.similarity_measure["params"][0])
+    elif chromosome.similarity_measure["similarity_method"] == 1:
+        similarity_measure = "Jaccard similarity, threshold: {0}\n"
+        similarity_measure += "Cosine similarity, cos-threshold {1}"
+        similarity_measure.format(chromosome.similarity_measure["params"][0],
+                                  chromosome.similarity_measure["params"][1]
+                                  )
+    elif chromosome.similarity_measure["similarity_method"] == 2:
+        similarity_measure = "Jaccard Similarity, Threshold: {0}\n".format(chromosome.similarity_measure["params"][0])
+        similarity_measure += \
+            "Amendment 1d Similarity, max corpus frequency avg = {0}, min label intersect = {1}".format(
+                chromosome.similarity_measure["params"][1], chromosome.similarity_measure["params"][2]
+            )
+
+    param_string += "\n".join([tree_type, top_base_cluster, min_max_term_occurrence, min_max_limit_bc_score,
+                               drop_clusters, text_types, text_amount, similarity_measure])
+
+    return param_string
