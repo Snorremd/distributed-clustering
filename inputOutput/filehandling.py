@@ -103,7 +103,7 @@ def get_parameters():
 
     tree_types = eval(params.findall(".tree_type")[0].text)  # Eval text to tuple
     top_base_clusters_amount = int(params.findall(".top_base_clusters_amount")[0].text)
-    min_term_occurence_in_collection = int(params.findall(".min_term_occurence_in_collection")[0].text)
+    min_term_occurrence_in_collection = int(params.findall(".min_term_occurrence_in_collection")[0].text)
     max_term_ratio_in_collection = float(params.findall(".max_term_ratio_in_collection")[0].text)
     min_limit_for_base_cluster_score = int(params.findall(".min_limit_for_base_cluster_score")[0].text)
     max_limit_for_base_cluster_score = int(params.findall(".max_limit_for_base_cluster_score")[0].text)
@@ -112,11 +112,12 @@ def get_parameters():
     text_amount = float(params.findall(".text_amount")[0].text)
     text_types = eval(params.findall(".text_types")[0].text)
     similarity_measure = eval(params.findall(".similarity_measure")[0].text)
+    sort_descending = int(params.findall(".sort_descending")[0].text)
 
-    return (tree_types, top_base_clusters_amount, min_term_occurence_in_collection,
+    return (tree_types, top_base_clusters_amount, min_term_occurrence_in_collection,
             max_term_ratio_in_collection, min_limit_for_base_cluster_score,
             max_limit_for_base_cluster_score, should_drop_singleton_base_clusters,
-            should_drop_one_word_clusters, text_types, text_amount, similarity_measure)
+            should_drop_one_word_clusters, text_types, text_amount, similarity_measure, sort_descending)
 
 def write_to_file(file_path, some_string):
     """

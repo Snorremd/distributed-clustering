@@ -1,10 +1,11 @@
 <parameters>
     <tree_type>(0,0,0)</tree_type>
     <top_base_clusters_amount>1000</top_base_clusters_amount>
-    <min_term_occurence_in_collection>4</min_term_occurence_in_collection>
+    <min_term_occurrence_in_collection>4</min_term_occurrence_in_collection>
     <max_term_ratio_in_collection>0.6</max_term_ratio_in_collection>
     <min_limit_for_base_cluster_score>2</min_limit_for_base_cluster_score>
     <max_limit_for_base_cluster_score>7</max_limit_for_base_cluster_score>
+    <sort_descending>0</sort_descending>
     <should_drop_singleton_base_clusters>1</should_drop_singleton_base_clusters>
     <should_drop_one_word_clusters>1</should_drop_one_word_clusters>
     <text_amount>0.2</text_amount>

@@ -20,6 +20,7 @@ SHOULDDROPONEWORDCLUSTERS = 8
 TEXTTYPE = 9
 TEXTAMOUNT = 10
 SIMILARITYMEASURE = 11
+SORTDESCENDING = 12
 
 ## Constants for tree types
 SUFFIX_TREE = 0
@@ -63,7 +64,8 @@ class Chromosome:
                  shouldDropOneWordClusters,
                  textType,
                  text_amount,
-                 similarity_measure):
+                 similarity_measure,
+                 sortDescending):
         """
         Constructor for the Chromosome class.
 
@@ -93,6 +95,7 @@ class Chromosome:
         self.max_term_ratio_in_collection = maxTermRatioInCollection
         self.min_limit_for_base_cluster_score = minLimitForBaseClusterScore
         self.max_limit_for_base_cluster_score = maxLimitForBaseClusterScore
+        self.sort_descending = sortDescending
         self.should_drop_singleton_base_clusters = shouldDropSingletonBaseClusters
         self.should_drop_one_word_clusters = shouldDropOneWordClusters
         self.fitness = 0
@@ -148,6 +151,8 @@ class Chromosome:
             self.text_amount = get_random_text_amount()
         elif geneToMutate == SIMILARITYMEASURE:
             self.similarity_measure = get_random_similarity_measure()
+        elif geneToMutate == SORTDESCENDING:
+            self.sort_descending = get_random_sort_descending()
         else:  # Just in case
             pass
 
@@ -162,7 +167,8 @@ class Chromosome:
                 self.should_drop_one_word_clusters,
                 self.text_types,
                 self.text_amount,
-                self.similarity_measure)
+                self.similarity_measure,
+                self.sort_descending)
 
     def chromosome_as_dict(self):
         text_types_keys = text_types()
@@ -186,6 +192,7 @@ class Chromosome:
             .min_limit_for_base_cluster_score,
             "max_limit_base_cluster_score": self
             .max_limit_for_base_cluster_score,
+            "sort_descending": self.sort_descending,
             "similarity_measure_method": self
             .similarity_measure["similarity_method"],
             "similarity_measure_threshold": self
@@ -261,6 +268,7 @@ def create_random_chromosome():
     maxTermRatioInCollection = getRandomMaxTermRatio()
     minLimitForBaseClusterScore = getRandomMinLimitBCScore()
     maxLimitForBaseClusterScore = getRandomMaxLimitBCScore()
+    sort_descending = get_random_sort_descending()
     shouldDropSingletonBaseClusters = randint(0, 1)
     shouldDropOneWordClusters = randint(0, 1)
     textType = getRandomTextType()
@@ -277,7 +285,8 @@ def create_random_chromosome():
                       shouldDropOneWordClusters,
                       textType,
                       text_amount,
-                      similarity_measure)
+                      similarity_measure,
+                      sort_descending)
 
 
 def getRandomTreeType():
@@ -370,6 +379,9 @@ def get_random_similarity_measure():
     return similarity_params
 
 
+def get_random_sort_descending():
+    return randint(0, 1)
+
 
 def genesTupleToChromosome(geneTuple):
     """
@@ -386,7 +398,8 @@ def genesTupleToChromosome(geneTuple):
                       geneTuple[7],
                       geneTuple[8],
                       geneTuple[9],
-                      geneTuple[10])
+                      geneTuple[10],
+                      geneTuple[11])
 
 
 def crossChromosomes(chromosome1, chromosome2):

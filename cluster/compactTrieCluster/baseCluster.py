@@ -1,4 +1,7 @@
+from datetime import datetime
+import os
 from easylogging.configLogger import get_logger_for_stdout
+from inputOutput.filehandling import write_to_file, append_to_file
 from text.wordOccurrence import count_sources, get_word_sources
 
 __author__ = 'snorre'
@@ -12,6 +15,7 @@ class BaseCluster(object):
         self.label = ""
         self.sources = []
         self.size = 0.0
+        self.score = 0.0
 
     def add_sources(self, sources):
         """
@@ -28,13 +32,14 @@ class BaseCluster(object):
         """
         Used when print-method is called on self
         """
-        print(self.label + ":"),
-        print(self.sources)
+        sources = "\n".join(self.sources)
+        label = " ".join(self.label)
+        return "Label: " + label + "\nScore: " + str(self.score) + "\n\n" #+ "\n" + sources
 
 
 def sort_base_clusters(baseClusters, noOfSources, wordSources, minNoInCollection,
                        maxRatioInCollection, minLimitForBaseClusterScore,
-                       maxLimitForBaseClusterScore):
+                       maxLimitForBaseClusterScore, sort_descending):
 
     def compute_score(baseCluster):
         """
@@ -75,9 +80,12 @@ def sort_base_clusters(baseClusters, noOfSources, wordSources, minNoInCollection
             return n
 
         base_cluster_score = baseCluster.size * f(effective_words(baseCluster.label))
+        baseCluster.score = base_cluster_score
         return base_cluster_score
 
-    baseClusters.sort(key=compute_score, reverse=True)
+
+    reverse_sort = True if sort_descending else False
+    baseClusters.sort(key=compute_score, reverse=reverse_sort)
 
 
 def top_base_clusters(compactTrie,
@@ -85,7 +93,8 @@ def top_base_clusters(compactTrie,
                       minNoInCollection=3,
                       maxRatioInCollection=0.4,
                       minLimitForBaseClusterScore=1,
-                      maxLimitForBaseClusterScore=6
+                      maxLimitForBaseClusterScore=6,
+                      sort_descending=1
                       ):
     """
 
@@ -108,7 +117,7 @@ def top_base_clusters(compactTrie,
 
     sort_base_clusters(baseClusters, noOfSources, wordSources, minNoInCollection,
                        maxRatioInCollection, minLimitForBaseClusterScore,
-                       maxLimitForBaseClusterScore)
+                       maxLimitForBaseClusterScore, sort_descending)
 
     if topBaseClustersAmount > len(baseClusters):
         return baseClusters

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from xml.etree.ElementTree import iterparse
 
 
@@ -10,7 +11,7 @@ def get_snippet_collection(snippetFilePath):
     ...], ...}
     """
     ##tree = parse(filename)
-    snippetDict = dict()
+    snippetDict = OrderedDict()
     no_of_documnets = 0
     for event, element in iterparse(snippetFilePath):
         if event == 'end':

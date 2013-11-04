@@ -1,4 +1,5 @@
 ## Tree types
+from collections import OrderedDict
 import weakref
 from easylogging.configLogger import get_logger_for_stdout
 from text.phrases import get_common_start_segment
@@ -80,7 +81,7 @@ class CompactTrieNode(object):
         self.parent = None
         self.sources = []
         self.sources_dict = {}
-        self.subtrees = {}
+        self.subtrees = OrderedDict()
 
     def add_sources(self, sources):
         """
@@ -219,7 +220,7 @@ class CompactTrieNode(object):
         new_node.parent = weakref.ref(self) if self else None
         new_node.add_sources(sources)
         ## Make branch a subtree of new node-tree
-        new_node.subtrees = {branch_rest[0]: branch_node}
+        new_node.subtrees = OrderedDict({branch_rest[0]: branch_node})
         branch_node.phrase = branch_rest
         branch_node.parent = weakref.ref(new_node) if new_node else None
         ## Make new_node child node of self
@@ -258,12 +259,12 @@ class CompactTrieNode(object):
         phrase_rest_node.parent = weakref.ref(common_start_segment_node) if \
             common_start_segment_node else None
         phrase_rest_node.add_sources(sources)
-        phrase_rest_node.subtrees = {}
+        phrase_rest_node.subtrees = OrderedDict()
         ## Make branch rest and phrase rest children of common start
         ## segment node
-        common_start_segment_node.subtrees = {
+        common_start_segment_node.subtrees = OrderedDict({
             branch_rest[0]: branch_node,
-            phrase_rest[0]: phrase_rest_node}
+            phrase_rest[0]: phrase_rest_node})
         ## Update branch trie and self (this node)
         branch_node.phrase = branch_rest
         branch_node.parent = weakref.ref(common_start_segment_node) if \

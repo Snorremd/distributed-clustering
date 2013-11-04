@@ -87,7 +87,8 @@ class CompactTrieClusterer(object):
                                           chromosome.min_term_occurrence_in_collection,
                                           chromosome.max_term_ratio_in_collection,
                                           chromosome.min_limit_for_base_cluster_score,
-                                          chromosome.max_limit_for_base_cluster_score)
+                                          chromosome.max_limit_for_base_cluster_score,
+                                          chromosome.sort_descending)
 
         if chromosome.should_drop_singleton_base_clusters:
             drop_singleton_base_clusters(base_clusters)
@@ -273,8 +274,8 @@ def filter_snippets(snippet_collection, text_types_dict, text_amount):
     filtered_collection = list()
     for textType, snippets in snippet_collection.items():
         if text_types_dict['ArticleText']:
-            amount = len(snippets) / text_amount
-            snippets = random_snippets(snippets[:], amount)
+            amount = int(len(snippets) / text_amount)
+            snippets = snippets[:amount-1]
         if text_types_dict[textType]:  # If text type is true, do include
             filtered_collection.extend(snippets[:])
     return filtered_collection
@@ -383,6 +384,11 @@ def make_parameter_string(chromosome):
         chromosome.max_limit_for_base_cluster_score
     )
 
+    if chromosome.sort_descending:
+        base_cluster_sort = "Sort base cluster: {0} first".format("best")
+    else:
+        base_cluster_sort = "Sort base cluster: {0} first".format("worst")
+
     drop_clusters = "Drop clusters:"
     if chromosome.should_drop_singleton_base_clusters:
         drop_clusters += "\n\tSingleton Base Clusters"
@@ -414,6 +420,6 @@ def make_parameter_string(chromosome):
             )
 
     param_string += "\n".join([tree_type, top_base_cluster, min_max_term_occurrence, min_max_limit_bc_score,
-                               drop_clusters, text_types, text_amount, similarity_measure])
+                               base_cluster_sort, drop_clusters, text_types, text_amount, similarity_measure])
 
     return param_string
