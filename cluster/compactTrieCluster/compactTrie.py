@@ -6,6 +6,7 @@ from text.phrases import get_common_start_segment
 from text.sliceTrees import make_mid_slice_tree, make_n_slice_tree, make_range_slice_tree
 from text.suffixTrees import make_suffix_tree
 
+## Constants for expansion techniques/tree types
 SUFFIX_TREE = 0
 MID_SLICE = 1
 RANGE_SLICE = 2
@@ -16,24 +17,33 @@ logger = get_logger_for_stdout("compactTrieModule")
 
 def generate_compact_trie(snippet_collection, tree_type_tuple):
     """
+    Generate a compact trie over the snippet collection using the expansion
+     technique given by tree_type_tuple.
 
-    :param tree_type_tuple:
-    :param snippet_collection:
-    :return:
+    :type tree_type_tuple: tuple
+    :param tree_type_tuple: tree type (expansion technique) to use for snippet expansion
+    :type snippet_collection: list
+    :param snippet_collection: list of snippet source pairs.
+
+    :rtype: CompactTrie
+    :return: compact trie generated from snippet collection
     """
     (tree_type, slice_length_range_min, range_max) = tree_type_tuple  # Expand tuple
     if tree_type == SUFFIX_TREE:
         logger.info("Creating suffix tree")
         return build_compact_trie(make_suffix_tree(snippet_collection))
+
     elif tree_type == MID_SLICE:
         logger.info("Creating mid slice tree")
         return build_compact_trie(make_mid_slice_tree(snippet_collection))
+
     elif tree_type == RANGE_SLICE:
         logger.info("Creating slice tree for min {0} -> max {1}".format(
             tree_type_tuple[1], tree_type_tuple[2]))
         return build_compact_trie(make_range_slice_tree(snippet_collection,
                                                         tree_type_tuple[1],
                                                         tree_type_tuple[2]))
+
     elif tree_type == N_SLICE:
         logger.info("Creating n-slice tree for n = {0}".format(
             tree_type_tuple[1]))
@@ -41,9 +51,19 @@ def generate_compact_trie(snippet_collection, tree_type_tuple):
                                                     tree_type_tuple[1]))
 
 
-def build_compact_trie(phrases):
+def build_compact_trie(phrase_source_pairs):
+    """
+    Build a compact trie over a list of phrase source pairs expanded from the
+     snippet source pairs from the snippet collection.
+
+    :type phrase_source_pairs: list
+    :param phrase_source_pairs: phrase source pairs to insert into compact trie structure
+
+    :rtype: CompactTrie
+    :return: compact trie built from phrase source pairs
+    """
     tree = CompactTrie()
-    for phrase, sources in phrases:
+    for phrase, sources in phrase_source_pairs:
         tree.insert(phrase, sources)
     return tree
 
@@ -51,7 +71,7 @@ def build_compact_trie(phrases):
 class CompactTrie(object):
     """
     Models a compact trie data structure. It contains a root compact trie
-    node that holds all other compact trie nodes as subtrees.
+     node that holds all other compact trie nodes as subtrees.
     """
 
     def __init__(self):
@@ -60,6 +80,7 @@ class CompactTrie(object):
     def insert(self, phrase, sources):
         """
         Insert a phrase, sources pair into the tree
+
         :type phrase: list
         :param phrase: the phrase to insert
         :type sources: list
@@ -88,6 +109,7 @@ class CompactTrieNode(object):
         Adds a list of sources to a node mapping them to the phrase of node.
         If source already exist in node, add to counter to keep track of how
         many times the phrase occurs in the given document.
+
         :type sources: list
         :param sources: to add to phrase in node
         """
@@ -104,7 +126,6 @@ class CompactTrieNode(object):
         """
         Recursively generate a concatenated node label array of self and
         parents.
-        :return:
         """
         if self.parent is None:
             return self.phrase
@@ -114,12 +135,12 @@ class CompactTrieNode(object):
 
     def insert(self, phrase, sources):
         """
-        Insert phrase into node
+        Insert phrase source pair into node
+
         :type phrase: list
         :param phrase: the (sub)phrase to insert
         :type sources: list
         :param sources: sources for phrase
-        :return:
         """
         if not phrase:
             return None
@@ -137,10 +158,13 @@ class CompactTrieNode(object):
         """
         Phrase does not exist in any branch of compact trie node,
         insert phrase as new branch.
-        :param first_word:
-        :param phrase:
-        :param sources:
-        :return:
+
+        :type first_word: str
+        :param first_word: of the phrase to insert
+        :type phrase: list
+        :param phrase: words to insert as new branch node
+        :type sources: list
+        :param sources: document to which phrase belong
         """
         ## Branch does not exist, create new branch
         new_branch_node = CompactTrieNode()
@@ -156,10 +180,13 @@ class CompactTrieNode(object):
          of phrase exists in compact trie node subtree, add sources to
          respective node. If part of phrase exist in subtree, insert common
          start segment as new subtree, and process existing subtree.
-        :param first_word:
-        :param phrase:
-        :param sources:
-        :return:
+
+        :type first_word: str
+        :param first_word: of the phrase to insert
+        :type phrase: list
+        :param phrase: words to insert as new branch node
+        :type sources: list
+        :param sources: document to which phrase belong
         """
         branch_node = self.subtrees[first_word]
         if branch_node.phrase == phrase:  # Phrase exists in tree, add sources
@@ -178,11 +205,15 @@ class CompactTrieNode(object):
          is both a phrase rest and a branch rest make a new node for common
          start segment, and make branch rest and phrase rest subtrees of the
          new start segment node.
-        :param branch_node:
-        :param phrase:
-        :param first_word:
-        :param sources:
-        :return:
+
+        :type branch_node: CompactTrieNode
+        :param branch_node: the branch node to add phrase to
+        :type first_word: str
+        :param first_word: of the phrase to insert
+        :type phrase: list
+        :param phrase: words to insert as new branch node
+        :type sources: list
+        :param sources: document to which phrase belong
         """
         (common_start_segment, branch_rest, phrase_rest) = \
             get_common_start_segment(branch_node.phrase, phrase)
@@ -202,17 +233,17 @@ class CompactTrieNode(object):
         Branch rest should be inserted as subtree node of new common start
          segment node. Common Start Segment node should replace branchNode as
          subtree node of current node.
+
         :type branch_node: CompactTrieNode
-        :param branch_node:
+        :param branch_node: branch node to make a new child node of a new node
         :type branch_rest: list
-        :param branch_rest:
-        :type common_start_segment: CompactTrieNode
-        :param common_start_segment:
+        :param branch_rest: the end of branch node's phrase
+        :type common_start_segment: list
+        :param common_start_segment: the word common to phrase and branch
         :type first_word: str
-        :param first_word:
+        :param first_word: of the phrase to insert
         :type sources: list
-        :param sources:
-        :return:
+        :param sources: document to which phrase belong
         """
         ## phrase rest is empty, insert new node
         new_node = CompactTrieNode()
@@ -234,19 +265,19 @@ class CompactTrieNode(object):
          node with common start segment as new subtree node of current compact
          trie node. Make branch rest and phrase rest subtree nodes of common
          start segment node.
+
         :type branch_node: CompactTrieNode
-        :param branch_node:
+        :param branch_node: branch node to make child node of common start segment node
         :type branch_rest: list
-        :param branch_rest:
+        :param branch_rest: the end of branch node's phrase unique to branch phrase
         :type common_start_segment: list
-        :param common_start_segment:
+        :param common_start_segment: the words common to branch node's phrase and phrase to insert
         :type first_word: str
-        :param first_word:
+        :param first_word: the first word of phrase
         :type phrase_rest: list
-        :param phrase_rest:
+        :param phrase_rest: the end words of phrase unique to phrase
         :type sources: list
-        :param sources:
-        :return:
+        :param sources: to insert into common start segment node
         """
         ## Create a new trie for common start segment
         common_start_segment_node = CompactTrieNode()
