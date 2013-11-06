@@ -2,6 +2,9 @@ from text.phrases import phrase_to_string
 
 
 class Cluster(object):
+    """
+    The Cluster class models a final cluster in the Compact Trie Clustering algorithm
+    """
 
     def __init__(self):
         self.label = []  # label for the cluster as a whole ?
@@ -14,12 +17,24 @@ class Cluster(object):
         self.label_overlap = []  # shared-by-all words
 
     def add_sources(self, sources):
+        """
+        Add a list of sources to the cluster
+
+        :type sources: list
+        :param sources: sources (documents) from corpus
+        """
         for source in sources:
             if not source in self.sources:
                 self.sources.append(source)
                 self.number_of_sources += 1
 
     def collect_words(self, label_list):
+        """
+        Collects words from a label list counting frequency of each word
+
+        :type label_list: list
+        :param label_list: labels from merged component
+        """
         for label in label_list:
             if label in self.word_frequency:
                 self.word_frequency[label] += 1
@@ -30,7 +45,7 @@ class Cluster(object):
     def make_label(self):
         """
         Constructs a label for the whole component based on the
-        list of words occuring in labels sorted by frequency.
+        list of words occurring in labels sorted by frequency.
         """
         label_list = []
         for (x, y) in self.word_frequency.items():
@@ -40,6 +55,7 @@ class Cluster(object):
             self.label.append(y)
 
     def __str__(self):
+        ## Override __str__ method of object class
         sources = []
         labels = []
         for label in self.labels:
@@ -65,6 +81,8 @@ class Cluster(object):
 
 def generate_clusters(component_list):
     """
+    Make clusters for each merged component in the component list
+
     :type component_list: list
     :param component_list: a list of components (base cluster lists)
     :return:
@@ -90,6 +108,7 @@ def generate_clusters(component_list):
 def drop_one_word_clusters(clusters):
     """
     Drop all clusters with labels shorter than two terms/words
+
     :type clusters: list
     :param clusters: cluster list to filter
     :rtype: list
@@ -104,7 +123,9 @@ def drop_one_word_clusters(clusters):
 
 def flatten(lists):
     """
-    type lists: list
+    Return a flat list of all elements contained within a list of lists
+
+    :type lists: list
     :param lists: list of lists
     :return: a flattened list of all elements contained within the lists
     """
@@ -118,7 +139,8 @@ def flatten(lists):
 def common(lists):
     """
     Returns a list of all the elements common in lists
-    :type lists: list
+
+    :type lists: list, map
     :param lists: a list of lists of elements
     :rtype: list
     :return: all common elements of lists
