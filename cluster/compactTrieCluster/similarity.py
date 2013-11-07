@@ -23,7 +23,7 @@ class SimilarityMeasurer(object):
     def similar(self, base_cluster_1, base_cluster_2):
         """
         Calculate the boolean similarity between two base clusters with one
-        of the similarity methods defined below.
+         of the similarity methods defined below.
 
         :type base_cluster_1: BaseCluster
         :param base_cluster_1: first base clusters
@@ -36,14 +36,16 @@ class SimilarityMeasurer(object):
     def jaccard_similarity(self, base_cluster_1, base_cluster_2):
         """
         Calculate the jaccard coefficient between the two base clusters based on
-        their common sources. The Jaccard coefficient is defined as
-        ¦a intersect b| / ¦a¦ and ¦a intersect b| / ¦b¦. If both are greater than 0.5
-        the two base clusters are "jaccard similar".
+         their common sources. The Jaccard coefficient is defined as
+         |a intersect b| / |a| and |a intersect b| / |b|. If both are greater than 0.5
+         the two base clusters are "jaccard similar".
 
         :type base_cluster_1: BaseCluster
         :param base_cluster_1: first base clusters
         :type base_cluster_2: BaseCluster
         :param base_cluster_2: second base cluster
+
+        :rtype: bool
         :return: similarity given by boolean value
         """
         threshold = self.params[0]
@@ -61,18 +63,12 @@ class SimilarityMeasurer(object):
         """
         Calculate the cosine similarity between two base clusters.
 
-        The first is the average corpus frequency for the labels in the union
-        of labels in base cluster 1 and base cluster 2. The average frequency
-        should be less than some predefined average (for example 5).
-
-        The second metric is the number of common labels in base cluster 1 and
-        base cluster 2. This number should be greater than a predefined value
-        (for example 1).
-
         :type base_cluster_1: BaseCluster
         :param base_cluster_1: first base clusters
         :type base_cluster_2: BaseCluster
         :param base_cluster_2: second base cluster
+
+        :rtype: bool
         :return: similarity given by boolean value
         """
         jaccard_similar = self.jaccard_similarity(base_cluster_1, base_cluster_2)
@@ -92,6 +88,14 @@ class SimilarityMeasurer(object):
     def label_vector(self, base_cluster):
         """
         Original author: Richard Elling Moe
+        Calculates the label vector of a base cluster, i.e. the tf-idf
+         values of each word in the base cluster.
+
+        :type base_cluster: BaseCluster
+        :param base_cluster: Base cluster
+
+        :rtype: dict
+        :return: label vector for base cluster
         """
         label_vector = {}
         for word in base_cluster.label:
@@ -101,6 +105,14 @@ class SimilarityMeasurer(object):
     def term_frequency(self, word, sources):
         """
         Get the term frequency of a single word
+
+        :type word: str
+        :param word: word to calculate term frequency of
+        :type sources: list
+        :param sources: a list of sources in which to count word
+
+        :rtype: int
+        :return: sum of frequency for word
         """
         sum_of_frequencies = 0
         for source in sources:
@@ -110,12 +122,26 @@ class SimilarityMeasurer(object):
     def inverse_document_frequency(self, word):
         """
         Get inverse document frequency given a word, a corpus size and document frequencies
+
+        :type word: str
+        :param word: word to calculate inverse document frequency for
+
+        :rtype: float
+        :return: inverse document frequency of word
         """
         return log(self.corpus_size / (1 + len(self.document_frequencies[word])))
 
     def tfidf(self, word, sources):
         """
-        Get the tfidf value of a word given sources
+        Get the tf-idf value of a word given sources
+
+        :type word: str
+        :param word: a word from a label to calculate tf-idf value for
+        :type sources: list
+        :param sources: sources from a base cluster
+
+        :rtype: float
+        :return: tf-idf value of word given sources
         """
         return self.term_frequency(word, sources) * self.inverse_document_frequency(word)
 
@@ -138,6 +164,8 @@ class SimilarityMeasurer(object):
         :param base_cluster_1: first base clusters
         :type base_cluster_2: BaseCluster
         :param base_cluster_2: second base cluster
+
+        :rtype: bool
         :return: similarity given by boolean value
         """
         jaccard_similar = self.jaccard_similarity(base_cluster_1, base_cluster_2)
@@ -165,7 +193,13 @@ class SimilarityMeasurer(object):
 
 def guarded_average(numbers):
     """
-    Calculate the average of numbers
+    Calculate the average of numbers. If list is empty, return 0.
+
+    :type numbers: list
+    :param numbers: bunch of numbers
+
+    :rtype: float
+    :return: the average value of the numbers
     """
     if not numbers:
         return 0
@@ -177,6 +211,15 @@ def guarded_average(numbers):
 def scalar_product(vector1, vector2):
     """
     Original author: Richard Elling Moe
+    Find the scalar product of two vectors.
+
+    :type vector1: dict
+    :param vector1: first label vector
+    :type vector2: dict
+    :param vector2: second label vector
+
+    :rtype: float
+    :return: scalar product of vector1 and vector2
     """
     sum_indices = 0
     indices = set().union(vector1.keys(), vector2.keys())
@@ -189,6 +232,13 @@ def scalar_product(vector1, vector2):
 def magnitude(vector):
     """
     Original author: Richard Elling Moe
+    Find the magnitude of a label vector
+
+    :type vector: dict
+    :param vector: a label vector
+
+    :rtype: float
+    :return: magnitude of vector
     """
     sum_vectors = 0
     for i in vector.keys():
