@@ -192,7 +192,7 @@ class Chromosome:
             .min_limit_for_base_cluster_score,
             "max_limit_base_cluster_score": self
             .max_limit_for_base_cluster_score,
-            "sort_descending": self.sort_descending,
+            "order_descending": self.sort_descending,
             "similarity_measure_method": self
             .similarity_measure["similarity_method"],
             "similarity_measure_threshold": self
