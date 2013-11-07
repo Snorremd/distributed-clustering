@@ -36,8 +36,9 @@ def find_corpus_settings():
 def main():
     corpus_settings = find_corpus_settings()
     chromosome = Chromosome(*get_parameters())
-    
-    cluster_settings = ClusterSettings(True, 1)  # True, drop singleton gt clusters, 1 fbeta-constant
+
+    # Drop singleton ground truth clusters: True, fbeta-constant: 1, store_result_details: true
+    cluster_settings = ClusterSettings(True, 1, True)
     clusterer = CompactTrieClusterer(corpus_settings, cluster_settings)
     results = clusterer.cluster(chromosome)
     results_filepath = "results" + os.sep + "parameter-test" + str(datetime.now()) + ".txt"

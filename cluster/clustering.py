@@ -40,6 +40,7 @@ def text_types():
 class CompactTrieClusterer(object):
     def __init__(self, corpus, cluster_settings):
         self.logger = get_logger_for_stdout("CompactTrieClusterer")
+        self.store_result_details = cluster_settings.store_result_details
         self.corpus = get_corpus_settings(corpus.name)
         self.snippet_file_path = self.corpus.snippetFilePath
         self.cluster_settings = cluster_settings
@@ -183,12 +184,13 @@ class CompactTrieClusterer(object):
 
         param_string = make_parameter_string(chromosome)
 
-        results_string = param_string + \
-            "\n\n" + \
-            make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
-                                no_of_clusters, len(ground_truth_clusters))
-
-        clusters_result_strings = make_clusters_details_string(sorted_clusters, tag_index)
+        results_string = "Exclude"
+        clusters_result_strings = "Exclude"
+        if self.store_result_details:
+            make_clusters_details_string(sorted_clusters, tag_index)
+            results_string = param_string + "\n\n" + \
+                make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
+                                    no_of_clusters, len(ground_truth_clusters))
 
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
                                 no_of_clusters, len(self.ground_truth_clusters),

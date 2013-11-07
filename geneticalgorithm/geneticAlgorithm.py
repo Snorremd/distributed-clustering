@@ -70,7 +70,7 @@ class GeneticAlgorithm:
         self.selectionProbabilities = []
         self.currentGeneration = 0
 
-        self.clusterSettings = ClusterSettings(True, 1.0)
+        self.clusterSettings = ClusterSettings(True, 1.0, False)
         self.corpus = corpus
 
         self.logger.info("Generate initial population")

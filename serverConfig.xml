@@ -9,5 +9,5 @@
     <dbhost>localhost</dbhost>
     <dbname>ctcluster</dbname>
     <dbuser>ctcluster</dbuser>
-    <dbpasswd>fTnYTmuPm6FbEmZK</dbpasswd>
+    <dbpasswd></dbpasswd>
 </serverconfig>

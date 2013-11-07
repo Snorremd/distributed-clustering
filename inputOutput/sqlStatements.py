@@ -81,6 +81,7 @@ POPULATION_TABLE_CREATE_STATEMENT = \
       `max_term_ratio_collection` int(11) NOT NULL,
       `min_limit_base_cluster_score` int(11) NOT NULL,
       `max_limit_base_cluster_score` int(11) NOT NULL,
+      `order_descending` tinyint NOT NULL,
       `similarity_measure_method` int(11) NOT NULL,
       `similarity_measure_threshold` double NOT NULL,
       `similarity_measure_avg_cf_threshold` int(11) NOT NULL,
@@ -153,6 +154,7 @@ CHROMOSOME_TABLE_CREATE_STATEMENT = \
         `max_term_ratio_collection` int(11) NOT NULL,
         `min_limit_base_cluster_score` int(11) NOT NULL,
         `max_limit_base_cluster_score` int(11) NOT NULL,
+        `order_descending` tinyint NOT NULL,
         `similarity_measure_method` int(11) NOT NULL,
         `similarity_measure_threshold` double NOT NULL,
         `similarity_measure_avg_cf_threshold` int(11) NOT NULL,
@@ -194,164 +196,175 @@ CHROMOSOME_TABLE_CREATE_STATEMENT = \
     ) ENGINE=InnoDB;
     """
 
-INSERT_INTO_SAVED_POPULATION = "INSERT INTO saved_population (" \
-                               "`id`, " \
-                               "`tree_type_1`, " \
-                               "`tree_type_2`, " \
-                               "`tree_type_3`, " \
-                               "`text_type_frontpageheading`, " \
-                               "`text_type_frontpageintroduction`, " \
-                               "`text_type_articleheading`, " \
-                               "`text_type_articlebyline`, " \
-                               "`text_type_articleintroduction`, " \
-                               "`text_type_articletext`, " \
-                               "`text_amount`, " \
-                               "`top_base_clusters_amount`, " \
-                               "`min_term_occurrence_collection`, " \
-                               "`max_term_ratio_collection`, " \
-                               "`min_limit_base_cluster_score`, " \
-                               "`max_limit_base_cluster_score`, " \
-                               "`similarity_measure_method`, " \
-                               "`similarity_measure_threshold`, " \
-                               "`similarity_measure_avg_cf_threshold`, " \
-                               "`similarity_measure_cf_intersect_min`, " \
-                               "`drop_singleton_base_clusters`, " \
-                               "`drop_one_word_clusters`, " \
-                               "`fitness`" \
-                               ") VALUES ( " \
-                               "%(id)s, " \
-                               "%(tree_type_1)s, " \
-                               "%(tree_type_2)s, " \
-                               "%(tree_type_3)s, " \
-                               "%(text_type_frontpageheading)s, " \
-                               "%(text_type_frontpageintroduction)s, " \
-                               "%(text_type_articleheading)s, " \
-                               "%(text_type_articlebyline)s, " \
-                               "%(text_type_articleintroduction)s, " \
-                               "%(text_type_articletext)s, " \
-                               "%(text_amount)s, " \
-                               "%(top_base_clusters_amount)s, " \
-                               "%(min_term_occurrence_collection)s, " \
-                               "%(max_term_ratio_collection)s, " \
-                               "%(min_limit_base_cluster_score)s, " \
-                               "%(max_limit_base_cluster_score)s, " \
-                               "%(similarity_measure_method)s, " \
-                               "%(similarity_measure_threshold)s, " \
-                               "%(similarity_measure_avg_cf_threshold)s, " \
-                               "%(similarity_measure_cf_intersect_min)s, " \
-                               "%(drop_singleton_base_clusters)s, " \
-                               "%(drop_one_word_clusters)s, " \
-                               "%(fitness)s )"
+INSERT_INTO_SAVED_POPULATION = \
+    """
+    INSERT INTO saved_population (
+        `id`,
+        `tree_type_1`,
+        `tree_type_2`,
+        `tree_type_3`,
+        `text_type_frontpageheading`,
+        `text_type_frontpageintroduction`,
+        `text_type_articleheading`,
+        `text_type_articlebyline`,
+        `text_type_articleintroduction`,
+        `text_type_articletext`,
+        `text_amount`,
+        `top_base_clusters_amount`,
+        `min_term_occurrence_collection`,
+        `max_term_ratio_collection`,
+        `min_limit_base_cluster_score`,
+        `max_limit_base_cluster_score`,
+        `order_descending`,
+        `similarity_measure_method`,
+        `similarity_measure_threshold`,
+        `similarity_measure_avg_cf_threshold`,
+        `similarity_measure_cf_intersect_min`,
+        `drop_singleton_base_clusters`,
+        `drop_one_word_clusters`,
+        `fitness`"
+    ) VALUES (
+        %(id)s,
+        %(tree_type_1)s,
+        %(tree_type_2)s,
+        %(tree_type_3)s,
+        %(text_type_frontpageheading)s,
+        %(text_type_frontpageintroduction)s,
+        %(text_type_articleheading)s,
+        %(text_type_articlebyline)s,
+        %(text_type_articleintroduction)s,
+        %(text_type_articletext)s,
+        %(text_amount)s,
+        %(top_base_clusters_amount)s,
+        %(min_term_occurrence_collection)s,
+        %(max_term_ratio_collection)s,
+        %(min_limit_base_cluster_score)s,
+        %(max_limit_base_cluster_score)s,
+        %(order_descending)s,
+        %(similarity_measure_method)s,
+        %(similarity_measure_threshold)s,
+        %(similarity_measure_avg_cf_threshold)s,
+        %(similarity_measure_cf_intersect_min)s,
+        %(drop_singleton_base_clusters)s,
+        %(drop_one_word_clusters)s,
+        %(fitness)s
+    )
+    """
 
-INSERT_INTO_CHROMOSOMES = "INSERT INTO chromosomes (" \
-                          "`id`, " \
-                          "`tree_type_1`, " \
-                          "`tree_type_2`, " \
-                          "`tree_type_3`, " \
-                          "`text_type_frontpageheading`, " \
-                          "`text_type_frontpageintroduction`, " \
-                          "`text_type_articleheading`, " \
-                          "`text_type_articlebyline`, " \
-                          "`text_type_articleintroduction`, " \
-                          "`text_type_articletext`, " \
-                          "`text_amount`, " \
-                          "`top_base_clusters_amount`, " \
-                          "`min_term_occurrence_collection`, " \
-                          "`max_term_ratio_collection`, " \
-                          "`min_limit_base_cluster_score`, " \
-                          "`max_limit_base_cluster_score`, " \
-                          "`similarity_measure_method`, " \
-                          "`similarity_measure_threshold`, " \
-                          "`similarity_measure_avg_cf_threshold`, " \
-                          "`similarity_measure_cf_intersect_min`, " \
-                          "`drop_singleton_base_clusters`, " \
-                          "`drop_one_word_clusters`, " \
-                          "`fitness`, " \
-                          "`time`, " \
-                          "`number_of_clusters`, " \
-                          "`number_of_base_clusters`, " \
-                          "`precision`, " \
-                          "`recall`, " \
-                          "`fmeasure`, " \
-                          "`tag_accuracy_0`, " \
-                          "`tag_accuracy_1`, " \
-                          "`tag_accuracy_2`, " \
-                          "`tag_accuracy_3` ," \
-                          "`tag_accuracy_4`, " \
-                          "`tag_accuracy_5`, " \
-                          "`precision_0`, " \
-                          "`precision_1`, " \
-                          "`precision_2`, " \
-                          "`precision_3` ," \
-                          "`precision_4`, " \
-                          "`precision_5`, " \
-                          "`recall_0`, " \
-                          "`recall_1`, " \
-                          "`recall_2`, " \
-                          "`recall_3`, " \
-                          "`recall_4`, " \
-                          "`recall_5`, " \
-                          "`f_measure_0`, " \
-                          "`f_measure_1`, " \
-                          "`f_measure_2`, " \
-                          "`f_measure_3`, " \
-                          "`f_measure_4`, " \
-                          "`f_measure_5` " \
-                          ") VALUES ( " \
-                          "%(id)s, " \
-                          "%(tree_type_1)s, " \
-                          "%(tree_type_2)s, " \
-                          "%(tree_type_3)s, " \
-                          "%(text_type_frontpageheading)s, " \
-                          "%(text_type_frontpageintroduction)s, " \
-                          "%(text_type_articleheading)s, " \
-                          "%(text_type_articlebyline)s, " \
-                          "%(text_type_articleintroduction)s, " \
-                          "%(text_type_articletext)s, " \
-                          "%(text_amount)s, " \
-                          "%(top_base_clusters_amount)s, " \
-                          "%(min_term_occurrence_collection)s, " \
-                          "%(max_term_ratio_collection)s, " \
-                          "%(min_limit_base_cluster_score)s, " \
-                          "%(max_limit_base_cluster_score)s, " \
-                          "%(similarity_measure_method)s, " \
-                          "%(similarity_measure_threshold)s, " \
-                          "%(similarity_measure_avg_cf_threshold)s, " \
-                          "%(similarity_measure_cf_intersect_min)s, " \
-                          "%(drop_singleton_base_clusters)s, " \
-                          "%(drop_one_word_clusters)s, " \
-                          "%(fitness)s, " \
-                          "%(time)s, " \
-                          "%(number_of_clusters)s, " \
-                          "%(number_of_base_clusters)s, " \
-                          "%(precision)s, " \
-                          "%(recall)s, " \
-                          "%(fmeasure)s, " \
-                          "%(tag_accuracy_0)s, " \
-                          "%(tag_accuracy_1)s, " \
-                          "%(tag_accuracy_2)s, " \
-                          "%(tag_accuracy_3)s ," \
-                          "%(tag_accuracy_4)s, " \
-                          "%(tag_accuracy_5)s, " \
-                          "%(precision_0)s, " \
-                          "%(precision_1)s, " \
-                          "%(precision_2)s, " \
-                          "%(precision_3)s ," \
-                          "%(precision_4)s, " \
-                          "%(precision_5)s, " \
-                          "%(recall_0)s, " \
-                          "%(recall_1)s, " \
-                          "%(recall_2)s, " \
-                          "%(recall_3)s, " \
-                          "%(recall_4)s, " \
-                          "%(recall_5)s, " \
-                          "%(f_measure_0)s, " \
-                          "%(f_measure_1)s, " \
-                          "%(f_measure_2)s, " \
-                          "%(f_measure_3)s, " \
-                          "%(f_measure_4)s, " \
-                          "%(f_measure_5)s " \
-                          ") ON DUPLICATE KEY UPDATE id=id"
+INSERT_INTO_CHROMOSOMES = \
+    """
+    INSERT INTO chromosomes (
+        `id`,
+        `tree_type_1`,
+        `tree_type_2`,
+        `tree_type_3`,
+        `text_type_frontpageheading`,
+        `text_type_frontpageintroduction`,
+        `text_type_articleheading`,
+        `text_type_articlebyline`,
+        `text_type_articleintroduction`,
+        `text_type_articletext`,
+        `text_amount`,
+        `top_base_clusters_amount`,
+        `min_term_occurrence_collection`,
+        `max_term_ratio_collection`,
+        `min_limit_base_cluster_score`,
+        `max_limit_base_cluster_score`,
+        `order_descending`,
+        `similarity_measure_method`,
+        `similarity_measure_threshold`,
+        `similarity_measure_avg_cf_threshold`,
+        `similarity_measure_cf_intersect_min`,
+        `drop_singleton_base_clusters`,
+        `drop_one_word_clusters`,
+        `fitness`,
+        `time`,
+        `number_of_clusters`,
+        `number_of_base_clusters`,
+        `precision`,
+        `recall`,
+        `fmeasure`,
+        `tag_accuracy_0`,
+        `tag_accuracy_1`,
+        `tag_accuracy_2`,
+        `tag_accuracy_3`,
+        `tag_accuracy_4`,
+        `tag_accuracy_5`,
+        `precision_0`,
+        `precision_1`,
+        `precision_2`,
+        `precision_3`,
+        `precision_4`,
+        `precision_5`,
+        `recall_0`,
+        `recall_1`,
+        `recall_2`,
+        `recall_3`,
+        `recall_4`,
+        `recall_5`,
+        `f_measure_0`,
+        `f_measure_1`,
+        `f_measure_2`,
+        `f_measure_3`,
+        `f_measure_4`,
+        `f_measure_5`
+    ) VALUES (
+        %(id)s,
+        %(tree_type_1)s,
+        %(tree_type_2)s,
+        %(tree_type_3)s,
+        %(text_type_frontpageheading)s,
+        %(text_type_frontpageintroduction)s,
+        %(text_type_articleheading)s,
+        %(text_type_articlebyline)s,
+        %(text_type_articleintroduction)s,
+        %(text_type_articletext)s,
+        %(text_amount)s,
+        %(top_base_clusters_amount)s,
+        %(min_term_occurrence_collection)s,
+        %(max_term_ratio_collection)s,
+        %(min_limit_base_cluster_score)s,
+        %(max_limit_base_cluster_score)s,
+        %(order_descending)s,
+        %(similarity_measure_method)s,
+        %(similarity_measure_threshold)s,
+        %(similarity_measure_avg_cf_threshold)s,
+        %(similarity_measure_cf_intersect_min)s,
+        %(drop_singleton_base_clusters)s,
+        %(drop_one_word_clusters)s,
+        %(fitness)s,
+        %(time)s,
+        %(number_of_clusters)s,
+        %(number_of_base_clusters)s,
+        %(precision)s,
+        %(recall)s,
+        %(fmeasure)s,
+        %(tag_accuracy_0)s,
+        %(tag_accuracy_1)s,
+        %(tag_accuracy_2)s,
+        %(tag_accuracy_3)s ," \
+        %(tag_accuracy_4)s,
+        %(tag_accuracy_5)s,
+        %(precision_0)s,
+        %(precision_1)s,
+        %(precision_2)s,
+        %(precision_3)s ," \
+        %(precision_4)s,
+        %(precision_5)s,
+        %(recall_0)s,
+        %(recall_1)s,
+        %(recall_2)s,
+        %(recall_3)s,
+        %(recall_4)s,
+        %(recall_5)s,
+        %(f_measure_0)s,
+        %(f_measure_1)s,
+        %(f_measure_2)s,
+        %(f_measure_3)s,
+        %(f_measure_4)s,
+        %(f_measure_5)s
+    ) ON DUPLICATE KEY UPDATE id=id"
+    """
 
 INSERT_INTO_GENETIC_ALGORITHM = \
     """
