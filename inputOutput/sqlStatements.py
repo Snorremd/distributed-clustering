@@ -342,13 +342,13 @@ INSERT_INTO_CHROMOSOMES = \
         %(tag_accuracy_0)s,
         %(tag_accuracy_1)s,
         %(tag_accuracy_2)s,
-        %(tag_accuracy_3)s ," \
+        %(tag_accuracy_3)s,
         %(tag_accuracy_4)s,
         %(tag_accuracy_5)s,
         %(precision_0)s,
         %(precision_1)s,
         %(precision_2)s,
-        %(precision_3)s ," \
+        %(precision_3)s,
         %(precision_4)s,
         %(precision_5)s,
         %(recall_0)s,
