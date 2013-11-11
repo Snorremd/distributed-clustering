@@ -241,7 +241,6 @@ class Chromosome:
         return self.result.f_measure
 
     def get_tag_accuracies(self):
-        print(self.result)
         return self.result.tag_accuracies
 
     def get_precisions(self):

@@ -36,7 +36,6 @@ def main():
                              "ArticleIntroduction": 1,
                              "ArticleText": 1})
     result = cluster(chromosome, corpus, clusterSettings)
-    print(result)
     logger.info("Sleep to let memory clear")
 
 

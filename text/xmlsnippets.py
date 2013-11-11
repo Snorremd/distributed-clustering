@@ -41,7 +41,6 @@ def make_tag_index(snippetFilePath):
     :return; a dict on the form {source: ["tag1-tag2-tag3"], ...}
     """
     tagIndex = dict()
-    print(snippetFilePath)
     for event, element in iterparse(snippetFilePath):
         if event == 'end':
             if element.tag == 'snippet':
