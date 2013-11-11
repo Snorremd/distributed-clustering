@@ -160,6 +160,7 @@ class TaskOrganizer(Subject):
         for result in results:
             if self.task_active(result.taskId):
                 self.finish_task(result)
+                self.logger.debug(result.taskId)
         if self.tasks_finished():
             self.notify()
         self.logger.debug("{0} out of {1} tasks completed!"\
