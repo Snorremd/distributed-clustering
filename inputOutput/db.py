@@ -192,13 +192,8 @@ class DbHandler(object):
         values = []
         for chromosome in chromosomes:
             values.append(chromosome.chromosome_as_dict())
-        for chromosome in values:
-            for key, value in chromosome.items():
-                if isinstance(value, str):
-                    print("Value is string: {0}".format(value))
 
         sql = INSERT_INTO_SAVED_POPULATION
-        print(sql)
 
         con = self.__getDatabaseConnection()
         cur = con.cursor()
@@ -239,10 +234,7 @@ class DbHandler(object):
         sql = INSERT_INTO_BEST_CHROMOSOMES
         values = []
         for chromosome in chromosomes:
-            print(chromosome.id)
             values.append([generation, chromosome.id])
-
-        print(sql, values)
 
         cur.executemany(sql, values)
         con.commit()
@@ -301,7 +293,6 @@ class DbHandler(object):
             return True
         else:
             return False
-
 
 
 if __name__ == '__main__':
