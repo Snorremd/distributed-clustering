@@ -38,7 +38,7 @@ def main():
     chromosome = Chromosome(*get_parameters())
 
     # Drop singleton ground truth clusters: True, fbeta-constant: 1, store_result_details: true
-    cluster_settings = ClusterSettings(True, 1, True)
+    cluster_settings = ClusterSettings(False, 1, True)
     clusterer = CompactTrieClusterer(corpus_settings, cluster_settings)
     results = clusterer.cluster(chromosome)
     results_filepath = "results" + os.sep + "parameter-test" + str(datetime.now()) + ".txt"

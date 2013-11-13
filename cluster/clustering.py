@@ -187,7 +187,7 @@ class CompactTrieClusterer(object):
         results_string = "Exclude"
         clusters_result_strings = "Exclude"
         if self.store_result_details:
-            make_clusters_details_string(sorted_clusters, tag_index)
+            clusters_result_strings = make_clusters_details_string(sorted_clusters, tag_index)
             results_string = param_string + "\n\n" + \
                 make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
                                     no_of_clusters, len(ground_truth_clusters))
