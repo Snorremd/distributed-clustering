@@ -74,13 +74,13 @@ class SimilarityMeasurer(object):
         jaccard_similar = self.jaccard_similarity(base_cluster_1, base_cluster_2)
 
         if jaccard_similar:
-            threshold = self.params[0]
+            cosine_threshold = self.params[1]
             label_vector_1 = self.label_vector(base_cluster_1)
             label_vector_2 = self.label_vector(base_cluster_2)
             cosine_sim = scalar_product(label_vector_1, label_vector_2) / \
                 (magnitude(label_vector_1) * magnitude(label_vector_2))
 
-            return cosine_sim > threshold
+            return cosine_sim > cosine_threshold
 
         else:
             return False

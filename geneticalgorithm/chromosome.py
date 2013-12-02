@@ -366,8 +366,9 @@ def get_random_similarity_measure():
                              "params": (threshold, 0, 0)}
 
     elif type == COSINE_SIMILARITY:
+        cosine_threshold = round(uniform(0, 1), 2)
         similarity_params = {"similarity_method": 1,
-                             "params": (threshold, 0, 0)}
+                             "params": (threshold, cosine_threshold, 0)}
 
     elif type == AMENDMENT_1C_SIMILARITY:
         avg_cf_threshold = randint(5, 100)  # TODO: Find reasonable values

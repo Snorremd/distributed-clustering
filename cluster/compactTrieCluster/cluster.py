@@ -111,14 +111,18 @@ def drop_one_word_clusters(clusters):
 
     :type clusters: list
     :param clusters: cluster list to filter
+
     :rtype: list
     :return: a filtered list of clusters
     """
-    result = []
-    for cluster in clusters:
+
+    def singleton_cluster(cluster):
         if len(cluster.labels) > 1 or len(cluster.labels[0]) > 1:
-            result.append(cluster)
-    return result
+            return False
+        else:
+            return True
+
+    return [cluster for cluster in clusters if not singleton_cluster(cluster)]
 
 
 def flatten(lists):

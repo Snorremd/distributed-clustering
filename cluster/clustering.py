@@ -92,7 +92,7 @@ class CompactTrieClusterer(object):
                                           chromosome.sort_descending)
 
         if chromosome.should_drop_singleton_base_clusters:
-            drop_singleton_base_clusters(base_clusters)
+            base_clusters = drop_singleton_base_clusters(base_clusters)
 
         no_of_base_clusters = len(base_clusters)
 
@@ -275,10 +275,10 @@ def filter_snippets(snippet_collection, text_types_dict, text_amount):
     """
     filtered_collection = list()
     for textType, snippets in snippet_collection.items():
-        if text_types_dict['ArticleText']:
-            amount = int(len(snippets) / text_amount)
-            snippets = snippets[:amount-1]
         if text_types_dict[textType]:  # If text type is true, do include
+            if textType == "ArticleText":
+                amount = int(len(snippets) * text_amount) if text_amount > 0 else 0
+                snippets = snippets[:amount-1]
             filtered_collection.extend(snippets[:])
     return filtered_collection
 

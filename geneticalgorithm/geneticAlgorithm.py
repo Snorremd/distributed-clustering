@@ -76,7 +76,7 @@ class GeneticAlgorithm:
         self.logger.info("Generate initial population")
         self.generateInitialPopulation()
         self.logger.info("Add population to task organizer")
-        self.taskOrganizer.add_tasks(self.make_clustering_tasks())
+        self.taskOrganizer.add_tasks(self.make_clustering_tasks(self.population))
 
     def generateInitialPopulation(self):
         """Generates n number of initial chromosomes
@@ -92,7 +92,7 @@ class GeneticAlgorithm:
     def update(self):
         self.logger.info("Received results from task organizer")
         results = self.taskOrganizer.get_all_results()
-        self.population = []
+
         for result in results:
             self.population.append(result.chromosome)
         self.sortPopulation()
@@ -133,8 +133,8 @@ class GeneticAlgorithm:
                 "Create generation {0}"
                 .format(self.currentGeneration)
             )
-            self.generationStep()
-            self.taskOrganizer.add_tasks(self.make_clustering_tasks())
+            offspring = self.generationStep()
+            self.taskOrganizer.add_tasks(self.make_clustering_tasks(offspring))
 
     def log_generation_data(self, generationData):
         topChromosome = generationData.topChromosomes[0]
@@ -204,13 +204,14 @@ class GeneticAlgorithm:
         This method takes the population and sort it by fitness.
         The bottom half of the generation gets discarded. Then the
         algorithm mate pairs of individuals till the population size
-        match the original population size. A random number of inidividuals
-        have their chromosome randomly mutated.
+        match the original population size. A random number of child
+        chromosomes have their chromosome randomly mutated.
         """
         ##  Keep the selection rate top fraction of chromosomes
         self.population = self.population[:self.keepSize]
-        self.produceOffspring()
-        self.mutateChromosomes()
+        offspring = self.produceOffspring()
+        self.mutateChromosomes(offspring)
+        return offspring
 
     def sortPopulation(self):
         """Sort all the chromosomes in the population
@@ -234,6 +235,7 @@ class GeneticAlgorithm:
         """
         ## Make a copy of the population:
         parents = ()
+        offspring = []
         if self.selectionType == GeneticAlgorithm.ROULETTEWHEEL:
             parents = self.rouletteWheelSelection()
         # noinspection PyArgumentList
@@ -241,10 +243,10 @@ class GeneticAlgorithm:
             parent1 = parents[i]
             parent2 = parents[i + 1]
             offsprings = crossChromosomes(parent1, parent2)
-            self.population.append(offsprings[0])
-            self.population.append(offsprings[1])
+            offspring.extend([offsprings[0], offspring[1]])
             print(".", end=' ')
         print("")
+        return offspring
         ## No need to sort here as population is sorted at beginning
         ## of each generation step
 
@@ -267,6 +269,7 @@ class GeneticAlgorithm:
         ## If the selection probability list is empty, calculate probabilities:
         if len(self.selectionProbabilities) == 0:
             self.calculateRankingProbabilities()
+        ## Always include best chromosome
         parents = [self.population[0]]
         ## While the number of parents AND chromosomes to keep are less than
         ## the population size we need parents to breed new offspring. Two
@@ -309,7 +312,7 @@ class GeneticAlgorithm:
             self.selectionProbabilities.append(
                 (probability, accumulatedProbability))
 
-    def mutateChromosomes(self):
+    def mutateChromosomes(self, offspring):
         """Mutates a random gene in a random selection of chromosomes
 
         This method first calculate the number of mutations by using
@@ -318,12 +321,11 @@ class GeneticAlgorithm:
         chromosome by a random amount.
         """
         chromosomeSize = len(self.population[0].genesAsTuple())
-        noOfMutations = int(math.ceil((self.populationSize - 1)
+        noOfMutations = int(math.ceil((len(offspring) - 1)
                                       * self.mutationRate * chromosomeSize))
         for _ in range(noOfMutations):
-            randomChromosome = randint(0, self.populationSize - 1)
-            self.population[
-                randomChromosome].mutate()  # Mutates a random chromosome
+            randomChromosome = randint(0, offspring - 1)
+            offspring[randomChromosome].mutate()  # Mutates a random chromosome
 
     def calcGenerationData(self):
         """Calculate average fitness etc.
@@ -444,9 +446,9 @@ class GeneticAlgorithm:
 
         return medianChromosomes
 
-    def make_clustering_tasks(self):
+    def make_clustering_tasks(self, chromosomes):
         tasks = []
-        for chromosome in self.population:
+        for chromosome in chromosomes:
             tasks.append(CompactTrieClusteringTask(chromosome))
         return tasks
 

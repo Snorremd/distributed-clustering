@@ -145,10 +145,6 @@ def top_base_clusters(compact_trie,
     :return: top/bottom x base clusters
     """
     base_clusters = generate_base_cluster(compact_trie.root)
-    some_base_clusters = []
-    for cluster in base_clusters:
-        if len(cluster.sources) > 2:
-            some_base_clusters.append(cluster)
     no_of_sources = count_sources(compact_trie.root)
     word_sources = get_word_sources(compact_trie.root)
 
@@ -194,7 +190,9 @@ def drop_singleton_base_clusters(base_clusters):
 
     :type base_clusters: list
     :param base_clusters: a list of base clusters
+
+    :rtype list:
+    :return: filtered base clusters list
     """
-    for base_cluster in base_clusters:
-        if len(base_cluster.sources) == 1:
-            del base_cluster
+    base_clusters = [bc for bc in base_clusters if len(bc.sources) != 1]
+    return base_clusters
