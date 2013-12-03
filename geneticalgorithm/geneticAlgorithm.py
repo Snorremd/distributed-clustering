@@ -77,6 +77,7 @@ class GeneticAlgorithm:
         self.generateInitialPopulation()
         self.logger.info("Add population to task organizer")
         self.taskOrganizer.add_tasks(self.make_clustering_tasks(self.population))
+        self.population = []
 
     def generateInitialPopulation(self):
         """Generates n number of initial chromosomes
@@ -90,6 +91,10 @@ class GeneticAlgorithm:
             self.population.append(chromosome)
 
     def update(self):
+        """
+        Call this method from notify method in TaskOrganizer instance.
+        This instance is an observer of the TaskOrganizer instance.
+        """
         self.logger.info("Received results from task organizer")
         results = self.taskOrganizer.get_all_results()
 
@@ -143,7 +148,7 @@ class GeneticAlgorithm:
         outputText += "Generation {0} \n".format(self.currentGeneration)
         outputText += "_________________________________\n"
         outputText += "Top chromosome: " + str(
-            topChromosome.genesAsTuple()) + "\n"
+            topChromosome.genes_as_tuple()) + "\n"
         outputText += "Fitness: %.4f" % (topChromosome.fitness,) + "\n"
         outputText += "Precisions: %.4f, %.4f, %.4f, %.4f, %.4f, %.4f" % \
                       topChromosome.get_precisions() + "\n"
@@ -175,7 +180,7 @@ class GeneticAlgorithm:
                            self.population[i].get_precisions()[1],
                            self.population[i].get_recalls()[0],
                            self.population[i].get_recalls()[1])
-            outputText += str(self.population[i].genesAsTuple())
+            outputText += str(self.population[i].genes_as_tuple())
             outputText += "\n"
 
     def results_to_avg_file(self, generationData):
@@ -224,7 +229,7 @@ class GeneticAlgorithm:
         self.population = sorted(self.population, key=fitness_inverse)
         print("Sorted population by fitness: ")
         for individual in self.population:
-            print(individual.fitness, str(individual.genesAsTuple()))
+            print(individual.fitness, str(individual.genes_as_tuple()))
 
     def produceOffspring(self):
         """Produce new chromosomes as offspring from the previous
@@ -243,7 +248,7 @@ class GeneticAlgorithm:
             parent1 = parents[i]
             parent2 = parents[i + 1]
             offsprings = crossChromosomes(parent1, parent2)
-            offspring.extend([offsprings[0], offspring[1]])
+            offspring.extend([offsprings[0], offsprings[1]])
             print(".", end=' ')
         print("")
         return offspring
@@ -320,11 +325,11 @@ class GeneticAlgorithm:
         number of chromosomes (by index) and mutates a random gene in that
         chromosome by a random amount.
         """
-        chromosomeSize = len(self.population[0].genesAsTuple())
+        chromosomeSize = len(self.population[0].genes_as_tuple())
         noOfMutations = int(math.ceil((len(offspring) - 1)
                                       * self.mutationRate * chromosomeSize))
         for _ in range(noOfMutations):
-            randomChromosome = randint(0, offspring - 1)
+            randomChromosome = randint(0, len(offspring) - 1)
             offspring[randomChromosome].mutate()  # Mutates a random chromosome
 
     def calcGenerationData(self):

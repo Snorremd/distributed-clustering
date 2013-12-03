@@ -60,7 +60,7 @@ class CompactTrieClusterer(object):
     def cluster(self, chromosome):
 
         self.logger.info("Cluster corpus {0} with parameter set:\n{1}".format(self.corpus.name,
-                                                                              chromosome.genesAsTuple()))
+                                                                              chromosome.genes_as_tuple()))
 
         ## Various clustering settings
         tag_index = self.tag_index

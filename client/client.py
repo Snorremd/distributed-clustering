@@ -21,7 +21,7 @@ from tasks.taskExecutor import ClusteringTaskExecutor
 
 class Client(asynchat.async_chat):
     """
-    Counts the length of strings received from server
+    Client does clustering jobs.
     """
 
     def __init__(self, address, programId, username):
