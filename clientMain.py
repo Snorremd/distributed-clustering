@@ -18,8 +18,7 @@ if __name__ == '__main__':
                                 ["yes", "no"])
     if choice == "yes":
         address, port, programId, username, timeout = get_client_config()
-        client = Client((address, int(port)), programId,
-                        username)
+        client = Client((address, int(port)), programId, username, timeout)
         asyncore.loop()
     else:
         show_info_dialog("This client is intended to run on one processor core "
