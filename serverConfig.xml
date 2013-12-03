@@ -2,12 +2,12 @@
     <hostaddress>0.0.0.0</hostaddress>
     <port>9876</port>
     <programid>distributed-clustering</programid>
-    <batchsize>5</batchsize>
+    <batchsize>2</batchsize>
     <timeout>500</timeout>
-    <populationsize>500</populationsize>
+    <populationsize>20</populationsize>
     <corpus>klimauken</corpus>
     <dbhost>localhost</dbhost>
     <dbname>ctcluster</dbname>
     <dbuser>ctcluster</dbuser>
-    <dbpasswd></dbpasswd>
+    <dbpasswd>UFKWrqfa5LPz3wNm</dbpasswd>
 </serverconfig>

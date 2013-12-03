@@ -17,7 +17,7 @@ if __name__ == '__main__':
     choice = show_option_dialog("Do you want to use config file?",
                                 ["yes", "no"])
     if choice == "yes":
-        address, port, programId, username = get_client_config()
+        address, port, programId, username, timeout = get_client_config()
         client = Client((address, int(port)), programId,
                         username)
         asyncore.loop()
@@ -38,11 +38,14 @@ if __name__ == '__main__':
 
         username = show_input_dialog("Please input a wanted username: ")
 
+        timeout = show_input_dialog("Please input a timeout of at least 30 seconds (how long to"
+                                    " wait when no tasks are available): ")
+
         mainLogger = get_logger_for_stdout("Main")
         address = (hostAddress, int(port))
         client = None
         try:
-            client = Client(address, programId, username)
+            client = Client(address, programId, username, int(timeout))
             asyncore.loop()
         except socket.error:
             # Server probably busy

@@ -24,7 +24,7 @@ class Client(asynchat.async_chat):
     Client does clustering jobs.
     """
 
-    def __init__(self, address, programId, username):
+    def __init__(self, address, programId, username, timeout):
         """
         Constructor of Client class
         """
@@ -32,6 +32,7 @@ class Client(asynchat.async_chat):
 
         self.logger = get_logger_for_stdout("Client")
         self.address = address
+        self.timeout = timeout
 
         self.programId = programId
         self.username = username
@@ -109,7 +110,7 @@ class Client(asynchat.async_chat):
             elif isinstance(message, NoTasksMessage):
                 self.logger.debug("Server returned NoTasksError " + \
                                   "with reason:\n" + message.noTasksInfo)
-                sleep(10)
+                sleep(self.timeout)
                 self.send_task_request()
             elif isinstance(message, ScoreMessage):
                 self.logger.debug("Received scores")

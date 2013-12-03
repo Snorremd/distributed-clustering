@@ -1,6 +1,7 @@
 <config>
-    <address>localhost</address>
+    <address>snorre.io</address>
     <port>9876</port>
     <programid>distributed-clustering</programid>
     <username>Snorre</username>
+    <timeout>120</timeout>
 </config>
