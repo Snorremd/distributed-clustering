@@ -11,9 +11,15 @@ class BaseCluster(object):
     """
     The BaseCluster class models a base cluster.
     """
+
+    ## Id counter
+    id = 0
+
     def __init__(self):
+        self.id = BaseCluster.id
+        BaseCluster.id += 1
         self.label = []
-        self.sources = []
+        self.sources = set()
         self.size = 0.0
         self.score = 0.0
 
@@ -26,7 +32,7 @@ class BaseCluster(object):
         """
         for source in sources:
             if not source in self.sources:
-                self.sources.append(source)
+                self.sources.add(source)
                 self.size += 1.0
 
     def __str__(self):

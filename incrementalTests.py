@@ -414,15 +414,20 @@ def similarity_method(clusterer, chromosome):
 
     chromosome.similarity_measure = {"similarity_method": 0, "params": (0.5, 0, 0)}
     result = construct_result_tuple(clusterer.cluster(chromosome))
+    result_tuple = ("Etzioni",) + result
+    results.append(result_tuple)
+
+    chromosome.similarity_measure = {"similarity_method": 1, "params": (0.5, 0, 0)}
+    result = construct_result_tuple(clusterer.cluster(chromosome))
     result_tuple = ("Jaccard",) + result
     results.append(result_tuple)
 
-    chromosome.similarity_measure = {"similarity_method": 1, "params": (0.5, 0.5, 0)}
+    chromosome.similarity_measure = {"similarity_method": 2, "params": (0.5, 0.5, 0)}
     result = construct_result_tuple(clusterer.cluster(chromosome))
     result_tuple = ("Cosine",) + result
     results.append(result_tuple)
 
-    chromosome.similarity_measure = {"similarity_method": 2, "params": (0.5, 5, 1)}
+    chromosome.similarity_measure = {"similarity_method": 3, "params": (0.5, 5, 1)}
     result = construct_result_tuple(clusterer.cluster(chromosome))
     result_tuple = ("Amendment1C",) + result
     results.append(result_tuple)
@@ -435,11 +440,27 @@ def similarity_method(clusterer, chromosome):
     write_similarity_methods()
 
 
-def jaccard_similarity(clusterer, chromosome):
+def etzioni_similarity(clusterer, chromosome):
     results = []
 
     for ratio in numpy.arange(0, 1.05, 0.05):
         chromosome.similarity_measure = {"similarity_method": 0, "params": (ratio, 0, 0)}
+        result = construct_result_tuple(clusterer.cluster(chromosome))
+        result_tuple = ("{0}".format(ratio),) + result
+        results.append(result_tuple)
+
+    def write_etzioni_similarity():
+        filename = "testEtzioniSimilarity.csv"
+        header = "Threshold"
+        write_results(results, filename, header)
+
+    write_etzioni_similarity()
+
+def jaccard_similarity(clusterer, chromosome):
+    results = []
+
+    for ratio in numpy.arange(0, 1.05, 0.05):
+        chromosome.similarity_measure = {"similarity_method": 1, "params": (ratio, 0, 0)}
         result = construct_result_tuple(clusterer.cluster(chromosome))
         result_tuple = ("{0}".format(ratio),) + result
         results.append(result_tuple)
@@ -456,7 +477,7 @@ def cosine_similarity(clusterer, chromosome):
     results = []
 
     for ratio in numpy.arange(0, 1.05, 0.05):
-        chromosome.similarity_measure = {"similarity_method": 1, "params": (0.5, ratio, 0)}
+        chromosome.similarity_measure = {"similarity_method": 2, "params": (0.5, ratio, 0)}
         result = construct_result_tuple(clusterer.cluster(chromosome))
         result_tuple = ("{0}".format(ratio),) + result
         results.append(result_tuple)
@@ -474,7 +495,7 @@ def amendment1c_similarity_avg_cf(clusterer, chromosome):
 
     def results_in_range(start, stop, step):
         for limit in range(start, stop, step):
-            chromosome.similarity_measure = {"similarity_method": 2, "params": (0.5, limit, 1)}
+            chromosome.similarity_measure = {"similarity_method": 3, "params": (0.5, limit, 1)}
             result = construct_result_tuple(clusterer.cluster(chromosome))
             result_tuple = ("{0}".format(limit),) + result
             results.append(result_tuple)

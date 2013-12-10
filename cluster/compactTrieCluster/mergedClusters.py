@@ -1,3 +1,4 @@
+from heapq import heappush
 import weakref
 from easylogging.configLogger import get_logger_for_stdout
 from text.phrases import phrase_to_string
@@ -7,7 +8,7 @@ __author__ = 'snorre'
 
 class Component(object):
     def __init__(self):
-        self.base_clusters = []
+        self.base_clusters = {}  # Base clusters arranged in heap
         self.next = None
         self.previous = None
 
@@ -31,7 +32,7 @@ def generate_initial_components(base_clusters):
     x = head
     for base_cluster in base_clusters:
         new_component = Component()
-        new_component.base_clusters = [base_cluster]
+        new_component.base_clusters[base_cluster.id] = base_cluster
         new_component.previous = weakref.ref(x)
         x.next = new_component
         x = new_component
@@ -48,9 +49,9 @@ def merge(component1, component2):
     :param component2: second component
     :return: component1 with union of base clusters in component 1 and 2
     """
-    for base_cluster in component2.base_clusters:
-        if base_cluster not in component1.base_clusters:
-            component1.base_clusters.append(base_cluster)
+    for base_cluster_key in component2.base_clusters.keys():
+        if base_cluster_key not in component1.base_clusters:
+            component1.base_clusters[base_cluster_key] = component2.base_clusters[base_cluster_key]
 
 
 def merge_components(base_clusters, similarity_measurer):
@@ -85,7 +86,7 @@ def merge_components(base_clusters, similarity_measurer):
     logger.debug("Merging complete, make component list")
     component = component_index[0]
     while component is not None:
-        components.append(component.base_clusters)
+        components.append(list(component.base_clusters.values()))
         component = component.next
     return components
 

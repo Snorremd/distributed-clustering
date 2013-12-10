@@ -5,19 +5,42 @@ __author__ = 'snorre'
 
 
 class SimilarityMeasurer(object):
-    def __init__(self, parameters, corpus_size, corpus_frequencies, raw_frequencies, document_frequencies):
+    """
+    The SimilarityMeasurer class implements four different similarity measures for
+    use with the Compact Trie Clustering algorithm. These measures are used when
+    merging to components (lists of base clusters). Each measure is represented by
+    an integer which maps to a method with the similarity_methods property.
+    """
 
+    def __init__(self, parameters, corpus_size, corpus_frequencies, raw_frequencies, document_frequencies):
+        """
+        Initializer method for the SimilarityMeasurer class.
+
+        :type parameters: dict
+        :param parameters: the similarity measure parameters supplied by the chromosome
+        :type corpus_size: int
+        :param corpus_size: the size of the current corpus
+        :type corpus_frequencies: dict
+        :param corpus_frequencies: an index of each word's frequency in corpus
+        :type raw_frequencies: dict
+        :param raw_frequencies:  an index of each word's total frequency
+        :type document_frequencies: dict
+        :param document_frequencies: an index of each words frequency per document
+        """
         self.logger = get_logger_for_stdout("SimilarityMeasurer")
+
         self.corpus_size = corpus_size
         self.corpus_frequencies = corpus_frequencies
         self.document_frequencies = document_frequencies
         self.raw_frequencies = raw_frequencies
+
         self.similarity_type = parameters["similarity_method"]
         self.params = parameters["params"]
         self.similarity_methods = {
-            0: self.jaccard_similarity,
-            1: self.cosine_similarity,
-            2: self.amendment_1c
+            0: self.etzioni_similarity,
+            1: self.jaccard_similarity,
+            2: self.cosine_similarity,
+            3: self.amendment_1c
         }
 
     def similar(self, base_cluster_1, base_cluster_2):
@@ -29,16 +52,18 @@ class SimilarityMeasurer(object):
         :param base_cluster_1: first base clusters
         :type base_cluster_2: BaseCluster
         :param base_cluster_2: second base cluster
+
+        :rtype: bool
         :return: similarity given by boolean value
         """
         return self.similarity_methods[self.similarity_type](base_cluster_1, base_cluster_2)
 
     def jaccard_similarity(self, base_cluster_1, base_cluster_2):
         """
-        Calculate the jaccard coefficient between the two base clusters based on
+        Calculate the Jaccard coefficient between the two base clusters based on
          their common sources. The Jaccard coefficient is defined as
-         |a intersect b| / |a| and |a intersect b| / |b|. If both are greater than 0.5
-         the two base clusters are "jaccard similar".
+         |a intersect b| / |a union b|. If the similarity is greater than 0.5
+         the two base clusters are "etzioni similar".
 
         :type base_cluster_1: BaseCluster
         :param base_cluster_1: first base clusters
@@ -49,15 +74,33 @@ class SimilarityMeasurer(object):
         :return: similarity given by boolean value
         """
         threshold = self.params[0]
-        common = []
-        for source in base_cluster_1.sources:
-            if source in base_cluster_2.sources:
-                common.append(source)
+        common = base_cluster_1.sources.intersection(base_cluster_2.sources)
+        union_length = len(base_cluster_1.sources.union(base_cluster_2.sources))
         size_overlap = float(len(common))  # Make sure result is not rounded
-        jaccard1 = size_overlap / base_cluster_1.size
-        jaccard2 = size_overlap / base_cluster_2.size
+        return size_overlap / union_length > threshold
 
-        return jaccard1 > threshold and jaccard2 > threshold
+    def etzioni_similarity(self, base_cluster_1, base_cluster_2):
+        """
+        Calculate the etzioni similarity between the two base clusters based on
+         their common sources. The etzioni similarity is defined as
+         |a intersect b| / |a| and |a intersect b| / |b|. If both are greater than 0.5
+         the two base clusters are "etzioni similar".
+
+        :type base_cluster_1: BaseCluster
+        :param base_cluster_1: first base clusters
+        :type base_cluster_2: BaseCluster
+        :param base_cluster_2: second base cluster
+
+        :rtype: bool
+        :return: similarity given by boolean value
+        """
+        threshold = self.params[0]
+        common = base_cluster_1.sources.intersection(base_cluster_2.sources)
+        size_overlap = float(len(common))  # Make sure result is not rounded
+        overlap_1 = size_overlap / base_cluster_1.size
+        overlap_2 = size_overlap / base_cluster_2.size
+
+        return overlap_1 > threshold and overlap_2 > threshold
 
     def cosine_similarity(self, base_cluster_1, base_cluster_2):
         """

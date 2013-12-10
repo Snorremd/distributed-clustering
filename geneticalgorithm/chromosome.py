@@ -29,9 +29,10 @@ RANGE_SLICE = 2
 N_SLICE = 3
 
 ## Constants for similarity types
-JACCARD_SIMILARITY = 0
-COSINE_SIMILARITY = 1
-AMENDMENT_1C_SIMILARITY = 2
+ETZIONI_SIMILARITY = 0
+JACCARD_SIMILARITY = 1
+COSINE_SIMILARITY = 2
+AMENDMENT_1C_SIMILARITY = 3
 
 
 class Chromosome:
@@ -276,9 +277,11 @@ class Chromosome:
 
     def mutate_similarity_measure(self):
 
-        similarity_measure = randint(0, 2)
+        similarity_measure = randint(0, 3)
 
-        if similarity_measure == JACCARD_SIMILARITY:
+        if similarity_measure == ETZIONI_SIMILARITY:
+            self.mutate_etzioni_similarity()
+        elif similarity_measure == JACCARD_SIMILARITY:
             self.mutate_jaccard_similarity()
         elif similarity_measure == COSINE_SIMILARITY:
             self.mutate_cosine_similarity()
@@ -295,6 +298,17 @@ class Chromosome:
 
         self.similarity_measure["params"] = (new_threshold, params[1], params[2])
         self.similarity_measure["similarity_method"] = 0
+
+    def mutate_jaccard_similarity(self):
+        params = self.similarity_measure["params"]
+        new_threshold = params[0] + round(uniform(-.1, .1), 2)
+        if new_threshold > 1:
+            new_threshold = 1
+        elif new_threshold < 0:
+            new_threshold = 0
+
+        self.similarity_measure["params"] = (new_threshold, params[1], params[2])
+        self.similarity_measure["similarity_method"] = 1
 
     def mutate_cosine_similarity(self):
         params = self.similarity_measure["params"]
@@ -323,7 +337,7 @@ class Chromosome:
         else:
             new_threshold = params[0]
 
-        self.similarity_measure["similarity_method"] = 1
+        self.similarity_measure["similarity_method"] = 2
         self.similarity_measure["params"] = (new_threshold, new_cosine, params[2])
 
     def mutate_amendment_1c_similarity(self):
@@ -334,6 +348,8 @@ class Chromosome:
             self.mutate_existing_amendment_1c(params, rand_param)
         else:
             self.similarity_measure = random_amendment_1c()
+
+        self.similarity_measure["similarity_method"] = 3
 
     def mutate_existing_amendment_1c(self, params, rand_param):
         if rand_param == 0:
@@ -574,10 +590,12 @@ def get_random_similarity_measure():
     similarity_params = {}
     threshold = round(uniform(0, 1), 2)
 
-    if type == JACCARD_SIMILARITY:
-        similarity_params = {"similarity_method": 0,
+    if type == ETZIONI_SIMILARITY:
+        similarity_params = {"similarity_method": ETZIONI_SIMILARITY,
                              "params": (threshold, 0, 0)}
-
+    elif type == JACCARD_SIMILARITY:
+        similarity_params = {"similarity_method": JACCARD_SIMILARITY,
+                             "params": (threshold, 0, 0)}
     elif type == COSINE_SIMILARITY:
         cosine_threshold = round(uniform(0, 1), 2)
         similarity_params = {"similarity_method": 1,
@@ -590,7 +608,7 @@ def get_random_similarity_measure():
 
 
 def random_amendment_1c():
-    avg_cf_threshold = randint(5, 500)  # TODO: Find reasonable values
+    avg_cf_threshold = randint(5, 500)
     cf_intersect_min = randint(0, 50)
     similarity_params = {"similarity_method": 2,
                          "params": (0.5, avg_cf_threshold, cf_intersect_min)}
