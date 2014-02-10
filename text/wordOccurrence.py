@@ -19,10 +19,10 @@ def collect_sources(compactTrie):
     :param compactTrie: compact trie node to collect sources from
     :return: source dictionary
     """
-    sources = compactTrie.sources.copy()
+    sources = compactTrie.sources[:]
 
     for subtree in compactTrie.subtrees.values():
-        for source in subtree.sources.copy():
+        for source in subtree.sources[:]:
             if not source in sources:
                 sources.append(source)
     return sources
