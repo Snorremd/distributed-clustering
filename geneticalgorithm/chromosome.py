@@ -288,7 +288,7 @@ class Chromosome:
         elif similarity_measure == AMENDMENT_1C_SIMILARITY:
             self.mutate_amendment_1c_similarity()
 
-    def mutate_jaccard_similarity(self):
+    def mutate_etzioni_similarity(self):
         params = self.similarity_measure["params"]
         new_threshold = params[0] + round(uniform(-.1, .1), 2)
         if new_threshold > 1:

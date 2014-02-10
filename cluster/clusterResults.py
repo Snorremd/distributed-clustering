@@ -175,6 +175,7 @@ def calc_f_measure(ground_truth, ground_truth_rep, f_beta_constant):
     :return:
     """
     f_measure_results = []
+    accumulated = 0
     for i in range(len(ground_truth)):
         precision = ground_truth[i][2]  # Get precision fraction
         recall = ground_truth_rep[i][2]  # Get recall fraction
@@ -187,7 +188,9 @@ def calc_f_measure(ground_truth, ground_truth_rep, f_beta_constant):
             f_measure = (1 + math.pow(f_beta_constant, 2)) * (
                 numerator / denominator)
 
-        f_measure_results.append((ground_truth[i][0], f_measure))
+        accumulated += f_measure
+
+        f_measure_results.append((5 - ground_truth[i][0], f_measure, accumulated))
     return f_measure_results
 
 

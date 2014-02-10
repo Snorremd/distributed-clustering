@@ -28,7 +28,7 @@ if __name__ == '__main__':
                                 ["y", "n"])
     if choice == "y":
         hostAddress, port, programId, batchSize,\
-            timeout, populationSize, corpusName,\
+            timeout, populationSize, max_generations, corpusName,\
             dbhost, dbname, dbuser, dbpasswd = get_server_config()
 
     else:
@@ -50,6 +50,8 @@ if __name__ == '__main__':
                                     "size): ")
 
         populationSize = show_input_dialog("Please specify a population size: ")
+
+        max_generations = show_input_dialog("Please specify the max number of generations: ")
 
         corpusName = show_input_dialog("Specify one of the following corpora:",
                                    get_corpus_options())
@@ -90,7 +92,7 @@ if __name__ == '__main__':
 
         taskOrganizer = TaskOrganizer(int(timeout), [])
         gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
-                                      corpus, int(populationSize), 100,
+                                      corpus, int(populationSize), int(max_generations),
                                       GeneticAlgorithm.ROULETTEWHEEL,
                                       0.5, 0.01, geneticAlgorithm.VERBOSEFILE)
 

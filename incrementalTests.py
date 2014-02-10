@@ -66,7 +66,7 @@ def tupleValuesToStringList(result_tuple):
 
 
 def write_results(resultTuples, filename, header):
-    csvFile = open("." + os.sep + "results" + os.sep + "incrementaletzionibase" + os.sep + filename, "w")
+    csvFile = open("." + os.sep + "results" + os.sep + "incrementalrichardbase" + os.sep + filename, "w")
     csvFile.write(header + TABLE_HEADERS + "\n")
 
     for resultTuple in resultTuples:
@@ -160,11 +160,11 @@ def number_base_clusters(clusterer, chromosome):
             result_tuple = ("{0}".format(number),) + result
             results.append(result_tuple)
 
-    results_in_range(100, 550, 50)
-    results_in_range(600, 1100, 100)
-    results_in_range(1250, 250, 5250)
-    results_in_range(5500, 10500, 500)
-    results_in_range(11000, 18000, 1000)
+    #results_in_range(100, 550, 50)
+    #results_in_range(600, 1100, 100)
+    results_in_range(1250, 5250, 250)
+    #results_in_range(5500, 10500, 500)
+    #results_in_range(11000, 18000, 1000)
 
     def write_base_cluster_amounts():
         filename = "testBaseClusterAmounts.csv"
@@ -548,25 +548,26 @@ def main():
     ## Copy chromosome and change specific parameter to test iteratively
     chromosome = Chromosome(*get_parameters())
 
-    tree_types(clusterer, deepcopy(chromosome))
-    n_slices(clusterer, deepcopy(chromosome))
-    range_slices(clusterer, deepcopy(chromosome))
-    number_base_clusters(clusterer, deepcopy(chromosome))
-    min_term_occurrence(clusterer, deepcopy(chromosome))
-    max_term_ratio(clusterer, deepcopy(chromosome))
-    min_limit_base_cluster(clusterer, deepcopy(chromosome))
-    max_limit_base_cluster(clusterer, deepcopy(chromosome))
-    max_limit_base_cluster_2(clusterer, deepcopy(chromosome))
-    drop_singleton_base_clusters(clusterer, deepcopy(chromosome))
-    drop_one_word_clusters(clusterer, deepcopy(chromosome))
-    sort_descending(clusterer, deepcopy(chromosome))
-    article_text_amount(clusterer, deepcopy(chromosome))
-    text_types(clusterer, deepcopy(chromosome))
-    similarity_method(clusterer, deepcopy(chromosome))
-    jaccard_similarity(clusterer, deepcopy(chromosome))
-    cosine_similarity(clusterer, deepcopy(chromosome))
-    amendment1c_similarity_avg_cf(clusterer, deepcopy(chromosome))
-    amendment1c_similarity_intersect_limit(clusterer, deepcopy(chromosome))
+    # tree_types(clusterer, deepcopy(chromosome))
+    # n_slices(clusterer, deepcopy(chromosome))
+    # range_slices(clusterer, deepcopy(chromosome))
+    #number_base_clusters(clusterer, deepcopy(chromosome))
+    # min_term_occurrence(clusterer, deepcopy(chromosome))
+    # max_term_ratio(clusterer, deepcopy(chromosome))
+    # min_limit_base_cluster(clusterer, deepcopy(chromosome))
+    # max_limit_base_cluster(clusterer, deepcopy(chromosome))
+    # max_limit_base_cluster_2(clusterer, deepcopy(chromosome))
+    # drop_singleton_base_clusters(clusterer, deepcopy(chromosome))
+    # drop_one_word_clusters(clusterer, deepcopy(chromosome))
+    # sort_descending(clusterer, deepcopy(chromosome))
+    # article_text_amount(clusterer, deepcopy(chromosome))
+    # text_types(clusterer, deepcopy(chromosome))
+    # similarity_method(clusterer, deepcopy(chromosome))
+    etzioni_similarity(clusterer, deepcopy(chromosome))
+    # jaccard_similarity(clusterer, deepcopy(chromosome))
+    # cosine_similarity(clusterer, deepcopy(chromosome))
+    # amendment1c_similarity_avg_cf(clusterer, deepcopy(chromosome))
+    # amendment1c_similarity_intersect_limit(clusterer, deepcopy(chromosome))
 
 
 

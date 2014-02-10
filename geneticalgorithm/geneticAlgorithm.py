@@ -40,7 +40,7 @@ class GeneticAlgorithm:
     ROULETTEWHEEL = 0
 
     def __init__(self, taskOrganizer, dbHandler, corpus, populationSize,
-                 noOfGenerations, selectionType, selectionRate, mutationRate,
+                 maxNumOfGenerations, selectionType, selectionRate, mutationRate,
                  gaVerbosity):
         """Constructor of the GeneticAlgorithm class
 
@@ -60,7 +60,7 @@ class GeneticAlgorithm:
         self.taskOrganizer.attach(self)  # Get notified when tasks done
         self.gaVerbosity = gaVerbosity
         self.populationSize = populationSize
-        self.noOfGenerations = noOfGenerations
+        self.maxNumOfGenerations = maxNumOfGenerations
         self.selectionType = selectionType
         self.selectionRate = selectionRate
         self.keepSize = int(2 * math.ceil(self.populationSize *
@@ -69,6 +69,9 @@ class GeneticAlgorithm:
         self.population = []
         self.selectionProbabilities = []
         self.currentGeneration = 0
+
+        self.convergence_count = 0
+        self.highest_fitness = 0
 
         self.clusterSettings = ClusterSettings(True, 1.0, False)
         self.corpus = corpus
@@ -132,7 +135,14 @@ class GeneticAlgorithm:
         self.dbHandler.create_saved_population_table()
         self.dbHandler.insert_chromosomes_saved_population(self.population)
 
-        if self.currentGeneration < self.noOfGenerations:
+        highest_fitness = generationData.topChromosomes[0].fitness
+        if highest_fitness == self.highest_fitness:
+            self.convergence_count += 1
+        elif highest_fitness < self.highest_fitness:
+            self.convergence_count = 0
+            self.highest_fitness = highest_fitness
+
+        if self.currentGeneration < self.maxNumOfGenerations and self.convergence_count < 10:
             self.currentGeneration += 1
             self.logger.info(
                 "Create generation {0}"

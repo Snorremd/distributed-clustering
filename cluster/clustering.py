@@ -190,7 +190,7 @@ class CompactTrieClusterer(object):
             clusters_result_strings = make_clusters_details_string(sorted_clusters, tag_index)
             results_string = param_string + "\n\n" + \
                 make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
-                                    no_of_clusters, len(ground_truth_clusters))
+                                    f_measures, no_of_clusters, len(ground_truth_clusters))
 
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
                                 no_of_clusters, len(self.ground_truth_clusters),
@@ -301,6 +301,7 @@ def random_snippets(snippets, amount):
 def make_results_string(resultsTagAccuracy,
                         resultsGroundTruth,
                         resultsGroundTruthRep,
+                        resultsFMeasure,
                         noOfClusters,
                         noOfGTClusters):
     tagAccuracy = "Tag Accuracy:\n"
@@ -330,11 +331,28 @@ def make_results_string(resultsTagAccuracy,
                                 "\t\t%.3f" % (fraction) + "\t " + \
                                 "%.3f" % (accumulated) + "\n"
 
-    return tagAccuracy + "\n" + groundTruthString + "\n" + groundTruthRepString
+
+    fMeasureString = "F-Measure:\n"
+    fMeasureString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
+    fMeasureString += "----------------------------------------------------\n"
+    for (i, f_measure, accumulated) in resultsFMeasure:
+        fMeasureString += str(i) + "\t\t%.3f" % (f_measure) + "\t" + "%.3f" % (accumulated) + "\n"
+
+    return tagAccuracy + "\n" + groundTruthString + "\n" + groundTruthRepString + "\n" + fMeasureString
 
 
 def make_clusters_details_string(sorted_clusters, tag_index):
+    """
+    Create a string representation of the clustering results.
 
+    :type sorted_clusters: list
+    :param sorted_clusters: a list of sorted clusters
+    :type tag_index: dict
+    :param tag_index: the tag index of tags mapped to documents
+
+    :rtype: str
+    :return: a clusters details string
+    """
     sorted_clusters_result_strings = []
     for cluster in sorted_clusters:
         cluster_string = \
@@ -359,6 +377,15 @@ def make_clusters_details_string(sorted_clusters, tag_index):
 
 
 def make_parameter_string(chromosome):
+    """
+    Make a string representation of the parameter set.
+
+    :type chromosome: Chromosome
+    :param chromosome: the chromosome containing the parameters
+
+    :rtype: str
+    :return: the parameters string
+    """
     param_string = "###################################\n" \
                    "Parameter set for clustering:\n\n"
 
@@ -407,15 +434,17 @@ def make_parameter_string(chromosome):
 
     similarity_measure = "Similarity measure: "
     if chromosome.similarity_measure["similarity_method"] == 0:
-        similarity_measure = "Jaccard similarity, threshold: {0}".format(chromosome.similarity_measure["params"][0])
+        similarity_measure += "Etzioni similarity, threshold: {0}".format(chromosome.similarity_measure["params"][0])
     elif chromosome.similarity_measure["similarity_method"] == 1:
-        similarity_measure = "Jaccard similarity, threshold: {0}\n"
+        similarity_measure += "Jaccard similarity, threshold: {0}".format(chromosome.similarity_measure["params"][0])
+    elif chromosome.similarity_measure["similarity_method"] == 2:
+        similarity_measure += "Jaccard similarity, threshold: {0}\n"
         similarity_measure += "Cosine similarity, cos-threshold {1}"
-        similarity_measure.format(chromosome.similarity_measure["params"][0],
+        similarity_measure = similarity_measure.format(chromosome.similarity_measure["params"][0],
                                   chromosome.similarity_measure["params"][1]
                                   )
-    elif chromosome.similarity_measure["similarity_method"] == 2:
-        similarity_measure = "Jaccard Similarity, Threshold: {0}\n".format(chromosome.similarity_measure["params"][0])
+    elif chromosome.similarity_measure["similarity_method"] == 3:
+        similarity_measure += "Jaccard Similarity, Threshold: {0}\n".format(chromosome.similarity_measure["params"][0])
         similarity_measure += \
             "Amendment 1d Similarity, max corpus frequency avg = {0}, min label intersect = {1}".format(
                 chromosome.similarity_measure["params"][1], chromosome.similarity_measure["params"][2]
