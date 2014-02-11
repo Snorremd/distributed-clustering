@@ -142,7 +142,7 @@ class GeneticAlgorithm:
             self.convergence_count = 0
             self.highest_fitness = highest_fitness
 
-        if self.currentGeneration < self.maxNumOfGenerations and self.convergence_count < 10:
+        if not (self.currentGeneration > self.maxNumOfGenerations or self.convergence_count > 10):
             self.currentGeneration += 1
             self.logger.info(
                 "Create generation {0}"
