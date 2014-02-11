@@ -17,9 +17,8 @@ if __name__ == '__main__':
     choice = show_option_dialog("Do you want to use config file?",
                                 ["yes", "no"])
     if choice == "yes":
-        address, port, programId, username, timeout = get_client_config()
-        client = Client((address, int(port)), programId, username, int(timeout))
-        asyncore.loop()
+        hostAddress, port, programId, username, timeout = get_client_config()
+
     else:
         show_info_dialog("This client is intended to run on one processor core "
                          "and calculates results from clustering documents given "
@@ -40,22 +39,30 @@ if __name__ == '__main__':
         timeout = show_input_dialog("Please input a timeout of at least 30 seconds (how long to"
                                     " wait when no tasks are available): ")
 
-        mainLogger = get_logger_for_stdout("Main")
-        address = (hostAddress, int(port))
-        client = None
+
+    mainLogger = get_logger_for_stdout("Main")
+    address = (hostAddress, int(port))
+    client = None
+    connected = False
+
+    try:
+        while True:
+            if not connected:
+                try:
+                    client = Client(address, programId, username, int(timeout), connected)
+                    asyncore.loop()
+                except socket.error:
+                    # Server probably busy
+                    connected = False
+                    mainLogger.debug("Could not connect to server with address {0} and "
+                                     "port {1}. Please restart script"
+                                     .format(hostAddress, port))
+            sleep(300)  # Sleep for five minutes and try again
+    except KeyboardInterrupt:
         try:
-            client = Client(address, programId, username, int(timeout))
-            asyncore.loop()
-        except socket.error:
-            # Server probably busy
-            mainLogger.debug("Could not connect to server with address {0} and "
-                             "port {1}. Please restart script"
-                             .format(hostAddress, port))
+            if client:
+                mainLogger.debug("Attempting to disconnect from server.\n" +
+                                 "Press ctrl + C again to force close script.")
+                client.disconnect("User cancelled script")
         except KeyboardInterrupt:
-            try:
-                if client:
-                    mainLogger.debug("Attempting to disconnect from server.\n" +
-                                     "Press ctrl + C again to force close script.")
-                    client.disconnect("User cancelled script")
-            except KeyboardInterrupt:
-                sys.exit(0)
+            sys.exit(0)

@@ -24,11 +24,13 @@ class Client(asynchat.async_chat):
     Client does clustering jobs.
     """
 
-    def __init__(self, address, programId, username, timeout):
+    def __init__(self, address, programId, username, timeout, connected):
         """
         Constructor of Client class
         """
         asynchat.async_chat.__init__(self)
+
+        self.connected = connected
 
         self.logger = get_logger_for_stdout("Client")
         self.address = address
@@ -40,9 +42,13 @@ class Client(asynchat.async_chat):
         self.receivedData = []
         self.noOfCompletedTasks = 0
 
-        self.create_socket(socket.AF_INET, socket.SOCK_STREAM)  # IPv4, TCP
-        self.logger.debug('Connecting to %s, %s' % address)
-        self.connect(address)
+        try:
+            self.create_socket(socket.AF_INET, socket.SOCK_STREAM)  # IPv4, TCP
+            self.logger.debug('Connecting to %s, %s' % address)
+
+            self.connect(address)
+        except ConnectionRefusedError:
+            raise
         return
 
     def handle_connect(self):
@@ -50,6 +56,7 @@ class Client(asynchat.async_chat):
         Push command to server to authenticate
         """
         self.logger.debug("Connected to server, push authentication data")
+        self.connected = True
         authMessage = AuthenticationMessage("Connecting", self.programId,
                                             self.username)
         self.send_message(authMessage)
@@ -62,6 +69,7 @@ class Client(asynchat.async_chat):
                           " try to restart clientMain script...".format(
                           *self.address))
         self.close()
+        self.connected = False
         return
 
     def handle_expt(self):
