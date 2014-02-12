@@ -118,9 +118,15 @@ class Chromosome:
         """
 
         self.result = compact_trie_clusterer.cluster(self)
-        fMeasure0 = self.result.f_measures[0]
-        fMeasure1 = self.result.f_measures[1]
-        self.fitness = fMeasure0 + fMeasure1
+        precision0 = self.result.precisions[0]
+        recall0 = self.result.recalls[0]
+        ## If number of clusters twice as many as ground truth clusters, subtract 0.2 from fitness.
+        ## If number thrice as high, subtract 0.3 and so forth.
+        clusterRatio = (self.result.no_of_clusters / self.result.no_of_gt_clusters) / 10
+
+        #fMeasure0 = self.result.f_measures[0]
+        #fMeasure1 = self.result.f_measures[1]
+        self.fitness = (precision0 + recall0 * 0.5) - clusterRatio  # fMeasure0 + fMeasure1
 
     def mutate(self):
         """
