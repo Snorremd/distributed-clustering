@@ -122,6 +122,7 @@ class Chromosome:
         recall0 = self.result.recalls[0]
         ## If number of clusters twice as many as ground truth clusters, subtract 0.2 from fitness.
         ## If number thrice as high, subtract 0.3 and so forth.
+        print("NUMBER OF GROUND TRUTH CLUSTERS: " + str(self.result.no_of_gt_clusters))
         cluster_ratio = (self.result.no_of_clusters / self.result.no_of_gt_clusters)
         if 0.8 <= cluster_ratio <= 3:
             ratio_modifier = 0.1

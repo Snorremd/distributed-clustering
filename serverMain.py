@@ -5,6 +5,7 @@ import asyncore
 import os
 import sys
 from xml.etree import ElementTree as ET
+from cluster.clusterSettings import ClusterSettings
 
 from easylogging.configLogger import get_logger_for_stdout
 from inputOutput.db import DbHandler
@@ -27,7 +28,7 @@ if __name__ == '__main__':
     choice = show_option_dialog("Do you want to use config file?",
                                 ["y", "n"])
     if choice == "y":
-        hostAddress, port, programId, batchSize,\
+        hostAddress, port, programId, batchSize, drop_singleton_gt,\
             timeout, populationSize, max_generations, corpusName,\
             dbhost, dbname, dbuser, dbpasswd = get_server_config()
 
@@ -44,6 +45,8 @@ if __name__ == '__main__':
         batchSize = show_input_dialog("Please specify a batch size (should "
                                       "preferably take no more than 60 seconds to"
                                       " complete): ")
+
+        drop_singleton_gt = show_option_dialog("Should we drop singleton ground truth clusters?", ["True", "False"])
 
         timeout = show_input_dialog("Specify task timeout in seconds (make this a"
                                     " multiple of task completion time and batch "
@@ -88,13 +91,14 @@ if __name__ == '__main__':
 
         corpus = get_corpus_settings(corpusName)
 
-
+        cluster_settings = ClusterSettings(eval(drop_singleton_gt), 1.0, False)
 
         taskOrganizer = TaskOrganizer(int(timeout), [])
         gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
                                       corpus, int(populationSize), int(max_generations),
                                       GeneticAlgorithm.ROULETTEWHEEL,
-                                      0.5, 0.02, geneticAlgorithm.VERBOSEFILE)
+                                      0.5, 0.02, geneticAlgorithm.VERBOSEFILE,
+                                      cluster_settings)
 
         ## Start server and asyncore loop
         server = Server((hostAddress, int(port)), programId, int(timeout),

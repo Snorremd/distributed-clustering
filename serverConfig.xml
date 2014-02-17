@@ -3,6 +3,7 @@
     <port>9875</port>
     <programid>distributed-clustering</programid>
     <batchsize>2</batchsize>
+    <dropsingletongt>False</dropsingletongt> <!-- True or False -->
     <timeout>500</timeout>
     <populationsize>200</populationsize>
     <maxgenerations>100</maxgenerations>

@@ -41,7 +41,7 @@ class GeneticAlgorithm:
 
     def __init__(self, taskOrganizer, dbHandler, corpus, populationSize,
                  maxNumOfGenerations, selectionType, selectionRate, mutationRate,
-                 gaVerbosity):
+                 gaVerbosity, cluster_settings):
         """Constructor of the GeneticAlgorithm class
 
         Args:
@@ -73,7 +73,7 @@ class GeneticAlgorithm:
         self.convergence_count = 0
         self.highest_fitness = 0
 
-        self.clusterSettings = ClusterSettings(True, 1.0, False)
+        self.clusterSettings = cluster_settings
         self.corpus = corpus
 
         self.logger.info("Generate initial population")
