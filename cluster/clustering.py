@@ -129,8 +129,8 @@ class CompactTrieClusterer(object):
         no_of_clusters = len(clusters)
         if no_of_clusters == 0:
             return ClusterResult(
-                no_of_clusters, no_of_base_clusters, len(self.ground_truth_clusters),
-                0, 0.0, 0.0, 0.0,
+                0, no_of_clusters, no_of_base_clusters, len(self.ground_truth_clusters),
+                 0.0, 0.0, 0.0,
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
