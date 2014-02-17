@@ -1,6 +1,6 @@
 <config>
-    <address>localhost</address>
-    <port>9875</port>
+    <address>snorre.io</address>
+    <port>9876</port>
     <programid>distributed-clustering</programid>
     <username>snorre-mac</username>
     <timeout>120</timeout>
