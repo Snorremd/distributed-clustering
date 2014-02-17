@@ -192,7 +192,7 @@ class CompactTrieClusterer(object):
                 make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
                                     f_measures, no_of_clusters, len(ground_truth_clusters))
 
-        print("CHECK THE LENGTH SHOULD BE LONG!" + str(len(self.ground_truth_clusters)))
+        print("Length of ground truth should match 669" + str(len(self.ground_truth_clusters)))
 
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
                                 no_of_clusters, len(self.ground_truth_clusters),
