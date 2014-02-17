@@ -68,7 +68,7 @@ class CompactTrieClusterer(object):
 
         ## If text types are empty (no text to be included) return empty result
         if not is_nonempty_text_types(chromosome.text_types):
-            return empty_result()
+            return empty_result(len(self.ground_truth_clusters))
 
         ## Filter snippet collection based on text types
         snippet_collection = filter_snippets(self.snippet_collection,
@@ -251,14 +251,14 @@ def is_nonempty_text_types(text_types_dict):
     return nonempty
 
 
-def empty_result():
+def empty_result(num_gt_clusters):
     """
     Convenience method for empty result
     :rtype: tuple
     :return: empty result set
     """
     return ClusterResult(
-        0, 0, 0, 0, .0, .0, .0,
+        0, 0, 0, num_gt_clusters, .0, .0, .0,
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
         (.0, .0, .0, .0, .0, .0),
