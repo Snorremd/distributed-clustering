@@ -99,6 +99,8 @@ class CompactTrieClusterer(object):
         if no_of_base_clusters < 2:
             self.logger.info("Can not merge one or fewer base clusters."
                              "Assume score of zero")
+            if len(self.ground_truth_clusters) == 0:
+                print("if no_of_base_clusters < 2:")
             return ClusterResult(
                 0, no_of_base_clusters, 0, len(self.ground_truth_clusters),
                 0.0, 0.0, 0.0,
@@ -128,9 +130,11 @@ class CompactTrieClusterer(object):
 
         no_of_clusters = len(clusters)
         if no_of_clusters == 0:
+            if len(self.ground_truth_clusters) == 0:
+                print("if no_of_clusters == 0:")
             return ClusterResult(
                 0, no_of_clusters, no_of_base_clusters, len(self.ground_truth_clusters),
-                 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0,
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
@@ -192,10 +196,11 @@ class CompactTrieClusterer(object):
                 make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
                                     f_measures, no_of_clusters, len(ground_truth_clusters))
 
-        print("Length of ground truth should match 669" + str(len(self.ground_truth_clusters)))
 
+        if len(ground_truth_clusters) == 0:
+            print("calculate_results")
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
-                                no_of_clusters, len(self.ground_truth_clusters),
+                                no_of_clusters, len(ground_truth_clusters),
                                 precision, recall, f_measure,
                                 tag_accuracy_tuple, ground_truth_tuple,
                                 ground_truth_represented_tuple,
