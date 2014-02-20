@@ -9,6 +9,6 @@
     <should_drop_singleton_base_clusters>0</should_drop_singleton_base_clusters>
     <should_drop_one_word_clusters>0</should_drop_one_word_clusters>
     <text_amount>0</text_amount>
-    <text_types>{"FrontPageIntroduction": 0, "FrontPageHeading": 0, "ArticleHeading": 0, "ArticleByline": 0, "ArticleIntroduction": 0, "ArticleText": 0}</text_types>
+    <text_types>{"FrontPageIntroduction": 1, "FrontPageHeading": 1, "ArticleHeading": 1, "ArticleByline": 1, "ArticleIntroduction": 1, "ArticleText": 0}</text_types>
     <similarity_measure>{"similarity_method": 0, "params": (0.5, 0, 0)}</similarity_measure>
 </parameters>
