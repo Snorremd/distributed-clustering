@@ -99,15 +99,16 @@ class CompactTrieClusterer(object):
         if no_of_base_clusters < 2:
             self.logger.info("Can not merge one or fewer base clusters."
                              "Assume score of zero")
-            if len(self.ground_truth_clusters) == 0:
-                print("if no_of_base_clusters < 2:")
-            return ClusterResult(
+
+            results = ClusterResult(
                 0, no_of_base_clusters, 0, len(self.ground_truth_clusters),
                 0.0, 0.0, 0.0,
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0), "empty", "empty")
+
+            print("no of base < 2 " + str(results))
 
         ## Helper object that measures similarity between base clusters
         similarity_measurer = SimilarityMeasurer(chromosome.similarity_measure,
@@ -132,13 +133,15 @@ class CompactTrieClusterer(object):
         if no_of_clusters == 0:
             if len(self.ground_truth_clusters) == 0:
                 print("if no_of_clusters == 0:")
-            return ClusterResult(
+            results = ClusterResult(
                 0, no_of_clusters, no_of_base_clusters, len(self.ground_truth_clusters),
                 0.0, 0.0, 0.0,
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0),
                 (.0, .0, .0, .0, .0, .0), "empty", "empty")
+            print("if no of clusters == 0" + str(results))
+            return results
 
         self.logger.info("Calculate results")
         return self.calculate_results(clusters, ground_truth_clusters,
@@ -196,9 +199,6 @@ class CompactTrieClusterer(object):
                 make_results_string(tag_accuracy, ground_truths, ground_truth_represented,
                                     f_measures, no_of_clusters, len(ground_truth_clusters))
 
-
-        if len(ground_truth_clusters) == 0:
-            print("calculate_results")
         results = ClusterResult(time_to_cluster, no_of_base_clusters,
                                 no_of_clusters, len(ground_truth_clusters),
                                 precision, recall, f_measure,
@@ -206,6 +206,7 @@ class CompactTrieClusterer(object):
                                 ground_truth_represented_tuple,
                                 f_measure_tuple, results_string, clusters_result_strings)
 
+        print(str(results))
         return results
 
 

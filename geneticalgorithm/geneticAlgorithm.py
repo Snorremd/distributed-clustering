@@ -225,13 +225,11 @@ class GeneticAlgorithm:
         ##  Keep the selection rate top fraction of chromosomes
         self.population = self.population[:self.keepSize]
         offspring = self.produceOffspring()
-        for individual in offspring:
-            self.population.append(individual)
+        chromosomes_to_mutate = []
+        chromosomes_to_mutate.extend(self.population)
+        chromosomes_to_mutate.extend(offspring)
 
-        mutated = set(self.mutateChromosomes())
-        mutatedAndOffspring = set(offspring)
-
-        return list(mutatedAndOffspring.union(mutated))
+        return self.mutateChromosomes(chromosomes_to_mutate)
 
     def sortPopulation(self):
         """Sort all the chromosomes in the population
@@ -332,7 +330,7 @@ class GeneticAlgorithm:
             self.selectionProbabilities.append(
                 (probability, accumulatedProbability))
 
-    def mutateChromosomes(self):
+    def mutateChromosomes(self, chromosomes):
         """Mutates a random gene in a random selection of chromosomes
 
         This method first calculate the number of mutations by using
@@ -341,13 +339,14 @@ class GeneticAlgorithm:
         chromosome by a random amount.
         """
         chromosomeSize = len(self.population[0].genes_as_tuple())
-        noOfMutations = int(math.ceil((len(self.chromosomes) - 1)
+        noOfMutations = int(math.ceil((len(chromosomes) - 1)
                                       * self.mutationRate * chromosomeSize))
         mutated_chromosomes = []
         for _ in range(noOfMutations):
             randomChromosome = randint(0, len(self.population) - 1)
-            chromosome = self.population[randomChromosome]  # Selects a random chromosome
-            self.population.remove(chromosome)
+            chromosome = chromosomes[randomChromosome]  # Selects a random chromosome
+            if chromosome in self.population:
+                self.population.remove(chromosome)
             chromosome.mutate()
             mutated_chromosomes.append(chromosome)
 
@@ -389,7 +388,9 @@ class GeneticAlgorithm:
 
     def calc_average_num_time(self):
         avgTime, noOfClusters, noBaseClusters = 0.0, 0.0, 0.0
+        print(str(self.population))
         for chromosome in self.population:
+            print("Chromosome: " + str(chromosome))
             numTime = chromosome.get_time_number_clusters()
             avgTime += numTime[0]
             noOfClusters += numTime[1]
