@@ -138,7 +138,7 @@ class GeneticAlgorithm:
         highest_fitness = generationData.topChromosomes[0].fitness
         if highest_fitness == self.highest_fitness:
             self.convergence_count += 1
-        elif highest_fitness < self.highest_fitness:
+        elif highest_fitness > self.highest_fitness:
             self.convergence_count = 0
             self.highest_fitness = highest_fitness
 
@@ -148,8 +148,8 @@ class GeneticAlgorithm:
                 "Create generation {0}"
                 .format(self.currentGeneration)
             )
-            offspring = self.generationStep()
-            self.taskOrganizer.add_tasks(self.make_clustering_tasks(offspring))
+            offspring_and_mutated = self.generationStep()
+            self.taskOrganizer.add_tasks(self.make_clustering_tasks(offspring_and_mutated))
 
     def log_generation_data(self, generationData):
         topChromosome = generationData.topChromosomes[0]
@@ -225,8 +225,13 @@ class GeneticAlgorithm:
         ##  Keep the selection rate top fraction of chromosomes
         self.population = self.population[:self.keepSize]
         offspring = self.produceOffspring()
-        self.mutateChromosomes(offspring)
-        return offspring
+        for individual in offspring:
+            self.population.append(individual)
+
+        mutated = set(self.mutateChromosomes())
+        mutatedAndOffspring = set(offspring)
+
+        return list(mutatedAndOffspring.union(mutated))
 
     def sortPopulation(self):
         """Sort all the chromosomes in the population
@@ -327,7 +332,7 @@ class GeneticAlgorithm:
             self.selectionProbabilities.append(
                 (probability, accumulatedProbability))
 
-    def mutateChromosomes(self, offspring):
+    def mutateChromosomes(self):
         """Mutates a random gene in a random selection of chromosomes
 
         This method first calculate the number of mutations by using
@@ -336,11 +341,18 @@ class GeneticAlgorithm:
         chromosome by a random amount.
         """
         chromosomeSize = len(self.population[0].genes_as_tuple())
-        noOfMutations = int(math.ceil((len(offspring) - 1)
+        noOfMutations = int(math.ceil((len(self.chromosomes) - 1)
                                       * self.mutationRate * chromosomeSize))
+        mutated_chromosomes = []
         for _ in range(noOfMutations):
-            randomChromosome = randint(0, len(offspring) - 1)
-            offspring[randomChromosome].mutate()  # Mutates a random chromosome
+            randomChromosome = randint(0, len(self.population) - 1)
+            chromosome = self.population[randomChromosome]  # Selects a random chromosome
+            self.population.remove(chromosome)
+            chromosome.mutate()
+            mutated_chromosomes.append(chromosome)
+
+        return mutated_chromosomes
+
 
     def calcGenerationData(self):
         """Calculate average fitness etc.

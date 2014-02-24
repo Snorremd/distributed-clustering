@@ -306,9 +306,9 @@ def calc_overall_fmeasure(ground_truth_clusters,
             recall = intersection_length / float(len(sources))
 
             f_measure = 0.0
-            f_beta_constant = math.pow(f_beta_constant, 2)
-            f_measure_num = (f_beta_constant + 1) * precision * recall
-            f_measure_den = (f_beta_constant * precision) + recall
+            f_beta_constant_pow = math.pow(f_beta_constant, 2)
+            f_measure_num = (f_beta_constant_pow + 1) * precision * recall
+            f_measure_den = (f_beta_constant_pow * precision) + recall
 
             if not f_measure_den == 0:
                 f_measure = f_measure_num / f_measure_den

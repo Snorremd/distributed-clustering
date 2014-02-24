@@ -91,13 +91,13 @@ if __name__ == '__main__':
 
         corpus = get_corpus_settings(corpusName)
 
-        cluster_settings = ClusterSettings(eval(drop_singleton_gt), 1.0, False)
+        cluster_settings = ClusterSettings(eval(drop_singleton_gt), 2.0, False)
 
         taskOrganizer = TaskOrganizer(int(timeout), [])
         gAlgorithm = GeneticAlgorithm(taskOrganizer, dbHandler,
                                       corpus, int(populationSize), int(max_generations),
                                       GeneticAlgorithm.ROULETTEWHEEL,
-                                      0.5, 0.02, geneticAlgorithm.VERBOSEFILE,
+                                      0.8, 0.01, geneticAlgorithm.VERBOSEFILE,
                                       cluster_settings)
 
         ## Start server and asyncore loop
