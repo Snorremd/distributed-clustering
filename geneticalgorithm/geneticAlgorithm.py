@@ -136,9 +136,9 @@ class GeneticAlgorithm:
         self.dbHandler.insert_chromosomes_saved_population(self.population)
 
         highest_fitness = generationData.topChromosomes[0].fitness
-        if highest_fitness == self.highest_fitness:
+        if highest_fitness <= self.highest_fitness:
             self.convergence_count += 1
-        elif highest_fitness < self.highest_fitness:
+        elif highest_fitness > self.highest_fitness:
             self.convergence_count = 0
             self.highest_fitness = highest_fitness
 

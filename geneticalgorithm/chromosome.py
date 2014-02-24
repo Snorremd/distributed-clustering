@@ -134,7 +134,7 @@ class Chromosome:
 
         #fMeasure0 = self.result.f_measures[0]
         #fMeasure1 = self.result.f_measures[1]
-        self.fitness = (precision0 + recall0)/2 + ratio_modifier  # fMeasure0 + fMeasure1
+        self.fitness = self.result.f_measures[0] + ratio_modifier  # fMeasure0 + fMeasure1
 
     def mutate(self):
         """
