@@ -148,8 +148,8 @@ class GeneticAlgorithm:
                 "Create generation {0}"
                 .format(self.currentGeneration)
             )
-            offspring = self.generationStep()
-            self.taskOrganizer.add_tasks(self.make_clustering_tasks(offspring))
+            changed = self.generationStep()
+            self.taskOrganizer.add_tasks(self.make_clustering_tasks(changed))
 
     def log_generation_data(self, generationData):
         topChromosome = generationData.topChromosomes[0]
@@ -225,8 +225,8 @@ class GeneticAlgorithm:
         ##  Keep the selection rate top fraction of chromosomes
         self.population = self.population[:self.keepSize]
         offspring = self.produceOffspring()
-        self.mutateChromosomes(offspring)
-        return offspring
+        changed = self.mutateChromosomes(offspring)
+        return offspring + changed
 
     def sortPopulation(self):
         """Sort all the chromosomes in the population
@@ -341,6 +341,20 @@ class GeneticAlgorithm:
         for _ in range(noOfMutations):
             randomChromosome = randint(0, len(offspring) - 1)
             offspring[randomChromosome].mutate()  # Mutates a random chromosome
+
+        noOfMutations = int(math.ceil((len(self.population) - 1)
+                                      * self.mutationRate * chromosomeSize))
+
+        changed = []
+        for _ in range(noOfMutations):
+            randomChromosome = self.population[randint(0, len(self.population) - 1)]
+            for chromosome in self.population:
+                if chromosome.id == randomChromosome.id:
+                    self.population.remove(chromosome)
+            randomChromosome.mutate()
+            changed.append(randomChromosome)
+
+        return changed
 
     def calcGenerationData(self):
         """Calculate average fitness etc.
