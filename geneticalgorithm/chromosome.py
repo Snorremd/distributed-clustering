@@ -612,7 +612,7 @@ def get_random_similarity_measure():
                              "params": (threshold, 0, 0)}
     elif type == COSINE_SIMILARITY:
         cosine_threshold = round(uniform(0, 1), 2)
-        similarity_params = {"similarity_method": 1,
+        similarity_params = {"similarity_method": COSINE_SIMILARITY,
                              "params": (threshold, cosine_threshold, 0)}
 
     elif type == AMENDMENT_1C_SIMILARITY:
@@ -624,7 +624,7 @@ def get_random_similarity_measure():
 def random_amendment_1c():
     avg_cf_threshold = randint(5, 500)
     cf_intersect_min = randint(0, 50)
-    similarity_params = {"similarity_method": 2,
+    similarity_params = {"similarity_method": AMENDMENT_1C_SIMILARITY,
                          "params": (0.5, avg_cf_threshold, cf_intersect_min)}
     return similarity_params
 

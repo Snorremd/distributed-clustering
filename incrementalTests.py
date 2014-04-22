@@ -11,12 +11,12 @@ from inputOutput.output import show_info_dialog, show_option_dialog
 __author__ = 'snorre'
 
 TABLE_HEADERS = ";Time;No. Clusters;No. Base Clusters;Precision;Recall;F-Measure;" + \
-                "Ground Truth 0;Ground Truth 1;" + \
-                "Ground Truth 2;Ground Truth 3;Ground Truth 4;" + \
-                "Ground Truth 5;Ground Truth Rep 0;Ground Truth Rep 1;" + \
-                "Ground Truth Rep 2;Ground Truth Rep 3;Ground Truth Rep 4;" + \
-                "Ground Truth Rep 5;fMeasure 0;fMeasure 1;fMeasure 2;fMeasure 3;" + \
-                "fMeasure 4;fMeasure 5"
+                "Precision 0;Precision 1;" + \
+                "Precision 2;Precision 3;Precision 4;" + \
+                "Precision 5;Recall 0;Recall 1;" + \
+                "Recall 2;Recall 3;Recall 4;" + \
+                "Recall 5;F-Measure 0;F-Measure 1;F-Measure 2;F-Measure 3;" + \
+                "F-Measure 4;F-Measure 5"
 
 
 def find_corpus_settings():
@@ -66,7 +66,7 @@ def tupleValuesToStringList(result_tuple):
 
 
 def write_results(resultTuples, filename, header):
-    csvFile = open("." + os.sep + "results" + os.sep + "incrementalrichardbase" + os.sep + filename, "w")
+    csvFile = open("." + os.sep + "results" + os.sep + "incrementalrichardbase2" + os.sep + filename, "w")
     csvFile.write(header + TABLE_HEADERS + "\n")
 
     for resultTuple in resultTuples:
@@ -548,28 +548,26 @@ def main():
     ## Copy chromosome and change specific parameter to test iteratively
     chromosome = Chromosome(*get_parameters())
 
-    # tree_types(clusterer, deepcopy(chromosome))
-    # n_slices(clusterer, deepcopy(chromosome))
-    # range_slices(clusterer, deepcopy(chromosome))
-    #number_base_clusters(clusterer, deepcopy(chromosome))
-    # min_term_occurrence(clusterer, deepcopy(chromosome))
-    # max_term_ratio(clusterer, deepcopy(chromosome))
-    # min_limit_base_cluster(clusterer, deepcopy(chromosome))
-    # max_limit_base_cluster(clusterer, deepcopy(chromosome))
-    # max_limit_base_cluster_2(clusterer, deepcopy(chromosome))
-    # drop_singleton_base_clusters(clusterer, deepcopy(chromosome))
-    # drop_one_word_clusters(clusterer, deepcopy(chromosome))
-    # sort_descending(clusterer, deepcopy(chromosome))
-    # article_text_amount(clusterer, deepcopy(chromosome))
-    # text_types(clusterer, deepcopy(chromosome))
-    # similarity_method(clusterer, deepcopy(chromosome))
+    tree_types(clusterer, deepcopy(chromosome))
+    n_slices(clusterer, deepcopy(chromosome))
+    range_slices(clusterer, deepcopy(chromosome))
+    number_base_clusters(clusterer, deepcopy(chromosome))
+    min_term_occurrence(clusterer, deepcopy(chromosome))
+    max_term_ratio(clusterer, deepcopy(chromosome))
+    min_limit_base_cluster(clusterer, deepcopy(chromosome))
+    max_limit_base_cluster(clusterer, deepcopy(chromosome))
+    max_limit_base_cluster_2(clusterer, deepcopy(chromosome))
+    drop_singleton_base_clusters(clusterer, deepcopy(chromosome))
+    drop_one_word_clusters(clusterer, deepcopy(chromosome))
+    sort_descending(clusterer, deepcopy(chromosome))
+    article_text_amount(clusterer, deepcopy(chromosome))
+    text_types(clusterer, deepcopy(chromosome))
+    similarity_method(clusterer, deepcopy(chromosome))
     etzioni_similarity(clusterer, deepcopy(chromosome))
-    # jaccard_similarity(clusterer, deepcopy(chromosome))
-    # cosine_similarity(clusterer, deepcopy(chromosome))
-    # amendment1c_similarity_avg_cf(clusterer, deepcopy(chromosome))
-    # amendment1c_similarity_intersect_limit(clusterer, deepcopy(chromosome))
-
-
+    jaccard_similarity(clusterer, deepcopy(chromosome))
+    cosine_similarity(clusterer, deepcopy(chromosome))
+    amendment1c_similarity_avg_cf(clusterer, deepcopy(chromosome))
+    amendment1c_similarity_intersect_limit(clusterer, deepcopy(chromosome))
 
 
 if __name__ == "__main__":

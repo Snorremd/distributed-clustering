@@ -315,35 +315,35 @@ def make_results_string(resultsTagAccuracy,
     tagAccuracy += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
     tagAccuracy += "----------------------------------------------------\n"
     for (i, countMatch, fraction, accumulated) in resultsTagAccuracy:
-        tagAccuracy += str(i) + "\t %2i" % (countMatch) + "/" + \
+        tagAccuracy += str(i) + "& \t %2i" % (countMatch) + "/" + \
                        str(noOfClusters) + \
-                       "\t\t%.3f" % (fraction) + "\t " + \
-                       "%.3f" % (accumulated) + "\n"
+                       "& \t\t%.3f" % (fraction) + " &\t " + \
+                       "%.3f" % (accumulated) + "\\\ \n"
 
     groundTruthString = "Ground truth:\n"
     groundTruthString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
     groundTruthString += "----------------------------------------------------\n"
     for (i, countMatch, fraction, accumulated) in resultsGroundTruth:
-        groundTruthString += str(i) + "\t %2i" % (countMatch) + "/" + \
+        groundTruthString += "precision - " + str(i) + "& \t %2i" % (countMatch) + "/" + \
                              str(noOfClusters) + \
-                             "\t\t%.3f" % (fraction) + "\t " + \
-                             "%.3f" % (accumulated) + "\n"
+                             "&\t\t%.3f" % (fraction) + "&\t " + \
+                             "%.3f" % (accumulated) + "\\\ \n"
 
     groundTruthRepString = "Ground truth represented:\n"
     groundTruthRepString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
     groundTruthRepString += "----------------------------------------------------\n"
     for (i, countMatch, fraction, accumulated) in resultsGroundTruthRep:
-        groundTruthRepString += str(i) + "\t %2i" % (countMatch) + "/" + \
+        groundTruthRepString += "recall - " + str(i) + "& \t %2i" % (countMatch) + "/" + \
                                 str(noOfGTClusters) + \
-                                "\t\t%.3f" % (fraction) + "\t " + \
-                                "%.3f" % (accumulated) + "\n"
+                                "&\t\t%.3f" % (fraction) + "&\t " + \
+                                "%.3f" % (accumulated) + "\\\ \n"
 
 
     fMeasureString = "F-Measure:\n"
     fMeasureString += "Overlap - Number/NoClusters - Fraction - Accumulated\n"
     fMeasureString += "----------------------------------------------------\n"
     for (i, f_measure, accumulated) in resultsFMeasure:
-        fMeasureString += str(i) + "\t\t%.3f" % (f_measure) + "\t" + "%.3f" % (accumulated) + "\n"
+        fMeasureString += "F-Measure - " + str(i) + "&\t\t%.3f" % (f_measure) + "\\\ \n"  # + "%.3f" % (accumulated) + "\n"
 
     return tagAccuracy + "\n" + groundTruthString + "\n" + groundTruthRepString + "\n" + fMeasureString
 

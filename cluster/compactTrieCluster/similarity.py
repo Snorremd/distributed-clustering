@@ -104,7 +104,9 @@ class SimilarityMeasurer(object):
 
     def cosine_similarity(self, base_cluster_1, base_cluster_2):
         """
-        Calculate the cosine similarity between two base clusters.
+        Calculate the similarity of two base clusters.
+        Two base clusters are similar if they are etzioni similar,
+        and they have a cosine similarity greater than some threshold.
 
         :type base_cluster_1: BaseCluster
         :param base_cluster_1: first base clusters
@@ -114,9 +116,9 @@ class SimilarityMeasurer(object):
         :rtype: bool
         :return: similarity given by boolean value
         """
-        jaccard_similar = self.jaccard_similarity(base_cluster_1, base_cluster_2)
+        etzioni_similar = self.etzioni_similarity(base_cluster_1, base_cluster_2)
 
-        if jaccard_similar:
+        if etzioni_similar:
             cosine_threshold = self.params[1]
             label_vector_1 = self.label_vector(base_cluster_1)
             label_vector_2 = self.label_vector(base_cluster_2)
@@ -193,7 +195,7 @@ class SimilarityMeasurer(object):
         Original author: Richard Elling Moe
 
         Calculate the similarity between two base clusters given
-        their jaccard similarity in addition to two additional metrics.
+        their etzioni similarity in addition to two additional metrics.
 
         The first is the average corpus frequency for the labels in the union
         of labels in base cluster 1 and base cluster 2. The average frequency
@@ -211,9 +213,9 @@ class SimilarityMeasurer(object):
         :rtype: bool
         :return: similarity given by boolean value
         """
-        jaccard_similar = self.jaccard_similarity(base_cluster_1, base_cluster_2)
+        etzioni_similar = self.etzioni_similarity(base_cluster_1, base_cluster_2)
 
-        if jaccard_similar:
+        if etzioni_similar:
             label_intersection = []
             label_union = base_cluster_1.label
             for word in base_cluster_2.label:

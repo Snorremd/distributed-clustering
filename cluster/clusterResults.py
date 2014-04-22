@@ -190,7 +190,7 @@ def calc_f_measure(ground_truth, ground_truth_rep, f_beta_constant):
 
         accumulated += f_measure
 
-        f_measure_results.append((5 - ground_truth[i][0], f_measure, accumulated))
+        f_measure_results.append((ground_truth[i][0], f_measure, accumulated))
     return f_measure_results
 
 
