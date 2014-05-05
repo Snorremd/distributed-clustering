@@ -1,6 +1,11 @@
 # distributed-clustering
 
-A project implementing a distributed form of clustering for the compact trie clustering algorithm.
+A project implementing a distributed optimization algorithm for the compact trie clustering algorithm.
+
+## Authors
+Snorre Magnus Davøen (implementation of optimization framework, and Python 3 version of Compact Trie Clustering algorithm).
+
+The Compact Trie Clustering algorithm is largely based on an implementation done by Richard Elling Moe, but ported to Python 3 and modified to work with an optimization algorithm.
 
 ## General description
 The project consists of three main parts: a corpus processor, a server and a client. The corpus processor
@@ -16,7 +21,7 @@ implements the compact trie clustering algorithm itself.
 ### Client
 
 ## Dependencies
- * Python 2.7 - The code has been coded to work with Python 2.7. Older versions are untested. Python 3 is not supported.
+ * Python 3 - The code has been coded to work with Python 3. A Python 2 version is not available.
  * LXML - The lxml library is an alternative to the xml package. If not included in your Python distribution it can be
           installed by using pip install lxml (if you do not have pip, see http://lxml.de/installation.html).
 
@@ -24,7 +29,7 @@ implements the compact trie clustering algorithm itself.
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Snorre Magnus Davøen
+Copyright (c) 2014 Snorre Magnus Davøen, Richard Elling Moe
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
