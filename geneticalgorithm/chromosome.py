@@ -633,7 +633,7 @@ def get_random_sort_descending():
     return randint(0, 1)
 
 
-def genesTupleToChromosome(geneTuple):
+def genes_tuple_to_chromosome(geneTuple):
     """
     Takes a tuple of genes and transforms it to a chromosome
     :param geneTuple:
@@ -663,5 +663,5 @@ def crossChromosomes(chromosome1, chromosome2):
     genes12 = genes1[0:crossOverPoint] + genes2[crossOverPoint:len(genes2)]
     genes21 = genes2[0:crossOverPoint] + genes1[crossOverPoint:len(genes1)]
 
-    return [genesTupleToChromosome(genes12),
-            genesTupleToChromosome(genes21)]
+    return [genes_tuple_to_chromosome(genes12),
+            genes_tuple_to_chromosome(genes21)]

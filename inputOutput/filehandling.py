@@ -125,6 +125,7 @@ def write_to_file(file_path, some_string):
     """
     file = open(get_root_path() + os.sep + file_path, "w", encoding="utf8")
     file.write(some_string)
+    file.close()
 
 
 def append_to_file(file_path, some_string):

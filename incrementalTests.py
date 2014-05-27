@@ -160,11 +160,11 @@ def number_base_clusters(clusterer, chromosome):
             result_tuple = ("{0}".format(number),) + result
             results.append(result_tuple)
 
-    #results_in_range(100, 550, 50)
-    #results_in_range(600, 1100, 100)
+    results_in_range(100, 550, 50)
+    results_in_range(600, 1100, 100)
     results_in_range(1250, 5250, 250)
-    #results_in_range(5500, 10500, 500)
-    #results_in_range(11000, 18000, 1000)
+    results_in_range(5500, 10500, 500)
+    results_in_range(11000, 18000, 1000)
 
     def write_base_cluster_amounts():
         filename = "testBaseClusterAmounts.csv"

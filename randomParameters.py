@@ -94,7 +94,7 @@ if __name__ == "__main__":
         clusterer = CompactTrieClusterer(corpus_settings, cluster_settings)
         results = clusterer.cluster(chromosome)
 
-        results_filepath = "results" + os.sep + "randomized" + os.sep + "random" + str(i) + ".txt"
+        results_filepath = "results" + os.sep + "randomized2" + os.sep + "random" + str(i) + ".txt"
         write_to_file(results_filepath, results.results_string)
         detailed_results = "\n________________________________\n".join(results.clusters_result_strings)
         append_to_file(results_filepath, detailed_results)
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     results_string += average_string("tag-accuracy", results_avg.precisions)
     results_string += average_string("precision", results_avg.tag_accuracies)
     results_string += average_string("recall", results_avg.recalls)
-    results_string += average_string("precision", results_avg.f_measures)
+    results_string += average_string("f-measure", results_avg.f_measures)
 
-    results_file_path = "results" + os.sep + "randomized" + os.sep + "average.txt"
+    results_file_path = "results" + os.sep + "randomized2" + os.sep + "average.txt"
     write_to_file(results_file_path, results_string)
